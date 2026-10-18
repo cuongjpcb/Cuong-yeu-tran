@@ -1,2539 +1,1043 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flappy Bé Xinh - Siêu Cấp Đáng Yêu</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Quicksand & Mali for cute Vietnamese typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #e0e7ff 100%);
-            height: 100dvh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .font-cute {
-            font-family: 'Mali', cursive;
-        }
-        #game-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            height: 100dvh;
-            max-height: 880px;
-            box-shadow: 0 20px 50px rgba(236, 72, 153, 0.28);
-            overflow: hidden;
-            background: #fff;
-        }
-        @media (min-width: 500px) {
-            #game-wrapper {
-                height: 94dvh;
-                border-radius: 28px;
-                border: 6px solid #ffffff;
-            }
-        }
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            touch-action: none;
-        }
-        .btn-cute {
-            background: linear-gradient(180deg, #ff7eb3 0%, #ff4d8d 100%);
-            box-shadow: 0 5px 0 #c9185b, 0 8px 16px rgba(255, 77, 141, 0.35);
-            transition: all 0.12s ease;
-        }
-        .btn-cute:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 0 #c9185b, 0 10px 20px rgba(255, 77, 141, 0.45);
-        }
-        .btn-cute:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #c9185b, 0 4px 8px rgba(255, 77, 141, 0.3);
-        }
-        .btn-secondary-cute {
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
-            box-shadow: 0 4px 0 #1d4ed8, 0 6px 14px rgba(59, 130, 246, 0.3);
-            transition: all 0.12s ease;
-        }
-        .btn-secondary-cute:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #1d4ed8;
-        }
-        .btn-amber-cute {
-            background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
-            box-shadow: 0 4px 0 #b45309, 0 6px 14px rgba(245, 158, 11, 0.3);
-            transition: all 0.12s ease;
-        }
-        .btn-amber-cute:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #b45309;
-        }
-        .btn-purple-cute {
-            background: linear-gradient(180deg, #a855f7 0%, #7e22ce 100%);
-            box-shadow: 0 4px 0 #581c87, 0 6px 14px rgba(147, 51, 234, 0.3);
-            transition: all 0.12s ease;
-        }
-        .btn-purple-cute:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #581c87;
-        }
-        @keyframes floatSlow {
-            0%, 100% { transform: translateY(0px) rotate(-1deg); }
-            50% { transform: translateY(-6px) rotate(1deg); }
-        }
-        .animate-float {
-            animation: floatSlow 2.8s ease-in-out infinite;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 3px solid #fbcfe8;
-        }
-        .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #fdf2f8;
-            border-radius: 8px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #f472b6;
-            border-radius: 8px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Kaia 3D Online - RPG & Fishing</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;font-family:'Segoe UI',sans-serif}
+body{background:#0f172a;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+/* Màn hình đăng nhập */
+#login-screen{position:fixed;inset:0;background:radial-gradient(circle at center,#1e3a8a,#0f172a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+.logo-box{background:linear-gradient(135deg,#f59e0b,#d97706);border:3px solid #fff;border-radius:16px;padding:12px 26px;box-shadow:0 8px 25px rgba(245,158,11,0.5);margin-bottom:16px;text-align:center}
+.logo-box h1{font-size:22px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.login-panel{background:rgba(255,255,255,0.95);border:3px solid #3b82f6;border-radius:16px;padding:18px;width:92%;max-width:350px;color:#1e293b;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
+.login-panel input,.login-panel select{width:100%;padding:10px;margin:5px 0;border:2px solid #cbd5e1;border-radius:8px;font-size:14px;background:#fff;color:#0f172a}
+.btn{padding:9px 12px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 3px 0 rgba(0,0,0,0.3);transition:0.1s;font-size:12px}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn-green{background:#10b981}.btn-orange{background:#f59e0b}.btn-blue{background:#3b82f6}.btn-red{background:#ef4444}.btn-purple{background:#8b5cf6}
+/* HUD trên cùng */
+#hud{background:#1e293b;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #334155;font-size:12px;z-index:20}
+.stat-bar{display:flex;gap:8px;align-items:center;background:#0f172a;padding:4px 10px;border-radius:16px;border:1px solid #334155}
+/* Thanh điều hướng */
+#nav{display:flex;background:#0f172a;padding:5px;gap:5px;border-bottom:1px solid #1e293b;z-index:20}
+.nav-btn{flex:1;padding:7px 4px;font-size:11px;border-radius:6px;background:#1e293b;color:#94a3b8;border:1px solid #334155;font-weight:bold;cursor:pointer}
+.nav-btn.active{background:#2563eb;color:#fff;border-color:#60a5fa}
+/* Khung 3D Viewport */
+#game-wrap{flex:1;position:relative;overflow:hidden}
+#canvas3d{width:100%;height:100%;display:block}
+#labels-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.label3d{position:absolute;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;font-size:11px;text-shadow:0 1px 3px #000}
+.chat-bubble{background:#fff;color:#000;padding:3px 8px;border-radius:10px;font-weight:bold;margin-bottom:3px;display:inline-block;border:1px solid #333;text-shadow:none}
+.hp-mini{width:54px;height:6px;background:#333;border-radius:3px;overflow:hidden;margin:2px auto;border:1px solid #000}
+.hp-mini-fill{height:100%;background:#ef4444;transition:width 0.2s}
+/* Giao diện nổi theo từng Khu */
+.ui-overlay{position:absolute;inset:0;pointer-events:none;display:none;flex-direction:column;justify-content:space-between;padding:8px;z-index:10}
+.ui-overlay.active{display:flex}
+.pointer-auto{pointer-events:auto}
+/* Boss Banner */
+#boss-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(127,29,29,0.9);border:2px solid #f87171;padding:5px 14px;border-radius:20px;font-size:11px;z-index:15;text-align:center;box-shadow:0 0 12px rgba(239,68,68,0.6)}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
+.modal.open{display:flex}
+.modal-card{background:#1e293b;color:#f8fafc;border:2px solid #475569;border-radius:14px;width:100%;max-width:410px;max-height:84vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{background:#0f172a;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;border-bottom:1px solid #334155}
+.modal-body{padding:12px;overflow-y:auto;flex:1}
+.item-row{display:flex;justify-content:space-between;align-items:center;background:#0f172a;padding:8px 10px;border-radius:8px;margin-bottom:6px;border:1px solid #334155}
+/* Độ hiếm */
+.r-0{color:#94a3b8;font-weight:bold}.r-1{color:#4ade80;font-weight:bold}.r-2{color:#38bdf8;font-weight:bold}.r-3{color:#c084fc;font-weight:bold}.r-4{color:#fbbf24;font-weight:bold;text-shadow:0 0 6px #f59e0b}
+#toast{position:fixed;top:55px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);border:1px solid #3b82f6;color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;z-index:200;display:none}
+/* Thanh câu cá */
+#tension-box{width:260px;height:24px;background:#0f172a;border:2px solid #fff;border-radius:12px;position:relative;overflow:hidden;display:none;margin:0 auto 10px auto}
+#tension-zone{position:absolute;left:35%;width:30%;top:0;bottom:0;background:rgba(16,185,129,0.75)}
+#tension-bar{position:absolute;left:10%;width:8px;top:0;bottom:0;background:#fbbf24}
+</style>
 </head>
 <body>
 
-    <!-- Hidden File Input for Custom Photo Upload -->
-    <input type="file" id="face-upload-input" accept="image/*" class="hidden">
+<div id="toast"></div>
 
-    <!-- Main Game Container -->
-    <div id="game-wrapper">
-        <!-- Game Canvas -->
-        <canvas id="game-canvas"></canvas>
-
-        <!-- TOP HUD BAR -->
-        <div class="absolute top-2.5 left-2.5 right-2.5 flex flex-col gap-1.5 pointer-events-none z-20">
-            <!-- Row 1: User Profile Badge, Coins, High Score & Sound -->
-            <div class="flex items-center justify-between gap-1">
-                <!-- Left: User Account Pill & Admin Button -->
-                <div class="flex items-center gap-1.5 pointer-events-auto">
-                    <button id="open-auth-btn" class="bg-white/95 hover:bg-pink-50 text-pink-700 font-bold text-xs px-2.5 py-1.5 rounded-2xl shadow-md border-2 border-pink-300 flex items-center gap-1.5 transition active:scale-95">
-                        <i class="fa-solid fa-circle-user text-pink-500 text-sm"></i>
-                        <span id="hud-username" class="max-w-[90px] truncate">Khách</span>
-                    </button>
-                    <button id="open-admin-btn" class="hidden bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-xs px-2.5 py-1.5 rounded-2xl shadow-md border-2 border-white flex items-center gap-1 transition active:scale-95 animate-pulse">
-                        <i class="fa-solid fa-crown"></i>
-                        <span>Admin</span>
-                    </button>
-                </div>
-
-                <!-- Right: Xu (Coins), Best Score & Sound -->
-                <div class="flex items-center gap-1.5 pointer-events-auto">
-                    <!-- Coins Badge -->
-                    <button id="hud-coin-btn" class="bg-white/95 hover:bg-amber-50 px-2.5 py-1.5 rounded-2xl shadow-md border-2 border-amber-300 flex items-center gap-1 transition active:scale-95" title="Mở Cửa Hàng">
-                        <span class="text-xs">🪙</span>
-                        <span id="hud-coins" class="text-xs font-extrabold text-amber-600">0</span>
-                    </button>
-
-                    <!-- High Score Badge -->
-                    <button id="hud-rank-btn" class="bg-white/95 hover:bg-pink-50 px-2.5 py-1.5 rounded-2xl shadow-md border-2 border-pink-300 flex items-center gap-1 transition active:scale-95" title="Bảng Xếp Hạng">
-                        <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
-                        <span id="hud-best-score" class="text-xs font-extrabold text-pink-600">0</span>
-                    </button>
-
-                    <!-- Sound Toggle -->
-                    <button id="sound-toggle-btn" title="Bật/Tắt âm thanh"
-                        class="bg-white/95 hover:bg-pink-50 text-pink-600 w-8 h-8 rounded-2xl shadow-md border-2 border-pink-300 flex items-center justify-center transition active:scale-95">
-                        <i id="sound-icon" class="fa-solid fa-volume-high text-xs"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Row 2: Quick Action Bar (Change Face Photo, Shop, Leaderboard) -->
-            <div id="top-sub-bar" class="flex items-center justify-between pointer-events-auto">
-                <button id="top-upload-btn" class="bg-white/90 hover:bg-pink-50 text-pink-600 font-bold text-[11px] px-2.5 py-1 rounded-xl shadow border border-pink-300 flex items-center gap-1 transition active:scale-95">
-                    <i class="fa-solid fa-camera text-pink-500"></i>
-                    <span>Đổi ảnh mặt</span>
-                </button>
-                <div class="flex items-center gap-1.5">
-                    <button id="top-shop-btn" class="bg-white/90 hover:bg-pink-50 text-pink-600 font-bold text-[11px] px-2.5 py-1 rounded-xl shadow border border-pink-300 flex items-center gap-1 transition active:scale-95">
-                        <i class="fa-solid fa-store text-pink-500"></i>
-                        <span>Shop Vật Phẩm</span>
-                    </button>
-                    <button id="top-leaderboard-btn" class="bg-white/90 hover:bg-pink-50 text-pink-600 font-bold text-[11px] px-2.5 py-1 rounded-xl shadow border border-pink-300 flex items-center gap-1 transition active:scale-95">
-                        <i class="fa-solid fa-ranking-star text-amber-500"></i>
-                        <span>BXH</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- LIVE SCORE & ACTIVE BUFFS DISPLAY (During Playing) -->
-        <div id="live-score-container" class="absolute top-20 left-0 right-0 flex flex-col items-center pointer-events-none z-10 hidden">
-            <div id="live-score" class="font-cute text-5xl font-bold text-white drop-shadow-[0_4px_4px_rgba(219,39,119,0.85)]" style="-webkit-text-stroke: 2px #db2777;">
-                0
-            </div>
-            <!-- Active Power-up Timers -->
-            <div id="active-buffs-row" class="mt-1 flex flex-wrap items-center justify-center gap-1.5 px-3">
-                <div id="buff-shield-pill" class="hidden px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[11px] font-extrabold shadow-md border border-white flex items-center gap-1">
-                    <span>🛡️ Bất Tử:</span>
-                    <span id="buff-shield-time">5.0s</span>
-                </div>
-                <div id="buff-magnet-pill" class="hidden px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[11px] font-extrabold shadow-md border border-white flex items-center gap-1">
-                    <span>🧲 Hút Sao:</span>
-                    <span id="buff-magnet-time">15.0s</span>
-                </div>
-                <div id="buff-x2-pill" class="hidden px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[11px] font-extrabold shadow-md border border-white">
-                    ✨ Đang Nhân Đôi (x2)
-                </div>
-            </div>
-        </div>
-
-        <!-- IN-GAME SKILL / ITEM BAR (Bottom HUD during gameplay) -->
-        <div id="ingame-skill-bar" class="absolute bottom-3 left-2.5 right-2.5 flex items-center justify-center gap-2 pointer-events-auto z-20 hidden">
-            <!-- Passive Heart Revive Counter -->
-            <div class="bg-white/95 px-2.5 py-1.5 rounded-2xl shadow-lg border-2 border-rose-300 flex items-center gap-1.5">
-                <span class="text-base">❤️</span>
-                <div class="flex flex-col leading-none">
-                    <span class="text-[10px] font-bold text-gray-500">Mạng</span>
-                    <span id="skill-heart-count" class="text-xs font-extrabold text-rose-600">0</span>
-                </div>
-            </div>
-
-            <!-- Active Skill 1: Shield (5s) -->
-            <button id="use-shield-btn" class="bg-gradient-to-b from-cyan-400 to-blue-600 active:translate-y-0.5 text-white px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-1.5 transition">
-                <span class="text-base">🛡️</span>
-                <div class="flex flex-col items-start leading-none">
-                    <span class="text-[10px] font-bold">Khiên Bất Tử</span>
-                    <span id="skill-shield-count" class="text-xs font-extrabold text-yellow-200">x0</span>
-                </div>
-            </button>
-
-            <!-- Active Skill 2: Star Magnet (15s) -->
-            <button id="use-magnet-btn" class="bg-gradient-to-b from-purple-400 to-fuchsia-600 active:translate-y-0.5 text-white px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-1.5 transition">
-                <span class="text-base">🧲</span>
-                <div class="flex flex-col items-start leading-none">
-                    <span class="text-[10px] font-bold">Hút Sao</span>
-                    <span id="skill-magnet-count" class="text-xs font-extrabold text-yellow-200">x0</span>
-                </div>
-            </button>
-
-            <!-- Active Skill 3: Double Score/Coins -->
-            <button id="use-x2-btn" class="bg-gradient-to-b from-amber-400 to-orange-500 active:translate-y-0.5 text-white px-3 py-1.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-1.5 transition">
-                <span class="text-base">✨</span>
-                <div class="flex flex-col items-start leading-none">
-                    <span class="text-[10px] font-bold">Thẻ x2</span>
-                    <span id="skill-x2-count" class="text-xs font-extrabold text-yellow-100">x0</span>
-                </div>
-            </button>
-        </div>
-
-        <!-- ==================== START SCREEN MODAL ==================== -->
-        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center p-4 pt-16 z-30 bg-gradient-to-b from-pink-200/40 via-pink-100/30 to-purple-200/50 backdrop-blur-[2px]">
-            <div class="glass-card w-full max-w-sm rounded-3xl p-4 shadow-2xl flex flex-col items-center text-center relative max-h-full overflow-y-auto custom-scroll">
-                <span class="px-3 py-0.5 rounded-full bg-pink-100 text-pink-600 font-bold text-[11px] tracking-wide mb-1 border border-pink-200">
-                    ✨ PHIÊN BẢN VIP: SHOP & BẢNG XẾP HẠNG ✨
-                </span>
-                <h1 class="font-cute text-2xl sm:text-3xl font-bold text-pink-600 drop-shadow-sm">
-                    Flappy Bé Xinh
-                </h1>
-                <p class="text-xs text-gray-600 mt-0.5 mb-2">
-                    Bay qua ống kẹo ngọt, thu thập <b>Ngôi Sao Hồng (+5 🪙)</b> để mua Khiên Bất Tử & Tim Hồi Sinh!
-                </p>
-
-                <!-- Avatar Preview Box -->
-                <div class="relative my-1 flex flex-col items-center">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-pink-200 to-rose-100 p-1 shadow-inner border-2 border-pink-300 flex items-center justify-center relative animate-float">
-                        <canvas id="avatar-preview-canvas" width="120" height="120" class="w-20 h-20 rounded-full"></canvas>
-                        <span id="avatar-status-badge" class="absolute -bottom-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                            Chibi Sao Hồng ✨
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Upload Photo Button -->
-                <div class="w-full mt-2 mb-2 flex flex-col gap-1">
-                    <button id="start-upload-btn" class="btn-secondary-cute w-full py-2 px-3 rounded-2xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-camera-retro"></i>
-                        <span>📸 Chọn ảnh khuôn mặt từ máy</span>
-                    </button>
-                    <button id="reset-avatar-btn" class="text-[11px] text-pink-600 hover:text-pink-800 font-semibold underline hidden">
-                        Dùng lại khuôn mặt Chibi vẽ sẵn
-                    </button>
-                </div>
-
-                <!-- Inventory Quick Summary & Shop/Rank Buttons -->
-                <div class="w-full grid grid-cols-2 gap-2 mb-2.5">
-                    <button id="start-shop-btn" class="btn-amber-cute py-2 px-3 rounded-2xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span>Cửa Hàng Vật Phẩm</span>
-                    </button>
-                    <button id="start-rank-btn" class="btn-purple-cute py-2 px-3 rounded-2xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-trophy"></i>
-                        <span>Bảng Xếp Hạng</span>
-                    </button>
-                </div>
-
-                <!-- Difficulty Selector -->
-                <div class="w-full bg-pink-50/90 p-2 rounded-2xl border border-pink-200 mb-3">
-                    <div class="flex items-center justify-between text-[11px] font-bold text-pink-700 mb-1 px-1">
-                        <span>Độ khó:</span>
-                        <span id="start-inventory-summary" class="text-rose-600">❤️0 🛡️0 🧲0 ✨0</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1.5">
-                        <button data-diff="easy" class="diff-btn py-1 rounded-xl text-xs font-bold transition bg-pink-500 text-white shadow-sm">
-                            🌸 Dễ (Chill)
-                        </button>
-                        <button data-diff="normal" class="diff-btn py-1 rounded-xl text-xs font-bold transition bg-white text-pink-600 border border-pink-200">
-                            ⭐ Vừa
-                        </button>
-                        <button data-diff="hard" class="diff-btn py-1 rounded-xl text-xs font-bold transition bg-white text-pink-600 border border-pink-200">
-                            🔥 Nhanh
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Start Play Button -->
-                <button id="start-play-btn" class="btn-cute w-full py-3 rounded-2xl text-white font-cute font-bold text-lg tracking-wide flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i>
-                    <span>BẮT ĐẦU BAY NGAY!</span>
-                </button>
-
-                <!-- Account Status Footer -->
-                <div class="mt-2.5 pt-2 border-t border-pink-200/80 w-full flex items-center justify-between text-[11px] text-gray-600">
-                    <span id="start-account-label">Đang chơi: <b>Khách</b></span>
-                    <button id="start-auth-link" class="text-pink-600 font-extrabold underline hover:text-pink-700">
-                        Đăng nhập / Đăng ký
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== GAME OVER MODAL ==================== -->
-        <div id="gameover-screen" class="absolute inset-0 flex flex-col items-center justify-center p-5 z-30 bg-black/40 backdrop-blur-xs hidden">
-            <div class="glass-card w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col items-center text-center">
-                <div class="w-14 h-14 -mt-10 rounded-full bg-white p-1 shadow-lg border-4 border-pink-300 flex items-center justify-center mb-1">
-                    <span id="medal-emoji" class="text-2xl">🎀</span>
-                </div>
-
-                <h2 class="font-cute text-2xl font-bold text-pink-600">Kết Thúc Lượt Bay!</h2>
-                <p id="gameover-comment" class="text-xs font-semibold text-gray-500 mb-3">Cố lên nhé, bạn bay siêu đáng yêu luôn!</p>
-
-                <!-- Score, Best Score & Earned Coins Card -->
-                <div class="w-full bg-gradient-to-r from-pink-50 via-rose-50 to-pink-50 rounded-2xl p-3 border-2 border-pink-200 mb-3 grid grid-cols-3 gap-2 shadow-inner">
-                    <div class="flex flex-col items-center border-r border-pink-200">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Điểm Ván</span>
-                        <span id="final-score" class="font-cute text-2xl font-bold text-pink-600 mt-0.5">0</span>
-                    </div>
-                    <div class="flex flex-col items-center border-r border-pink-200">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Kỷ Lục</span>
-                        <span id="final-best" class="font-cute text-2xl font-bold text-amber-500 mt-0.5">0</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Xu Nhận</span>
-                        <span id="final-earned-coins" class="font-cute text-2xl font-bold text-emerald-600 mt-0.5">+0</span>
-                    </div>
-                </div>
-
-                <!-- Medal Reward Banner -->
-                <div class="w-full bg-white/90 rounded-xl px-3 py-1.5 border border-pink-200 mb-3 flex items-center justify-between">
-                    <span class="text-xs font-bold text-gray-600">Danh hiệu:</span>
-                    <span id="medal-title" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-600">
-                        Tập Sự Đáng Yêu
-                    </span>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="w-full flex flex-col gap-2">
-                    <button id="restart-btn" class="btn-cute w-full py-3 rounded-2xl text-white font-cute font-bold text-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span>CHƠI LẠI NGAY!</span>
-                    </button>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="gameover-shop-btn" class="btn-amber-cute py-2 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-store"></i>
-                            <span>Mua Vật Phẩm</span>
-                        </button>
-                        <button id="gameover-rank-btn" class="btn-purple-cute py-2 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-trophy"></i>
-                            <span>Bảng Xếp Hạng</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== AUTH (LOGIN / REGISTER) MODAL ==================== -->
-        <div id="auth-modal" class="absolute inset-0 flex flex-col items-center justify-center p-4 z-40 bg-black/50 backdrop-blur-xs hidden">
-            <div class="glass-card w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col relative">
-                <button id="close-auth-btn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="text-center mb-3">
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pink-100 text-pink-600 text-xl mb-1">
-                        <i class="fa-solid fa-user-astronaut"></i>
-                    </div>
-                    <h3 class="font-cute text-2xl font-bold text-pink-600">Tài Khoản Thành Viên</h3>
-                    <p class="text-xs text-gray-500">Lưu kỷ lục, tích Xu mua vật phẩm & đua Top BXH!</p>
-                </div>
-
-                <!-- Logged-in View -->
-                <div id="auth-logged-in-view" class="hidden flex-col gap-3">
-                    <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-3 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs text-gray-500">Xin chào thành viên:</div>
-                            <div id="profile-username" class="text-base font-extrabold text-pink-600">User</div>
-                            <span id="profile-role-badge" class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-200 text-pink-700">Thành viên</span>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xs font-bold text-amber-600">🪙 <span id="profile-coins">0</span> Xu</div>
-                            <div class="text-xs font-bold text-pink-600">🏆 Kỷ lục: <span id="profile-best">0</span></div>
-                        </div>
-                    </div>
-
-                    <button id="profile-open-admin-btn" class="hidden btn-amber-cute w-full py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-crown"></i>
-                        <span>Mở Bảng Quản Trị Admin</span>
-                    </button>
-
-                    <button id="logout-btn" class="w-full py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold text-xs transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Đăng Xuất Tài Khoản</span>
-                    </button>
-                </div>
-
-                <!-- Login / Register Form View -->
-                <div id="auth-form-view" class="flex flex-col gap-2.5">
-                    <!-- Mode Tabs -->
-                    <div class="grid grid-cols-2 gap-1 bg-pink-100/80 p-1 rounded-xl">
-                        <button id="tab-login-btn" class="py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs">
-                            Đăng Nhập
-                        </button>
-                        <button id="tab-register-btn" class="py-1.5 rounded-lg text-xs font-bold text-gray-600">
-                            Đăng Ký Mới
-                        </button>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Tên đăng nhập (Username):</label>
-                        <input id="auth-username-input" type="text" placeholder="Nhập tên tài khoản..."
-                            class="w-full px-3 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-500 focus:outline-none text-sm font-semibold">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Mật khẩu (Password):</label>
-                        <input id="auth-password-input" type="password" placeholder="Nhập mật khẩu..."
-                            class="w-full px-3 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-500 focus:outline-none text-sm font-semibold">
-                    </div>
-
-                    <div id="auth-error-box" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 text-center"></div>
-
-                    <button id="auth-submit-btn" class="btn-cute w-full py-2.5 rounded-xl text-white font-bold text-sm mt-1">
-                        ĐĂNG NHẬP NGAY
-                    </button>
-
-                    <!-- Quick Admin Demo Fill Hint -->
-                    <div class="mt-1 p-2 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-center justify-between">
-                        <span>👑 TK Admin: <b>admin</b> / MK: <b>123456</b></span>
-                        <button id="quick-fill-admin-btn" class="px-2 py-0.5 bg-amber-500 text-white font-bold rounded-lg text-[10px]">
-                            Điền nhanh
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== SHOP MODAL ==================== -->
-        <div id="shop-modal" class="absolute inset-0 flex flex-col items-center justify-center p-4 z-40 bg-black/50 backdrop-blur-xs hidden">
-            <div class="glass-card w-full max-w-sm rounded-3xl p-4 shadow-2xl flex flex-col relative max-h-[88dvh]">
-                <button id="close-shop-btn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="text-center mb-2">
-                    <h3 class="font-cute text-2xl font-bold text-pink-600">🛍️ Tiệm Tạp Hóa Bé Xinh</h3>
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-700 font-extrabold text-xs mt-1">
-                        <span>Số dư của bạn:</span>
-                        <span>🪙 <span id="shop-coins-balance">0</span> Xu</span>
-                    </div>
-                </div>
-
-                <!-- Shop Items List -->
-                <div class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1 my-1">
-                    <!-- Item 1: Heart Revive -->
-                    <div class="bg-white rounded-2xl p-3 border-2 border-pink-200 flex items-center justify-between gap-2 shadow-xs">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-11 h-11 rounded-2xl bg-rose-100 flex items-center justify-center text-2xl shrink-0">
-                                ❤️
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-bold text-sm text-gray-800">Tim Hồi Sinh</span>
-                                    <span id="shop-own-heart" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 text-rose-600">Đang có: 0</span>
-                                </div>
-                                <p class="text-[11px] text-gray-500">Tự động hồi sinh khi va chạm ống kẹo hoặc rơi xuống đất.</p>
-                            </div>
-                        </div>
-                        <button data-item="hearts" data-price="30" class="buy-item-btn btn-cute px-3 py-2 rounded-xl text-white font-bold text-xs shrink-0">
-                            🪙 30
-                        </button>
-                    </div>
-
-                    <!-- Item 2: Immortal Shield -->
-                    <div class="bg-white rounded-2xl p-3 border-2 border-pink-200 flex items-center justify-between gap-2 shadow-xs">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-11 h-11 rounded-2xl bg-cyan-100 flex items-center justify-center text-2xl shrink-0">
-                                🛡️
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-bold text-sm text-gray-800">Khiên Bất Tử (5s)</span>
-                                    <span id="shop-own-shield" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Đang có: 0</span>
-                                </div>
-                                <p class="text-[11px] text-gray-500">Bấm nút khi đang bay để hóa cầu vồng húc văng mọi ống kẹo!</p>
-                            </div>
-                        </div>
-                        <button data-item="shields" data-price="25" class="buy-item-btn btn-cute px-3 py-2 rounded-xl text-white font-bold text-xs shrink-0">
-                            🪙 25
-                        </button>
-                    </div>
-
-                    <!-- Item 3: Star Magnet -->
-                    <div class="bg-white rounded-2xl p-3 border-2 border-pink-200 flex items-center justify-between gap-2 shadow-xs">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-11 h-11 rounded-2xl bg-purple-100 flex items-center justify-center text-2xl shrink-0">
-                                🧲
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-bold text-sm text-gray-800">Nam Châm Hút Sao</span>
-                                    <span id="shop-own-magnet" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Đang có: 0</span>
-                                </div>
-                                <p class="text-[11px] text-gray-500">Tự động hút mọi Ngôi Sao Hồng trên màn hình về phía bạn (15s).</p>
-                            </div>
-                        </div>
-                        <button data-item="magnets" data-price="20" class="buy-item-btn btn-cute px-3 py-2 rounded-xl text-white font-bold text-xs shrink-0">
-                            🪙 20
-                        </button>
-                    </div>
-
-                    <!-- Item 4: Double Score & Coins Card -->
-                    <div class="bg-white rounded-2xl p-3 border-2 border-pink-200 flex items-center justify-between gap-2 shadow-xs">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl shrink-0">
-                                ✨
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-bold text-sm text-gray-800">Thẻ Nhân Đôi (x2)</span>
-                                    <span id="shop-own-x2" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Đang có: 0</span>
-                                </div>
-                                <p class="text-[11px] text-gray-500">Nhân đôi toàn bộ Điểm và Xu kiếm được trong suốt ván chơi!</p>
-                            </div>
-                        </div>
-                        <button data-item="x2cards" data-price="40" class="buy-item-btn btn-cute px-3 py-2 rounded-xl text-white font-bold text-xs shrink-0">
-                            🪙 40
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-2 pt-2 border-t border-pink-200 text-center text-[11px] text-gray-500">
-                    💡 Mẹo: Ăn mỗi <b>Ngôi Sao Hồng ⭐</b> trong game nhận ngay <b>+5 Xu</b>!
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== LEADERBOARD MODAL ==================== -->
-        <div id="leaderboard-modal" class="absolute inset-0 flex flex-col items-center justify-center p-4 z-40 bg-black/50 backdrop-blur-xs hidden">
-            <div class="glass-card w-full max-w-sm rounded-3xl p-4 shadow-2xl flex flex-col relative max-h-[88dvh]">
-                <button id="close-leaderboard-btn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="text-center mb-2">
-                    <h3 class="font-cute text-2xl font-bold text-pink-600">🏆 Bảng Xếp Hạng</h3>
-                    <p class="text-xs text-gray-500">Vinh danh các cao thủ bay lượn xuất sắc nhất</p>
-                </div>
-
-                <!-- Tabs: Top Score vs Top Coins -->
-                <div class="grid grid-cols-2 gap-1.5 bg-pink-100 p-1 rounded-xl mb-2.5">
-                    <button id="rank-tab-score" class="py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs">
-                        🏆 Top Điểm Cao
-                    </button>
-                    <button id="rank-tab-coins" class="py-1.5 rounded-lg text-xs font-bold text-gray-600">
-                        🪙 Top Đại Gia Xu
-                    </button>
-                </div>
-
-                <!-- Leaderboard List Container -->
-                <div id="leaderboard-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== ADMIN PANEL MODAL ==================== -->
-        <div id="admin-modal" class="absolute inset-0 flex flex-col items-center justify-center p-3 z-50 bg-black/60 backdrop-blur-xs hidden">
-            <div class="glass-card w-full max-w-md rounded-3xl p-4 shadow-2xl flex flex-col relative max-h-[92dvh] border-4 border-amber-300">
-                <button id="close-admin-btn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-lg shadow">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-cute text-xl font-bold text-amber-700">Bảng Quản Trị Admin</h3>
-                        <p class="text-[11px] text-gray-500">Tặng thưởng Xu/Điểm/Vật phẩm hoặc Cấm thành viên</p>
-                    </div>
-                </div>
-
-                <!-- Selected Member Gift / Edit Box -->
-                <div class="bg-amber-50/90 border-2 border-amber-200 rounded-2xl p-2.5 mb-2.5">
-                    <div class="text-xs font-bold text-amber-800 mb-1.5 flex items-center justify-between">
-                        <span>🎁 Tặng thưởng / Chỉnh sửa thành viên:</span>
-                        <span id="admin-selected-user" class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-extrabold">admin</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-1.5 mb-2">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-600">Số Xu cộng/trừ (🪙):</label>
-                            <input id="admin-gift-coins" type="number" value="500" class="w-full px-2.5 py-1 rounded-lg border border-amber-300 text-xs font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-600">Đặt Kỷ Lục Điểm (🏆):</label>
-                            <input id="admin-set-score" type="number" placeholder="Giữ nguyên" class="w-full px-2.5 py-1 rounded-lg border border-amber-300 text-xs font-bold">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <button id="admin-apply-gift-btn" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs py-1.5 rounded-xl shadow active:scale-95">
-                            <i class="fa-solid fa-gift"></i> Tặng Xu & Lưu Điểm
-                        </button>
-                        <button id="admin-gift-pack-btn" class="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs py-1.5 rounded-xl shadow active:scale-95">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Tặng Combo +5 Đồ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Member List Header -->
-                <div class="flex items-center justify-between text-xs font-bold text-gray-600 mb-1 px-1">
-                    <span>Danh sách thành viên (<span id="admin-user-count">0</span>):</span>
-                    <span class="text-[10px] text-gray-400">Chạm vào tên để chọn</span>
-                </div>
-
-                <!-- Member List Scrollable -->
-                <div id="admin-member-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast Notification (No alert() used) -->
-        <div id="toast-msg" class="absolute top-14 left-1/2 -translate-x-1/2 bg-pink-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl pointer-events-none opacity-0 transition-opacity duration-300 z-50 whitespace-nowrap border-2 border-white">
-            ✨ Thông báo!
-        </div>
+<!-- MÀN HÌNH ĐĂNG NHẬP (Đã bỏ thông báo Admin đầu tiên) -->
+<div id="login-screen">
+  <div class="logo-box">
+    <h1>⚔️ KAIA 3D ONLINE</h1>
+    <div style="font-size:11px;color:#fef3c7">Thế Giới 3D Săn Boss • Thời Trang • Câu Cá</div>
+  </div>
+  <div class="login-panel">
+    <div id="sync-status" style="font-size:11px;text-align:center;color:#10b981;margin-bottom:6px">🔄 Đang đồng bộ máy chủ 3D Cloud...</div>
+    <input id="inp-user" placeholder="Tên tài khoản (viết liền)...">
+    <input id="inp-pass" type="password" placeholder="Mật khẩu...">
+    <select id="inp-gender">
+      <option value="male">👦 Giới tính: Nam (khi đăng ký mới)</option>
+      <option value="female">👧 Giới tính: Nữ (khi đăng ký mới)</option>
+    </select>
+    <input id="inp-phone" placeholder="Số điện thoại (khi đăng ký mới)...">
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-blue" style="flex:1;padding:11px" onclick="handleAuth('login')">Đăng Nhập</button>
+      <button class="btn btn-green" style="flex:1;padding:11px" onclick="handleAuth('register')">Đăng Ký</button>
     </div>
+  </div>
+</div>
 
-    <script>
-        /**
-         * FLAPPY BÉ XINH (FLAPPY CUTE) - PHIÊN BẢN ĐẦY ĐỦ:
-         * 1. Khuôn mặt Chibi mẫu & Đổi ảnh mặt thật tự động cắt tròn + gắn bờm tai hồng + 2 ngôi sao hồng.
-         * 2. Đăng ký / Đăng nhập thành viên (Lưu LocalStorage + Đồng bộ mượt mà khi up lên GitHub Pages).
-         * 3. Tài khoản Admin mặc định (admin / 123456) quản lý cấm (Ban/Unban), tặng Xu, sửa điểm, tặng vật phẩm.
-         * 4. Cửa hàng vật phẩm: Tim Hồi Sinh, Khiên Bất Tử (5s), Nam Châm Hút Sao (15s), Thẻ Nhân Đôi (x2).
-         * 5. Bảng xếp hạng Top Điểm Cao & Top Đại Gia Xu.
-         */
+<!-- THANH HUD -->
+<div id="hud">
+  <div>
+    <div>
+      <b id="ui-name" style="color:#38bdf8">...</b>
+      <span id="ui-lv" style="background:#3b82f6;padding:1px 6px;border-radius:6px;font-size:10px">Lv.1</span>
+      <span id="ui-admin-tag" style="background:#ef4444;padding:1px 5px;border-radius:6px;font-size:10px;display:none">👑 ADMIN</span>
+    </div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:2px">
+      ❤️ <span id="ui-hp">100/100</span> | ⚔️ <span id="ui-atk">15</span> | 🛡️ <span id="ui-def">5</span>
+    </div>
+  </div>
+  <div class="stat-bar">
+    <span>🪙 <b id="ui-silver">0</b></span>
+    <span>👑 <b id="ui-gold" style="color:#fbbf24">0</b></span>
+  </div>
+  <div style="display:flex;gap:4px">
+    <button class="btn btn-blue" onclick="openModal('modal-bag')">🎒 Đồ</button>
+    <button class="btn btn-green" onclick="openProfile()">👤 TK</button>
+    <button class="btn btn-purple" onclick="openAdmin()">👑</button>
+  </div>
+</div>
 
-        // --- DOM ELEMENTS ---
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const previewCanvas = document.getElementById('avatar-preview-canvas');
-        const previewCtx = previewCanvas.getContext('2d');
+<!-- THANH CHUYỂN KHU -->
+<div id="nav">
+  <button class="nav-btn active" onclick="switchZone('plaza',this)">💬 Khu Trò Chuyện (3 Shop)</button>
+  <button class="nav-btn" onclick="switchZone('combat',this)">⚔️ Khu Đánh Quái (10 Khu)</button>
+  <button class="nav-btn" onclick="switchZone('fish',this)">🎣 Khu Câu Cá 3D</button>
+</div>
 
-        const fileInput = document.getElementById('face-upload-input');
-        const topUploadBtn = document.getElementById('top-upload-btn');
-        const startUploadBtn = document.getElementById('start-upload-btn');
-        const resetAvatarBtn = document.getElementById('reset-avatar-btn');
-        const avatarStatusBadge = document.getElementById('avatar-status-badge');
+<!-- KHUNG 3D CHÍNH -->
+<div id="game-wrap">
+  <div id="boss-banner">🔥 Boss Thế Giới: <span id="boss-timer">Đang tính...</span></div>
+  <canvas id="canvas3d"></canvas>
+  <div id="labels-layer"></div>
 
-        const soundToggleBtn = document.getElementById('sound-toggle-btn');
-        const soundIcon = document.getElementById('sound-icon');
+  <!-- UI KHU 1: QUẢNG TRƯỜNG & 3 SHOP -->
+  <div id="ui-plaza" class="ui-overlay active">
+    <div style="display:flex;gap:6px;justify-content:center;margin-top:34px" class="pointer-auto">
+      <button class="btn btn-green" onclick="openModal('modal-shop1')">👘 Shop 1: Vũ Khí & Trang Phục</button>
+      <button class="btn btn-blue" onclick="openModal('modal-shop2')">🎣 Shop 2: Cần Câu & Mồi</button>
+      <button class="btn btn-purple" onclick="openModal('modal-shop3')">🎰 Shop 3: Gacha Thần Thoại</button>
+    </div>
+    <div style="display:flex;gap:6px" class="pointer-auto">
+      <input id="inp-chat" placeholder="Chạm mặt đất 3D để đi • Nhập chat tại đây..." style="flex:1;padding:9px;border-radius:8px;border:1px solid #475569;background:rgba(15,23,42,0.85);color:#fff" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-blue" style="padding:0 16px" onclick="sendChat()">Gửi</button>
+    </div>
+  </div>
 
-        // HUD & Bars
-        const hudUsername = document.getElementById('hud-username');
-        const hudCoins = document.getElementById('hud-coins');
-        const hudBestScore = document.getElementById('hud-best-score');
-        const openAdminBtn = document.getElementById('open-admin-btn');
-        const topSubBar = document.getElementById('top-sub-bar');
-        const ingameSkillBar = document.getElementById('ingame-skill-bar');
+  <!-- UI KHU 2: 10 KHU ĐÁNH QUÁI (LV 1 - 100) -->
+  <div id="ui-combat" class="ui-overlay">
+    <div style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:34px;flex-wrap:wrap" class="pointer-auto">
+      <select id="sel-map" onchange="changeCombatMap(this.value)" style="padding:7px;border-radius:8px;background:#0f172a;color:#fbbf24;border:1px solid #f59e0b;font-weight:bold;font-size:12px"></select>
+      <button id="btn-auto" class="btn btn-green" onclick="toggleAuto()">🤖 Tự Đánh: TẮT</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px" class="pointer-auto">
+      <div id="combat-log" style="background:rgba(15,23,42,0.8);padding:5px 12px;border-radius:12px;font-size:11px;color:#38bdf8">Chạm vào Quái 3D hoặc bấm nút Tấn Công!</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-red" style="padding:12px 24px;font-size:14px" onclick="playerAttack(1)">⚔️ CHÉM THƯỜNG</button>
+        <button class="btn btn-orange" style="padding:12px 20px;font-size:14px" onclick="playerAttack(2.2)">💥 TUYỆT KỸ (x2.2)</button>
+      </div>
+    </div>
+  </div>
 
-        // Skill counts & buttons
-        const skillHeartCount = document.getElementById('skill-heart-count');
-        const skillShieldCount = document.getElementById('skill-shield-count');
-        const skillMagnetCount = document.getElementById('skill-magnet-count');
-        const skillX2Count = document.getElementById('skill-x2-count');
-        const useShieldBtn = document.getElementById('use-shield-btn');
-        const useMagnetBtn = document.getElementById('use-magnet-btn');
-        const useX2Btn = document.getElementById('use-x2-btn');
+  <!-- UI KHU 3: CÂU CÁ 3D -->
+  <div id="ui-fish" class="ui-overlay">
+    <div style="text-align:center;margin-top:34px">
+      <span style="background:rgba(15,23,42,0.85);padding:6px 14px;border-radius:14px;font-size:12px">
+        🪱 Mồi câu: <b id="ui-bait">0</b> | Tỉ lệ cá hiếm: +<b id="ui-fish-buff">0</b>%
+      </span>
+      <div id="fish-msg" style="color:#fbbf24;font-weight:bold;margin-top:6px;text-shadow:0 1px 3px #000">Bấm Quăng Câu để thả phao xuống hồ 3D!</div>
+    </div>
+    <div style="text-align:center" class="pointer-auto">
+      <div id="tension-box"><div id="tension-zone"></div><div id="tension-bar"></div></div>
+      <button class="btn btn-orange" style="padding:12px 30px;font-size:15px" onclick="fishAction()">🎣 QUĂNG CÂU / GIẬT CẦN</button>
+    </div>
+  </div>
+</div>
 
-        // Buff pills
-        const buffShieldPill = document.getElementById('buff-shield-pill');
-        const buffShieldTime = document.getElementById('buff-shield-time');
-        const buffMagnetPill = document.getElementById('buff-magnet-pill');
-        const buffMagnetTime = document.getElementById('buff-magnet-time');
-        const buffX2Pill = document.getElementById('buff-x2-pill');
+<!-- MODAL SHOP 1: VŨ KHÍ, QUẦN ÁO, TÓC, PHỤ KIỆN -->
+<div id="modal-shop1" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>👘 Shop 1: Trang Bị, Tóc & Phụ Kiện</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="shop1-list"></div>
+</div></div>
 
-        // Screens & Modals
-        const startScreen = document.getElementById('start-screen');
-        const gameoverScreen = document.getElementById('gameover-screen');
-        const authModal = document.getElementById('auth-modal');
-        const shopModal = document.getElementById('shop-modal');
-        const leaderboardModal = document.getElementById('leaderboard-modal');
-        const adminModal = document.getElementById('admin-modal');
-        const toastMsg = document.getElementById('toast-msg');
+<!-- MODAL SHOP 2: CÂU CÁ -->
+<div id="modal-shop2" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🎣 Shop 2: Cần Câu & Mồi</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="shop2-list"></div>
+</div></div>
 
-        // --- SOUND ENGINE (Web Audio API) ---
-        class CuteAudio {
-            constructor() {
-                this.ctx = null;
-                this.enabled = true;
-            }
-            init() {
-                if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (AudioCtx) this.ctx = new AudioCtx();
-                }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
-            toggle() {
-                this.enabled = !this.enabled;
-                soundIcon.className = this.enabled ? 'fa-solid fa-volume-high text-xs' : 'fa-solid fa-volume-xmark text-xs';
-                return this.enabled;
-            }
-            playFlap() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(360, now);
-                osc.frequency.exponentialRampToValueAtTime(650, now + 0.11);
-                gain.gain.setValueAtTime(0.14, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start(now);
-                osc.stop(now + 0.12);
-            }
-            playScore() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                [587.33, 880].forEach((freq, i) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(freq, now + i * 0.065);
-                    gain.gain.setValueAtTime(0.16, now + i * 0.065);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.065 + 0.16);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now + i * 0.065);
-                    osc.stop(now + i * 0.065 + 0.16);
-                });
-            }
-            playStarBonus() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + i * 0.05);
-                    gain.gain.setValueAtTime(0.15, now + i * 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.2);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now + i * 0.05);
-                    osc.stop(now + i * 0.05 + 0.2);
-                });
-            }
-            playPowerup() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                [440, 554.37, 659.25, 880].forEach((freq, i) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(freq, now + i * 0.06);
-                    gain.gain.setValueAtTime(0.18, now + i * 0.06);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.22);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now + i * 0.06);
-                    osc.stop(now + i * 0.06 + 0.22);
-                });
-            }
-            playHit() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(240, now);
-                osc.frequency.exponentialRampToValueAtTime(80, now + 0.28);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            }
+<!-- MODAL SHOP 3: GACHA -->
+<div id="modal-shop3" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🎰 Shop 3: Gacha Trang Bị & Cần Câu</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" style="text-align:center">
+    <p style="font-size:12px;margin-bottom:8px">Quay ngẫu nhiên Vũ Khí, Giáp, Cánh Phụ Kiện & Cần Câu từ <span class="r-0">Thường</span> đến <span class="r-4">Thần Thoại</span>!</p>
+    <div id="gacha-box" style="background:#0f172a;border:2px dashed #8b5cf6;padding:14px;border-radius:10px;margin-bottom:12px;min-height:55px">Chúc bạn may mắn!</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-blue" style="flex:1;padding:10px" onclick="rollGacha('silver')">Quay Bạc<br>(🪙 250 Bạc)</button>
+      <button class="btn btn-orange" style="flex:1;padding:10px" onclick="rollGacha('gold')">Quay Hoàng Kim<br>(👑 15 Vàng - Tỉ lệ x5)</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- MODAL TÚI ĐỒ & NHÂN VẬT -->
+<div id="modal-bag" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🎒 Kho Trang Bị & Ngoại Hình 3D</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="bag-list"></div>
+</div></div>
+
+<!-- MODAL THÔNG TIN TÀI KHOẢN (ĐỔI MẬT KHẨU, SĐT, GIỚI TÍNH) -->
+<div id="modal-profile" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>👤 Thông Tin Tài Khoản</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body">
+    <div id="profile-summary" style="background:#0f172a;padding:10px;border-radius:8px;margin-bottom:10px;font-size:12px;line-height:1.6"></div>
+    <label style="font-size:11px">Giới tính nhân vật 3D:</label>
+    <select id="prof-gender" style="width:100%;padding:8px;margin:4px 0 8px;border-radius:6px;background:#0f172a;color:#fff;border:1px solid #475569">
+      <option value="male">👦 Nam</option>
+      <option value="female">👧 Nữ</option>
+    </select>
+    <label style="font-size:11px">Số điện thoại liên hệ:</label>
+    <input id="prof-phone" placeholder="Nhập số điện thoại..." style="width:100%;padding:8px;margin:4px 0 8px;border-radius:6px;background:#0f172a;color:#fff;border:1px solid #475569">
+    <button class="btn btn-green" style="width:100%;margin-bottom:12px" onclick="saveProfileInfo()">💾 Lưu Thông Tin & Giới Tính</button>
+    <hr style="border-color:#334155;margin-bottom:10px">
+    <b style="font-size:12px">🔐 Đổi Mật Khẩu:</b>
+    <input id="prof-oldpass" type="password" placeholder="Mật khẩu hiện tại..." style="width:100%;padding:8px;margin:5px 0;border-radius:6px;background:#0f172a;color:#fff;border:1px solid #475569">
+    <input id="prof-newpass" type="password" placeholder="Mật khẩu mới..." style="width:100%;padding:8px;margin:5px 0 8px;border-radius:6px;background:#0f172a;color:#fff;border:1px solid #475569">
+    <button class="btn btn-orange" style="width:100%" onclick="changePassword()">🔄 Cập Nhật Mật Khẩu</button>
+  </div>
+</div></div>
+
+<!-- MODAL ADMIN -->
+<div id="modal-admin" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>👑 Bảng Quản Trị Admin</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body">
+    <div id="admin-auth" style="display:none;margin-bottom:10px">
+      <input id="inp-admin-key" placeholder="Mã chủ game (cuongadmin)..." style="padding:7px;width:65%;border-radius:6px;border:1px solid #475569;background:#0f172a;color:#fff">
+      <button class="btn btn-green" onclick="unlockAdmin()">Kích Hoạt</button>
+    </div>
+    <div id="admin-panel"></div>
+  </div>
+</div></div>
+
+<script>
+// ================= 1. DỮ LIỆU CÂN BẰNG GAME & 10 KHU ĐÁNH QUÁI =================
+const RARITY = ["Thường","Hiếm","Sử Thi","Huyền Thoại","Thần Thoại"];
+const ZONES_DATA = [
+  {id:0,name:"Khu 1: Thảo Nguyên Xanh (Lv.1-10)",minLv:1,maxLv:10,color:0x4ade80,mobs:[
+    {name:"Slime Xanh",color:0x22c55e,hp:80,atk:8,def:2,exp:18,silver:15},
+    {name:"Nấm Lùn Đỏ",color:0xef4444,hp:120,atk:11,def:3,exp:24,silver:22},
+    {name:"Nhím Gai Nhỏ",color:0xa16207,hp:160,atk:14,def:5,exp:32,silver:30}
+  ]},
+  {id:1,name:"Khu 2: Rừng Chạng Vạng (Lv.11-20)",minLv:11,maxLv:20,color:0x15803d,mobs:[
+    {name:"Sói Xám Hoang",color:0x64748b,hp:320,atk:28,def:10,exp:55,silver:50},
+    {name:"Yêu Tinh Rừng",color:0x16a34a,hp:420,atk:35,def:14,exp:70,silver:65},
+    {name:"Gấu Nâu Khổng Lồ",color:0x78350f,hp:580,atk:44,def:20,exp:95,silver:85}
+  ]},
+  {id:2,name:"Khu 3: Hang Đá Ngầm (Lv.21-30)",minLv:21,maxLv:30,color:0x475569,mobs:[
+    {name:"Dơi Hút Máu",color:0x9333ea,hp:900,atk:65,def:28,exp:130,silver:120},
+    {name:"Người Đá Cổ",color:0x94a3b8,hp:1250,atk:80,def:42,exp:165,silver:150},
+    {name:"Nhện Độc Hang Sâu",color:0x31102f,hp:1550,atk:95,def:35,exp:200,silver:180}
+  ]},
+  {id:3,name:"Khu 4: Sa Mạc Lửa (Lv.31-40)",minLv:31,maxLv:40,color:0xd97706,mobs:[
+    {name:"Bọ Cạp Vàng",color:0xf59e0b,hp:2200,atk:130,def:55,exp:260,silver:240},
+    {name:"Xác Ướp Cổ Đại",color:0xe2e8f0,hp:2800,atk:155,def:70,exp:320,silver:290},
+    {name:"Thằn Lằn Hỏa",color:0xdc2626,hp:3400,atk:185,def:85,exp:390,silver:350}
+  ]},
+  {id:4,name:"Khu 5: Đầm Lầy Tử Thần (Lv.41-50)",minLv:41,maxLv:50,color:0x365314,mobs:[
+    {name:"Cá Sấu Đầm Lầy",color:0x14532d,hp:4600,atk:240,def:110,exp:480,silver:440},
+    {name:"Phù Thủy Bóng Đêm",color:0x6b21a8,hp:5500,atk:290,def:130,exp:580,silver:520},
+    {name:"Chiến Binh Xương",color:0xcbd5e1,hp:6800,atk:340,def:160,exp:700,silver:620}
+  ]},
+  {id:5,name:"Khu 6: Đỉnh Tuyết Vĩnh Cửu (Lv.51-60)",minLv:51,maxLv:60,color:0xe0f2fe,mobs:[
+    {name:"Sói Tuyết Bắc Cực",color:0x38bdf8,hp:9000,atk:430,def:210,exp:880,silver:780},
+    {name:"Người Tuyết Yeti",color:0xffffff,hp:11500,atk:510,def:260,exp:1050,silver:920},
+    {name:"Tinh Linh Băng Giá",color:0x0284c7,hp:14000,atk:600,def:300,exp:1250,silver:1100}
+  ]},
+  {id:6,name:"Khu 7: Thung Lũng Sấm Sét (Lv.61-70)",minLv:61,maxLv:70,color:0x4c1d95,mobs:[
+    {name:"Báo Lôi Điện",color:0xfacc15,hp:18500,atk:750,def:380,exp:1550,silver:1350},
+    {name:"Chiến Binh Sấm",color:0x818cf8,hp:23000,atk:890,def:450,exp:1850,silver:1600},
+    {name:"Lôi Điểu Cổ Đại",color:0xca8a04,hp:28000,atk:1050,def:520,exp:2200,silver:1900}
+  ]},
+  {id:7,name:"Khu 8: Pháo Đài Hắc Ám (Lv.71-80)",minLv:71,maxLv:80,color:0x1e1b4b,mobs:[
+    {name:"Hiệp Sĩ Bóng Đêm",color:0x334155,hp:36000,atk:1300,def:650,exp:2700,silver:2300},
+    {name:"Ác Quỷ Huyết Nguyệt",color:0x991b1b,hp:44000,atk:1550,def:780,exp:3200,silver:2750},
+    {name:"Tử Thần Hắc Ám",color:0x0f172a,hp:54000,atk:1850,def:920,exp:3800,silver:3300}
+  ]},
+  {id:8,name:"Khu 9: Hỏa Diệm Sơn (Lv.81-90)",minLv:81,maxLv:90,color:0x7f1d1d,mobs:[
+    {name:"Quỷ Dung Nham",color:0xea580c,hp:70000,atk:2300,def:1150,exp:4600,silver:4000},
+    {name:"Hỏa Long Giáp Sắt",color:0xb91c1c,hp:88000,atk:2800,def:1400,exp:5600,silver:4900},
+    {name:"Phượng Hoàng Lửa",color:0xf59e0b,hp:110000,atk:3400,def:1700,exp:6800,silver:6000}
+  ]},
+  {id:9,name:"Khu 10: Thần Điện Hư Không (Lv.91-100)",minLv:91,maxLv:100,color:0x311042,mobs:[
+    {name:"Thiên Sứ Sa Ngã",color:0xc084fc,hp:145000,atk:4200,def:2100,exp:8500,silver:7500},
+    {name:"Hộ Vệ Không Gian",color:0x38bdf8,hp:185000,atk:5200,def:2600,exp:10500,silver:9500},
+    {name:"Chúa Tể Hư Không",color:0xfbbf24,hp:240000,atk:6500,def:3200,exp:14000,silver:12500}
+  ]}
+];
+
+// Danh sách Trang bị (Vũ khí, Quần áo, Tóc, Phụ kiện, Cần câu)
+const ITEMS_DB = {
+  // Vũ khí (weapon)
+  w0:{id:"w0",slot:"weapon",name:"Kiếm Gỗ Tân Thủ",r:0,atk:10,hp:0,def:0,color:0xa16207},
+  w1:{id:"w1",slot:"weapon",name:"Thanh Kiếm Bạc",r:1,atk:45,hp:100,def:10,color:0xcbd5e1,cost:300,cur:"silver"},
+  w2:{id:"w2",slot:"weapon",name:"Đại Đao Hỏa Long",r:2,atk:160,hp:400,def:35,color:0xef4444,cost:1200,cur:"silver"},
+  w3:{id:"w3",slot:"weapon",name:"Thánh Kiếm Ánh Sáng",r:3,atk:520,hp:1500,def:120,color:0x38bdf8,cost:25,cur:"gold"},
+  w4:{id:"w4",slot:"weapon",name:"Lưỡi Hái Thần Thoại",r:4,atk:1800,hp:5000,def:450,color:0xfbbf24,cost:80,cur:"gold"},
+  // Quần áo / Giáp (outfit)
+  o0:{id:"o0",slot:"outfit",name:"Áo Vải Tân Thủ",r:0,atk:0,hp:50,def:5,color:0x3b82f6},
+  o1:{id:"o1",slot:"outfit",name:"Giáp Chiến Binh Rừng",r:1,atk:15,hp:350,def:35,color:0x10b981,cost:280,cur:"silver"},
+  o2:{id:"o2",slot:"outfit",name:"Áo Choàng Quý Tộc",r:2,atk:60,hp:1200,def:110,color:0x8b5cf6,cost:1100,cur:"silver"},
+  o3:{id:"o3",slot:"outfit",name:"Chiến Giáp Bạch Kim",r:3,atk:220,hp:4200,def:380,color:0xf8fafc,cost:22,cur:"gold"},
+  o4:{id:"o4",slot:"outfit",name:"Long Bào Hoàng Kim",r:4,atk:750,hp:15000,def:1200,color:0xf59e0b,cost:75,cur:"gold"},
+  // Kiểu tóc (hair)
+  h0:{id:"h0",slot:"hair",name:"Tóc Đen Tự Nhiên",r:0,atk:0,hp:20,def:0,color:0x1e293b},
+  h1:{id:"h1",slot:"hair",name:"Tóc Nâu Hạt Dẻ",r:1,atk:20,hp:180,def:15,color:0x78350f,cost:200,cur:"silver"},
+  h2:{id:"h2",slot:"hair",name:"Tóc Hồng Sakura",r:2,atk:75,hp:650,def:55,color:0xf472b6,cost:850,cur:"silver"},
+  h3:{id:"h3",slot:"hair",name:"Tóc Bạch Kim Tuyết",r:3,atk:240,hp:2200,def:180,color:0xe2e8f0,cost:18,cur:"gold"},
+  h4:{id:"h4",slot:"hair",name:"Tóc Lửa Thần Thái Dương",r:4,atk:800,hp:7500,def:600,color:0xfbbf24,cost:60,cur:"gold"},
+  // Phụ kiện / Cánh (acc)
+  a0:{id:"a0",slot:"acc",name:"Không Phụ Kiện",r:0,atk:0,hp:0,def:0,color:0x000000},
+  a1:{id:"a1",slot:"acc",name:"Bờm Tai Thỏ Dễ Thương",r:1,atk:30,hp:250,def:20,color:0xf9a8d4,cost:350,cur:"silver"},
+  a2:{id:"a2",slot:"acc",name:"Cánh Thiên Thần Trắng",r:2,atk:120,hp:1100,def:95,color:0xffffff,cost:1500,cur:"silver"},
+  a3:{id:"a3",slot:"acc",name:"Cánh Ác Quỷ Huyết Nguyệt",r:3,atk:400,hp:3500,def:300,color:0xdc2626,cost:30,cur:"gold"},
+  a4:{id:"a4",slot:"acc",name:"Đại Dực Phượng Hoàng Hoàng Kim",r:4,atk:1400,hp:12000,def:1000,color:0xfbbf24,cost:90,cur:"gold"},
+  // Cần câu (rod)
+  r0:{id:"r0",slot:"rod",name:"Cần Câu Tre",r:0,atk:0,hp:0,def:0,fishBuff:0,color:0xa16207},
+  r1:{id:"r1",slot:"rod",name:"Cần Sợi Carbon",r:1,atk:0,hp:0,def:0,fishBuff:20,color:0x38bdf8,cost:300,cur:"silver"},
+  r2:{id:"r2",slot:"rod",name:"Cần Hải Vương",r:2,atk:0,hp:0,def:0,fishBuff:45,color:0x8b5cf6,cost:1200,cur:"silver"},
+  r3:{id:"r3",slot:"rod",name:"Cần Thần Long",r:3,atk:0,hp:0,def:0,fishBuff:85,color:0xf43f5e,cost:20,cur:"gold"},
+  r4:{id:"r4",slot:"rod",name:"Cần Thái Dương Thần",r:4,atk:0,hp:0,def:0,fishBuff:150,color:0xfbbf24}
+};
+
+const FISH_LIST = [
+  {name:"🐟 Cá Rô Suối",r:0,price:40},
+  {name:"🐠 Cá Hề Biển",r:1,price:110},
+  {name:"🦈 Cá Mập Trắng",r:2,price:350},
+  {name:"🐋 Cá Voi Xanh Cổ Đại",r:3,price:1200},
+  {name:"🐉 Thủy Long Hoàng Kim",r:4,price:3800}
+];
+
+// ================= 2. ĐỒNG BỘ CLOUD MQTT ONLINE =================
+const TOPIC_DB = "cuong_kaia3d_2026_v3/db";
+const TOPIC_LIVE = "cuong_kaia3d_2026_v3/live";
+const TOPIC_BOSS = "cuong_kaia3d_2026_v3/boss";
+let db = JSON.parse(localStorage.getItem("kaia3d_db") || '{"users":{},"firstAdmin":""}');
+let curUser = null, client = null, onlinePlayers = {};
+let curZone = "plaza", curCombatMap = 0, autoCombat = false;
+let worldBoss = {active:false, mapId:0, name:"🐉 Hắc Long Hủy Diệt (BOSS THẾ GIỚI)", hp:500000, maxHp:500000, atk:1200, def:400, hourKey:-1};
+
+function initCloud(){
+  client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
+  client.on("connect",()=>{
+    document.getElementById("sync-status").innerText = "🟢 Đã kết nối Máy Chủ 3D Cloud!";
+    client.subscribe([TOPIC_DB, TOPIC_LIVE, TOPIC_BOSS]);
+  });
+  client.on("message",(topic, payload)=>{
+    try{
+      const data = JSON.parse(payload.toString());
+      if(topic === TOPIC_DB && data.users){
+        db.firstAdmin = data.firstAdmin || db.firstAdmin;
+        for(let u in data.users){
+          if(!db.users[u] || (data.users[u].updated||0) >= (db.users[u].updated||0)) db.users[u] = data.users[u];
         }
-        const audio = new CuteAudio();
-
-        function showToast(message, bgClass = 'bg-pink-600') {
-            toastMsg.textContent = message;
-            toastMsg.className = `absolute top-14 left-1/2 -translate-x-1/2 ${bgClass} text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl pointer-events-none transition-opacity duration-300 z-50 whitespace-nowrap border-2 border-white`;
-            toastMsg.style.opacity = '1';
-            clearTimeout(showToast.timer);
-            showToast.timer = setTimeout(() => {
-                toastMsg.style.opacity = '0';
-            }, 2500);
+        localStorage.setItem("kaia3d_db", JSON.stringify(db));
+        if(curUser && db.users[curUser]){
+          if(db.users[curUser].banned){ alert("Tài khoản đã bị khóa!"); location.reload(); }
+          updateHUD();
         }
-
-        // --- USER DATABASE & AUTH SYSTEM (With Default Admin & Sample Players) ---
-        const DB_USERS_KEY = 'flappy_cute_users_db_v2';
-        const DB_CURRENT_USER_KEY = 'flappy_cute_current_user_v2';
-        const STORAGE_KEY_FACE = 'flappy_cute_custom_face_v1';
-
-        function getDefaultUsersDB() {
-            return {
-                'admin': {
-                    username: 'admin',
-                    password: '123456',
-                    role: 'admin',
-                    bestScore: 99,
-                    coins: 9999,
-                    banned: false,
-                    items: { hearts: 5, shields: 5, magnets: 5, x2cards: 5 }
-                },
-                'be_xinh_cute': {
-                    username: 'be_xinh_cute',
-                    password: '123',
-                    role: 'member',
-                    bestScore: 45,
-                    coins: 380,
-                    banned: false,
-                    items: { hearts: 2, shields: 1, magnets: 2, x2cards: 1 }
-                },
-                'cong_chua_bong_bong': {
-                    username: 'cong_chua_bong_bong',
-                    password: '123',
-                    role: 'member',
-                    bestScore: 32,
-                    coins: 250,
-                    banned: false,
-                    items: { hearts: 1, shields: 1, magnets: 0, x2cards: 0 }
-                },
-                'thien_than_sao_hong': {
-                    username: 'thien_than_sao_hong',
-                    password: '123',
-                    role: 'member',
-                    bestScore: 18,
-                    coins: 120,
-                    banned: false,
-                    items: { hearts: 0, shields: 1, magnets: 1, x2cards: 0 }
-                }
-            };
-        }
-
-        let usersDB = {};
-        let currentUser = null; // null means Guest ('Khách'), or username key in usersDB
-        let guestProfile = {
-            username: 'Khách',
-            role: 'guest',
-            bestScore: 0,
-            coins: 60, // Give guests 60 starter coins so they can try buying an item immediately!
-            banned: false,
-            items: { hearts: 1, shields: 1, magnets: 0, x2cards: 0 }
-        };
-
-        function loadUsersDB() {
-            try {
-                const raw = localStorage.getItem(DB_USERS_KEY);
-                if (raw) {
-                    usersDB = JSON.parse(raw);
-                } else {
-                    usersDB = getDefaultUsersDB();
-                }
-                // Always ensure 'admin' account exists with admin privileges
-                if (!usersDB['admin']) {
-                    usersDB['admin'] = getDefaultUsersDB()['admin'];
-                } else {
-                    usersDB['admin'].role = 'admin';
-                }
-                saveUsersDB();
-
-                const savedUser = localStorage.getItem(DB_CURRENT_USER_KEY);
-                if (savedUser && usersDB[savedUser] && !usersDB[savedUser].banned) {
-                    currentUser = savedUser;
-                }
-            } catch (e) {
-                usersDB = getDefaultUsersDB();
-            }
-        }
-
-        function saveUsersDB() {
-            try {
-                localStorage.setItem(DB_USERS_KEY, JSON.stringify(usersDB));
-            } catch (e) {}
-        }
-
-        function getActiveProfile() {
-            if (currentUser && usersDB[currentUser]) {
-                // Ensure items object exists
-                if (!usersDB[currentUser].items) {
-                    usersDB[currentUser].items = { hearts: 0, shields: 0, magnets: 0, x2cards: 0 };
-                }
-                return usersDB[currentUser];
-            }
-            return guestProfile;
-        }
-
-        function updateAllUserUI() {
-            const p = getActiveProfile();
-            hudUsername.textContent = p.username;
-            hudCoins.textContent = p.coins;
-            hudBestScore.textContent = p.bestScore;
-
-            // Show/hide Admin button
-            if (p.role === 'admin') {
-                openAdminBtn.classList.remove('hidden');
-                document.getElementById('profile-open-admin-btn').classList.remove('hidden');
-            } else {
-                openAdminBtn.classList.add('hidden');
-                document.getElementById('profile-open-admin-btn').classList.add('hidden');
-            }
-
-            // Start screen inventory summary
-            const inv = p.items;
-            document.getElementById('start-inventory-summary').textContent =
-                `❤️${inv.hearts} 🛡️${inv.shields} 🧲${inv.magnets} ✨${inv.x2cards}`;
-
-            document.getElementById('start-account-label').innerHTML =
-                p.role === 'guest'
-                    ? `Đang chơi: <b>Khách (Chưa lưu BXH)</b>`
-                    : `Thành viên: <b class="text-pink-600">${p.username}</b> ${p.role === 'admin' ? '👑' : ''}`;
-
-            document.getElementById('start-auth-link').textContent =
-                p.role === 'guest' ? 'Đăng nhập / Đăng ký' : 'Tài khoản / Đổi TK';
-
-            // Update In-Game Skill Bar counts
-            skillHeartCount.textContent = inv.hearts;
-            skillShieldCount.textContent = `x${inv.shields}`;
-            skillMagnetCount.textContent = `x${inv.magnets}`;
-            skillX2Count.textContent = `x${inv.x2cards}`;
-
-            // Update Shop Modal balances & owned counts
-            document.getElementById('shop-coins-balance').textContent = p.coins;
-            document.getElementById('shop-own-heart').textContent = `Đang có: ${inv.hearts}`;
-            document.getElementById('shop-own-shield').textContent = `Đang có: ${inv.shields}`;
-            document.getElementById('shop-own-magnet').textContent = `Đang có: ${inv.magnets}`;
-            document.getElementById('shop-own-x2').textContent = `Đang có: ${inv.x2cards}`;
-        }
-
-        // --- AUTH MODAL LOGIC ---
-        let authMode = 'login'; // 'login' or 'register'
-        const tabLoginBtn = document.getElementById('tab-login-btn');
-        const tabRegisterBtn = document.getElementById('tab-register-btn');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
-        const authErrorBox = document.getElementById('auth-error-box');
-        const authUsernameInput = document.getElementById('auth-username-input');
-        const authPasswordInput = document.getElementById('auth-password-input');
-
-        function openAuthModal() {
-            authErrorBox.classList.add('hidden');
-            const p = getActiveProfile();
-            if (p.role !== 'guest') {
-                document.getElementById('auth-logged-in-view').classList.remove('hidden');
-                document.getElementById('auth-logged-in-view').classList.add('flex');
-                document.getElementById('auth-form-view').classList.add('hidden');
-
-                document.getElementById('profile-username').textContent = p.username;
-                document.getElementById('profile-coins').textContent = p.coins;
-                document.getElementById('profile-best').textContent = p.bestScore;
-                document.getElementById('profile-role-badge').textContent =
-                    p.role === 'admin' ? '👑 Quản Trị Viên (Admin)' : '🌸 Thành Viên Chính Thức';
-            } else {
-                document.getElementById('auth-logged-in-view').classList.add('hidden');
-                document.getElementById('auth-logged-in-view').classList.remove('flex');
-                document.getElementById('auth-form-view').classList.remove('hidden');
-            }
-            authModal.classList.remove('hidden');
-        }
-
-        function setAuthTab(mode) {
-            authMode = mode;
-            authErrorBox.classList.add('hidden');
-            if (mode === 'login') {
-                tabLoginBtn.className = 'py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs';
-                tabRegisterBtn.className = 'py-1.5 rounded-lg text-xs font-bold text-gray-600';
-                authSubmitBtn.textContent = 'ĐĂNG NHẬP NGAY';
-            } else {
-                tabRegisterBtn.className = 'py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs';
-                tabLoginBtn.className = 'py-1.5 rounded-lg text-xs font-bold text-gray-600';
-                authSubmitBtn.textContent = 'ĐĂNG KÝ TÀI KHOẢN (+100 🪙)';
-            }
-        }
-
-        tabLoginBtn.addEventListener('click', () => setAuthTab('login'));
-        tabRegisterBtn.addEventListener('click', () => setAuthTab('register'));
-
-        document.getElementById('quick-fill-admin-btn').addEventListener('click', () => {
-            setAuthTab('login');
-            authUsernameInput.value = 'admin';
-            authPasswordInput.value = '123456';
-        });
-
-        authSubmitBtn.addEventListener('click', () => {
-            const uname = authUsernameInput.value.trim().toLowerCase();
-            const pass = authPasswordInput.value.trim();
-
-            if (!uname || !pass) {
-                authErrorBox.textContent = '⚠️ Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!';
-                authErrorBox.classList.remove('hidden');
-                return;
-            }
-
-            if (authMode === 'login') {
-                const userRecord = usersDB[uname];
-                if (!userRecord || userRecord.password !== pass) {
-                    authErrorBox.textContent = '❌ Sai tên đăng nhập hoặc mật khẩu!';
-                    authErrorBox.classList.remove('hidden');
-                    return;
-                }
-                if (userRecord.banned) {
-                    authErrorBox.textContent = '🚫 Tài khoản này đã bị Admin khóa! Vui lòng liên hệ Admin.';
-                    authErrorBox.classList.remove('hidden');
-                    return;
-                }
-                currentUser = uname;
-                try { localStorage.setItem(DB_CURRENT_USER_KEY, uname); } catch (e) {}
-                updateAllUserUI();
-                authModal.classList.add('hidden');
-                showToast(`🎉 Chào mừng ${uname} đã quay trở lại!`);
-            } else {
-                if (uname.length < 3) {
-                    authErrorBox.textContent = '⚠️ Tên tài khoản cần ít nhất 3 ký tự!';
-                    authErrorBox.classList.remove('hidden');
-                    return;
-                }
-                if (usersDB[uname]) {
-                    authErrorBox.textContent = '⚠️ Tên tài khoản này đã có người đăng ký!';
-                    authErrorBox.classList.remove('hidden');
-                    return;
-                }
-                usersDB[uname] = {
-                    username: uname,
-                    password: pass,
-                    role: 'member',
-                    bestScore: Math.max(0, guestProfile.bestScore),
-                    coins: 100 + guestProfile.coins, // Gift 100 bonus coins on registration!
-                    banned: false,
-                    items: { hearts: 1, shields: 1, magnets: 1, x2cards: 0 }
-                };
-                currentUser = uname;
-                saveUsersDB();
-                try { localStorage.setItem(DB_CURRENT_USER_KEY, uname); } catch (e) {}
-                updateAllUserUI();
-                authModal.classList.add('hidden');
-                showToast(`🎁 Đăng ký thành công! Tặng bạn +100 Xu & gói quà tân thủ!`);
-            }
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            currentUser = null;
-            try { localStorage.removeItem(DB_CURRENT_USER_KEY); } catch (e) {}
-            updateAllUserUI();
-            openAuthModal();
-            showToast('👋 Đã đăng xuất tài khoản!');
-        });
-
-        document.getElementById('open-auth-btn').addEventListener('click', openAuthModal);
-        document.getElementById('start-auth-link').addEventListener('click', openAuthModal);
-        document.getElementById('close-auth-btn').addEventListener('click', () => authModal.classList.add('hidden'));
-
-        // --- SHOP SYSTEM ---
-        function openShopModal() {
-            updateAllUserUI();
-            shopModal.classList.remove('hidden');
-        }
-        document.getElementById('top-shop-btn').addEventListener('click', openShopModal);
-        document.getElementById('hud-coin-btn').addEventListener('click', openShopModal);
-        document.getElementById('start-shop-btn').addEventListener('click', openShopModal);
-        document.getElementById('gameover-shop-btn').addEventListener('click', openShopModal);
-        document.getElementById('close-shop-btn').addEventListener('click', () => shopModal.classList.add('hidden'));
-
-        document.querySelectorAll('.buy-item-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const itemKey = btn.dataset.item;
-                const price = parseInt(btn.dataset.price, 10);
-                const p = getActiveProfile();
-
-                if (p.coins < price) {
-                    showToast('⚠️ Bạn chưa đủ Xu! Hãy bay ăn Sao Hồng hoặc nhờ Admin tặng nhé!', 'bg-rose-600');
-                    return;
-                }
-
-                p.coins -= price;
-                p.items[itemKey] = (p.items[itemKey] || 0) + 1;
-                saveUsersDB();
-                updateAllUserUI();
-                audio.playPowerup();
-                showToast('🛍️ Mua vật phẩm thành công!');
-            });
-        });
-
-        // --- LEADERBOARD SYSTEM ---
-        let currentRankSort = 'score'; // 'score' or 'coins'
-        const rankTabScore = document.getElementById('rank-tab-score');
-        const rankTabCoins = document.getElementById('rank-tab-coins');
-        const leaderboardList = document.getElementById('leaderboard-list');
-
-        function renderLeaderboard() {
-            const list = Object.values(usersDB).filter(u => !u.banned);
-            if (currentRankSort === 'score') {
-                list.sort((a, b) => b.bestScore - a.bestScore || b.coins - a.coins);
-            } else {
-                list.sort((a, b) => b.coins - a.coins || b.bestScore - a.bestScore);
-            }
-
-            leaderboardList.innerHTML = '';
-            list.forEach((u, idx) => {
-                let rankBadge = `<span class="w-6 h-6 rounded-full bg-pink-100 text-pink-600 font-extrabold text-xs flex items-center justify-center">${idx + 1}</span>`;
-                if (idx === 0) rankBadge = `<span class="text-xl">🥇</span>`;
-                else if (idx === 1) rankBadge = `<span class="text-xl">🥈</span>`;
-                else if (idx === 2) rankBadge = `<span class="text-xl">🥉</span>`;
-
-                const isMe = currentUser === u.username;
-                const row = document.createElement('div');
-                row.className = `flex items-center justify-between p-2.5 rounded-2xl border-2 ${isMe ? 'bg-pink-50 border-pink-400' : 'bg-white border-pink-100'} shadow-xs`;
-                row.innerHTML = `
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 flex items-center justify-center">${rankBadge}</div>
-                        <div>
-                            <div class="flex items-center gap-1">
-                                <span class="font-extrabold text-xs sm:text-sm text-gray-800">${u.username}</span>
-                                ${u.role === 'admin' ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">👑 Admin</span>' : ''}
-                                ${isMe ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-pink-500 text-white font-bold">Bạn</span>' : ''}
-                            </div>
-                            <div class="text-[10px] text-gray-400 font-semibold">
-                                Kho đồ: ❤️${u.items?.hearts || 0} 🛡️${u.items?.shields || 0} 🧲${u.items?.magnets || 0}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-cute font-bold text-sm ${currentRankSort === 'score' ? 'text-pink-600' : 'text-amber-600'}">
-                            ${currentRankSort === 'score' ? `🏆 ${u.bestScore} điểm` : `🪙 ${u.coins} Xu`}
-                        </div>
-                        <div class="text-[10px] text-gray-400 font-bold">
-                            ${currentRankSort === 'score' ? `🪙 ${u.coins} Xu` : `🏆 ${u.bestScore} điểm`}
-                        </div>
-                    </div>
-                `;
-                leaderboardList.appendChild(row);
-            });
-        }
-
-        function openLeaderboardModal() {
-            renderLeaderboard();
-            leaderboardModal.classList.remove('hidden');
-        }
-
-        rankTabScore.addEventListener('click', () => {
-            currentRankSort = 'score';
-            rankTabScore.className = 'py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs';
-            rankTabCoins.className = 'py-1.5 rounded-lg text-xs font-bold text-gray-600';
-            renderLeaderboard();
-        });
-
-        rankTabCoins.addEventListener('click', () => {
-            currentRankSort = 'coins';
-            rankTabCoins.className = 'py-1.5 rounded-lg text-xs font-bold bg-white text-pink-600 shadow-xs';
-            rankTabScore.className = 'py-1.5 rounded-lg text-xs font-bold text-gray-600';
-            renderLeaderboard();
-        });
-
-        document.getElementById('top-leaderboard-btn').addEventListener('click', openLeaderboardModal);
-        document.getElementById('hud-rank-btn').addEventListener('click', openLeaderboardModal);
-        document.getElementById('start-rank-btn').addEventListener('click', openLeaderboardModal);
-        document.getElementById('gameover-rank-btn').addEventListener('click', openLeaderboardModal);
-        document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardModal.classList.add('hidden'));
-
-        // --- ADMIN PANEL SYSTEM ---
-        let selectedAdminTarget = 'admin';
-        const adminSelectedUserEl = document.getElementById('admin-selected-user');
-        const adminMemberList = document.getElementById('admin-member-list');
-        const adminGiftCoinsInput = document.getElementById('admin-gift-coins');
-        const adminSetScoreInput = document.getElementById('admin-set-score');
-
-        function selectAdminTarget(uname) {
-            selectedAdminTarget = uname;
-            adminSelectedUserEl.textContent = uname;
-            const u = usersDB[uname];
-            if (u) {
-                adminSetScoreInput.value = u.bestScore;
-            }
-            renderAdminMemberList();
-        }
-
-        function renderAdminMemberList() {
-            const members = Object.values(usersDB);
-            document.getElementById('admin-user-count').textContent = members.length;
-            adminMemberList.innerHTML = '';
-
-            members.forEach(u => {
-                const isSelected = u.username === selectedAdminTarget;
-                const row = document.createElement('div');
-                row.className = `p-2.5 rounded-2xl border-2 transition cursor-pointer flex items-center justify-between gap-2 ${
-                    u.banned ? 'bg-rose-50 border-rose-300 opacity-80' : isSelected ? 'bg-amber-100/80 border-amber-400' : 'bg-white border-gray-200'
-                }`;
-
-                row.innerHTML = `
-                    <div class="flex-1 min-w-0" data-select="${u.username}">
-                        <div class="flex items-center gap-1.5">
-                            <span class="font-extrabold text-xs text-gray-800 truncate">${u.username}</span>
-                            ${u.role === 'admin' ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500 text-white font-bold">ADMIN</span>' : ''}
-                            ${u.banned ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-bold">ĐÃ KHÓA</span>' : ''}
-                        </div>
-                        <div class="text-[11px] font-bold text-gray-600 mt-0.5">
-                            🏆 Điểm: <span class="text-pink-600">${u.bestScore}</span> | 🪙 Xu: <span class="text-amber-600">${u.coins}</span>
-                        </div>
-                        <div class="text-[10px] text-gray-400">
-                            Đồ: ❤️${u.items?.hearts || 0} 🛡️${u.items?.shields || 0} 🧲${u.items?.magnets || 0} ✨${u.items?.x2cards || 0}
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1 shrink-0">
-                        ${u.role !== 'admin' ? `
-                            <button data-ban="${u.username}" class="px-2.5 py-1.5 rounded-xl font-bold text-[10px] text-white ${u.banned ? 'bg-emerald-500' : 'bg-rose-500'} shadow-xs">
-                                ${u.banned ? '🔓 Mở khóa' : '🚫 Cấm'}
-                            </button>
-                            <button data-del="${u.username}" class="w-7 h-7 rounded-xl bg-gray-200 hover:bg-rose-100 text-gray-600 hover:text-rose-600 flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        ` : '<span class="text-[10px] font-bold text-amber-600 px-2">Chủ Shop</span>'}
-                    </div>
-                `;
-
-                row.querySelector(`[data-select="${u.username}"]`).addEventListener('click', () => {
-                    selectAdminTarget(u.username);
-                });
-
-                const banBtn = row.querySelector(`[data-ban="${u.username}"]`);
-                if (banBtn) {
-                    banBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        u.banned = !u.banned;
-                        saveUsersDB();
-                        renderAdminMemberList();
-                        showToast(u.banned ? `🚫 Đã khóa tài khoản ${u.username}!` : `🔓 Đã mở khóa cho ${u.username}!`);
-                    });
-                }
-
-                const delBtn = row.querySelector(`[data-del="${u.username}"]`);
-                if (delBtn) {
-                    delBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        delete usersDB[u.username];
-                        if (selectedAdminTarget === u.username) selectedAdminTarget = 'admin';
-                        saveUsersDB();
-                        renderAdminMemberList();
-                        showToast(`🗑️ Đã xóa thành viên ${u.username}!`);
-                    });
-                }
-
-                adminMemberList.appendChild(row);
-            });
-        }
-
-        function openAdminModal() {
-            const p = getActiveProfile();
-            if (p.role !== 'admin') {
-                showToast('⚠️ Chỉ tài khoản Admin mới truy cập được!', 'bg-rose-600');
-                return;
-            }
-            authModal.classList.add('hidden');
-            selectAdminTarget(selectedAdminTarget || 'admin');
-            adminModal.classList.remove('hidden');
-        }
-
-        document.getElementById('admin-apply-gift-btn').addEventListener('click', () => {
-            const target = usersDB[selectedAdminTarget];
-            if (!target) return;
-            const addCoins = parseInt(adminGiftCoinsInput.value || '0', 10) || 0;
-            const newScoreRaw = adminSetScoreInput.value.trim();
-
-            target.coins = Math.max(0, target.coins + addCoins);
-            if (newScoreRaw !== '') {
-                target.bestScore = Math.max(0, parseInt(newScoreRaw, 10) || 0);
-            }
-            saveUsersDB();
-            updateAllUserUI();
-            renderAdminMemberList();
-            audio.playPowerup();
-            showToast(`🎁 Đã cập nhật Xu & Điểm cho ${target.username}!`, 'bg-emerald-600');
-        });
-
-        document.getElementById('admin-gift-pack-btn').addEventListener('click', () => {
-            const target = usersDB[selectedAdminTarget];
-            if (!target) return;
-            if (!target.items) target.items = { hearts: 0, shields: 0, magnets: 0, x2cards: 0 };
-            target.items.hearts += 5;
-            target.items.shields += 5;
-            target.items.magnets += 5;
-            target.items.x2cards += 5;
-            saveUsersDB();
-            updateAllUserUI();
-            renderAdminMemberList();
-            audio.playPowerup();
-            showToast(`✨ Đã tặng Combo +5 mọi vật phẩm cho ${target.username}!`, 'bg-pink-600');
-        });
-
-        openAdminBtn.addEventListener('click', openAdminModal);
-        document.getElementById('profile-open-admin-btn').addEventListener('click', openAdminModal);
-        document.getElementById('close-admin-btn').addEventListener('click', () => adminModal.classList.add('hidden'));
-
-        // --- AVATAR / FACE IMAGE HANDLING ---
-        let userFaceImg = null;
-        let hasCustomFace = false;
-
-        function updateAvatarUIState() {
-            if (hasCustomFace) {
-                avatarStatusBadge.textContent = 'Ảnh Thật Của Bạn 💖';
-                avatarStatusBadge.className = 'absolute -bottom-2 bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow';
-                resetAvatarBtn.classList.remove('hidden');
-            } else {
-                avatarStatusBadge.textContent = 'Chibi Sao Hồng ✨';
-                avatarStatusBadge.className = 'absolute -bottom-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow';
-                resetAvatarBtn.classList.add('hidden');
-            }
-        }
-
-        function initAvatarImage() {
-            try {
-                const savedDataUrl = localStorage.getItem(STORAGE_KEY_FACE);
-                if (savedDataUrl) {
-                    const img = new Image();
-                    img.onload = () => {
-                        userFaceImg = img;
-                        hasCustomFace = true;
-                        updateAvatarUIState();
-                    };
-                    img.src = savedDataUrl;
-                    return;
-                }
-            } catch (e) {}
-
-            const defaultImg = new Image();
-            defaultImg.onload = () => {
-                userFaceImg = defaultImg;
-                hasCustomFace = true;
-                updateAvatarUIState();
-            };
-            defaultImg.onerror = () => {
-                hasCustomFace = false;
-                updateAvatarUIState();
-            };
-            defaultImg.src = 'image_4.png';
-        }
-
-        function handleFileUpload(e) {
-            const file = e.target.files && e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const rawImg = new Image();
-                rawImg.onload = () => {
-                    const offCanvas = document.createElement('canvas');
-                    const size = 240;
-                    offCanvas.width = size;
-                    offCanvas.height = size;
-                    const offCtx = offCanvas.getContext('2d');
-
-                    const minSide = Math.min(rawImg.width, rawImg.height);
-                    const sx = (rawImg.width - minSide) / 2;
-                    const sy = Math.max(0, (rawImg.height - minSide) * 0.35);
-
-                    offCtx.drawImage(rawImg, sx, sy, minSide, minSide, 0, 0, size, size);
-                    const resizedDataUrl = offCanvas.toDataURL('image/jpeg', 0.88);
-
-                    const finalImg = new Image();
-                    finalImg.onload = () => {
-                        userFaceImg = finalImg;
-                        hasCustomFace = true;
-                        updateAvatarUIState();
-                        showToast('💖 Đã ghép khuôn mặt vào nhân vật thành công!');
-                    };
-                    finalImg.src = resizedDataUrl;
-
-                    try {
-                        localStorage.setItem(STORAGE_KEY_FACE, resizedDataUrl);
-                    } catch (err) {}
-                };
-                rawImg.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-            fileInput.value = '';
-        }
-
-        fileInput.addEventListener('change', handleFileUpload);
-        topUploadBtn.addEventListener('click', () => fileInput.click());
-        startUploadBtn.addEventListener('click', () => fileInput.click());
-
-        resetAvatarBtn.addEventListener('click', () => {
-            userFaceImg = null;
-            hasCustomFace = false;
-            try { localStorage.removeItem(STORAGE_KEY_FACE); } catch (e) {}
-            updateAvatarUIState();
-            showToast('🌸 Đã chuyển về khuôn mặt Chibi Sao Hồng!');
-        });
-
-        // --- HELPER: DRAW FIVE-POINTED STAR ---
-        function drawStarShape(c, cx, cy, spikes, outerRadius, innerRadius, fillStyle, strokeStyle) {
-            let rot = Math.PI / 2 * 3;
-            let x = cx;
-            let y = cy;
-            const step = Math.PI / spikes;
-
-            c.beginPath();
-            c.moveTo(cx, cy - outerRadius);
-            for (let i = 0; i < spikes; i++) {
-                x = cx + Math.cos(rot) * outerRadius;
-                y = cy + Math.sin(rot) * outerRadius;
-                c.lineTo(x, y);
-                rot += step;
-
-                x = cx + Math.cos(rot) * innerRadius;
-                y = cy + Math.sin(rot) * innerRadius;
-                c.lineTo(x, y);
-                rot += step;
-            }
-            c.lineTo(cx, cy - outerRadius);
-            c.closePath();
-            if (fillStyle) {
-                c.fillStyle = fillStyle;
-                c.fill();
-            }
-            if (strokeStyle) {
-                c.strokeStyle = strokeStyle;
-                c.lineWidth = 1.5;
-                c.stroke();
-            }
-        }
-
-        /**
-         * DRAW CHARACTER AVATAR (With Shield Aura & Magnet Ring if active)
-         */
-        function drawCharacterAvatar(targetCtx, x, y, radius, wingAngle, tiltAngle, isBlinking, shieldActive = false, magnetActive = false) {
-            targetCtx.save();
-            targetCtx.translate(x, y);
-
-            // Magnet Aura Ring
-            if (magnetActive) {
-                targetCtx.save();
-                targetCtx.strokeStyle = 'rgba(192, 132, 252, 0.7)';
-                targetCtx.lineWidth = 3;
-                targetCtx.setLineDash([6, 6]);
-                targetCtx.beginPath();
-                targetCtx.arc(0, 0, radius + 16 + Math.sin(performance.now() * 0.01) * 4, 0, Math.PI * 2);
-                targetCtx.stroke();
-                targetCtx.restore();
-            }
-
-            // Immortal Rainbow Shield Bubble
-            if (shieldActive) {
-                targetCtx.save();
-                const shieldGrad = targetCtx.createRadialGradient(0, 0, radius * 0.7, 0, 0, radius + 14);
-                shieldGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
-                shieldGrad.addColorStop(0.7, 'rgba(56, 189, 248, 0.25)');
-                shieldGrad.addColorStop(1, 'rgba(244, 114, 182, 0.75)');
-                targetCtx.fillStyle = shieldGrad;
-                targetCtx.beginPath();
-                targetCtx.arc(0, 0, radius + 14, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                targetCtx.strokeStyle = '#38bdf8';
-                targetCtx.lineWidth = 2.5;
-                targetCtx.beginPath();
-                targetCtx.arc(0, 0, radius + 13, 0, Math.PI * 2);
-                targetCtx.stroke();
-                targetCtx.restore();
-            }
-
-            targetCtx.rotate(tiltAngle);
-
-            // 1. Back Angel Wing
-            targetCtx.save();
-            targetCtx.translate(-radius * 0.45, -radius * 0.1);
-            targetCtx.rotate(Math.sin(wingAngle) * 0.55 - 0.25);
-            targetCtx.fillStyle = '#fff1f2';
-            targetCtx.strokeStyle = '#f472b6';
-            targetCtx.lineWidth = 2;
-            targetCtx.beginPath();
-            targetCtx.ellipse(-radius * 0.55, 0, radius * 0.58, radius * 0.32, 0.2, 0, Math.PI * 2);
-            targetCtx.fill();
-            targetCtx.stroke();
-            targetCtx.restore();
-
-            // 2. Cute Pink Plush Ear Headband on Top of Head
-            targetCtx.save();
-            targetCtx.rotate(-0.12);
-            targetCtx.fillStyle = '#ff9ebb';
-            targetCtx.strokeStyle = '#ec4899';
-            targetCtx.lineWidth = 2;
-            targetCtx.beginPath();
-            targetCtx.ellipse(-radius * 0.52, -radius * 0.92, radius * 0.36, radius * 0.46, -0.35, 0, Math.PI * 2);
-            targetCtx.fill();
-            targetCtx.stroke();
-
-            targetCtx.fillStyle = '#ffd1dc';
-            targetCtx.beginPath();
-            targetCtx.ellipse(-radius * 0.52, -radius * 0.90, radius * 0.20, radius * 0.28, -0.35, 0, Math.PI * 2);
-            targetCtx.fill();
-
-            targetCtx.fillStyle = '#ff9ebb';
-            targetCtx.beginPath();
-            targetCtx.ellipse(radius * 0.52, -radius * 0.92, radius * 0.36, radius * 0.46, 0.35, 0, Math.PI * 2);
-            targetCtx.fill();
-            targetCtx.stroke();
-
-            targetCtx.fillStyle = '#ffd1dc';
-            targetCtx.beginPath();
-            targetCtx.ellipse(radius * 0.52, -radius * 0.90, radius * 0.20, radius * 0.28, 0.35, 0, Math.PI * 2);
-            targetCtx.fill();
-            targetCtx.restore();
-
-            // 3. Cute White & Teal Shirt Collar
-            targetCtx.save();
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.strokeStyle = '#0d9488';
-            targetCtx.lineWidth = 2;
-            targetCtx.beginPath();
-            targetCtx.arc(0, radius * 0.95, radius * 0.55, Math.PI * 1.15, Math.PI * 1.85, false);
-            targetCtx.fill();
-
-            targetCtx.fillStyle = '#0f766e';
-            targetCtx.beginPath();
-            targetCtx.moveTo(-radius * 0.55, radius * 0.72);
-            targetCtx.lineTo(-radius * 0.15, radius * 1.12);
-            targetCtx.lineTo(-radius * 0.68, radius * 1.05);
-            targetCtx.closePath();
-            targetCtx.fill();
-
-            targetCtx.beginPath();
-            targetCtx.moveTo(radius * 0.55, radius * 0.72);
-            targetCtx.lineTo(radius * 0.15, radius * 1.12);
-            targetCtx.lineTo(radius * 0.68, radius * 1.05);
-            targetCtx.closePath();
-            targetCtx.fill();
-            targetCtx.restore();
-
-            // 4. Head Circle (Clipped)
-            targetCtx.save();
-            targetCtx.beginPath();
-            targetCtx.arc(0, 0, radius, 0, Math.PI * 2);
-            targetCtx.closePath();
-            targetCtx.clip();
-
-            if (hasCustomFace && userFaceImg) {
-                targetCtx.drawImage(userFaceImg, -radius, -radius, radius * 2, radius * 2);
-                const grad = targetCtx.createRadialGradient(0, 0, radius * 0.65, 0, 0, radius);
-                grad.addColorStop(0, 'rgba(255,192,203,0)');
-                grad.addColorStop(1, 'rgba(244,114,182,0.28)');
-                targetCtx.fillStyle = grad;
-                targetCtx.fillRect(-radius, -radius, radius * 2, radius * 2);
-            } else {
-                const skinGrad = targetCtx.createRadialGradient(-radius * 0.15, -radius * 0.15, radius * 0.1, 0, 0, radius);
-                skinGrad.addColorStop(0, '#fff7f5');
-                skinGrad.addColorStop(1, '#fde2dd');
-                targetCtx.fillStyle = skinGrad;
-                targetCtx.fillRect(-radius, -radius, radius * 2, radius * 2);
-
-                // Hair
-                targetCtx.fillStyle = '#272024';
-                targetCtx.beginPath();
-                targetCtx.arc(0, -radius * 0.15, radius * 1.02, Math.PI * 0.92, Math.PI * 2.08);
-                targetCtx.lineTo(radius, -radius);
-                targetCtx.lineTo(-radius, -radius);
-                targetCtx.closePath();
-                targetCtx.fill();
-
-                targetCtx.fillStyle = skinGrad;
-                targetCtx.beginPath();
-                targetCtx.ellipse(radius * 0.04, radius * 0.08, radius * 0.85, radius * 0.88, -0.12, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                // 2 Signature Pink Star Stickers on Forehead
-                drawStarShape(targetCtx, radius * 0.22, -radius * 0.50, 5, radius * 0.16, radius * 0.08, '#ff9ebb', '#f472b6');
-                drawStarShape(targetCtx, radius * 0.66, -radius * 0.12, 5, radius * 0.14, radius * 0.07, '#ff9ebb', '#f472b6');
-
-                // Eyebrows
-                targetCtx.strokeStyle = '#4a3f44';
-                targetCtx.lineWidth = 2.2;
-                targetCtx.lineCap = 'round';
-                targetCtx.beginPath();
-                targetCtx.moveTo(-radius * 0.48, -radius * 0.22);
-                targetCtx.quadraticCurveTo(-radius * 0.24, -radius * 0.35, -radius * 0.05, -radius * 0.18);
-                targetCtx.stroke();
-                targetCtx.beginPath();
-                targetCtx.moveTo(radius * 0.22, -radius * 0.10);
-                targetCtx.quadraticCurveTo(radius * 0.44, -radius * 0.18, radius * 0.62, -radius * 0.02);
-                targetCtx.stroke();
-
-                // Eyes
-                const drawCuteEye = (ex, ey, tilt) => {
-                    targetCtx.save();
-                    targetCtx.translate(ex, ey);
-                    targetCtx.rotate(tilt);
-                    if (isBlinking) {
-                        targetCtx.strokeStyle = '#272024';
-                        targetCtx.lineWidth = 2.5;
-                        targetCtx.beginPath();
-                        targetCtx.arc(0, 0, radius * 0.16, 0.1, Math.PI - 0.1);
-                        targetCtx.stroke();
-                    } else {
-                        targetCtx.fillStyle = '#ffffff';
-                        targetCtx.beginPath();
-                        targetCtx.ellipse(0, 0, radius * 0.18, radius * 0.14, 0, 0, Math.PI * 2);
-                        targetCtx.fill();
-
-                        targetCtx.fillStyle = '#232023';
-                        targetCtx.beginPath();
-                        targetCtx.arc(0, 0, radius * 0.125, 0, Math.PI * 2);
-                        targetCtx.fill();
-
-                        targetCtx.fillStyle = '#090809';
-                        targetCtx.beginPath();
-                        targetCtx.arc(0, 0, radius * 0.065, 0, Math.PI * 2);
-                        targetCtx.fill();
-
-                        targetCtx.fillStyle = '#ffffff';
-                        targetCtx.beginPath();
-                        targetCtx.arc(-radius * 0.045, -radius * 0.045, radius * 0.042, 0, Math.PI * 2);
-                        targetCtx.fill();
-                        targetCtx.beginPath();
-                        targetCtx.arc(radius * 0.045, radius * 0.04, radius * 0.02, 0, Math.PI * 2);
-                        targetCtx.fill();
-
-                        targetCtx.strokeStyle = '#1f191c';
-                        targetCtx.lineWidth = 2.2;
-                        targetCtx.beginPath();
-                        targetCtx.arc(0, radius * 0.02, radius * 0.18, Math.PI * 1.1, Math.PI * 1.92);
-                        targetCtx.stroke();
-                    }
-                    targetCtx.restore();
-                };
-
-                drawCuteEye(-radius * 0.25, -radius * 0.02, 0.12);
-                drawCuteEye(radius * 0.36, radius * 0.11, 0.12);
-
-                // Cheeks
-                targetCtx.fillStyle = 'rgba(255, 115, 155, 0.35)';
-                targetCtx.beginPath();
-                targetCtx.ellipse(-radius * 0.42, radius * 0.18, radius * 0.18, radius * 0.11, 0.1, 0, Math.PI * 2);
-                targetCtx.fill();
-                targetCtx.beginPath();
-                targetCtx.ellipse(radius * 0.42, radius * 0.30, radius * 0.16, radius * 0.10, 0.1, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                // Nose & beauty mark
-                targetCtx.strokeStyle = '#e0a99e';
-                targetCtx.lineWidth = 1.6;
-                targetCtx.beginPath();
-                targetCtx.arc(radius * 0.04, radius * 0.24, radius * 0.06, 0.3, Math.PI - 0.3);
-                targetCtx.stroke();
-
-                targetCtx.fillStyle = '#7c5850';
-                targetCtx.beginPath();
-                targetCtx.arc(radius * 0.06, radius * 0.12, 1.1, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                // Pink Lips
-                targetCtx.save();
-                targetCtx.translate(-radius * 0.02, radius * 0.46);
-                targetCtx.rotate(0.14);
-                const lipGrad = targetCtx.createRadialGradient(0, 0, 1, 0, 0, radius * 0.22);
-                lipGrad.addColorStop(0, '#ff3b7d');
-                lipGrad.addColorStop(1, '#ff94b8');
-                targetCtx.fillStyle = lipGrad;
-                targetCtx.beginPath();
-                targetCtx.ellipse(0, 0, radius * 0.20, radius * 0.10, 0, 0, Math.PI * 2);
-                targetCtx.fill();
-
-                targetCtx.strokeStyle = '#be185d';
-                targetCtx.lineWidth = 1.4;
-                targetCtx.beginPath();
-                targetCtx.moveTo(-radius * 0.19, -radius * 0.01);
-                targetCtx.quadraticCurveTo(0, radius * 0.04, radius * 0.19, -radius * 0.01);
-                targetCtx.stroke();
-                targetCtx.restore();
-            }
-            targetCtx.restore();
-
-            // 5. Outer Glowing Ring Border
-            targetCtx.strokeStyle = shieldActive ? '#38bdf8' : '#f472b6';
-            targetCtx.lineWidth = 3.5;
-            targetCtx.beginPath();
-            targetCtx.arc(0, 0, radius, 0, Math.PI * 2);
-            targetCtx.stroke();
-
-            if (hasCustomFace) {
-                drawStarShape(targetCtx, radius * 0.55, -radius * 0.68, 5, radius * 0.18, radius * 0.09, '#ff9ebb', '#ffffff');
-            }
-
-            // 6. Front Flapping Angel Wing
-            targetCtx.save();
-            targetCtx.translate(-radius * 0.55, radius * 0.08);
-            targetCtx.rotate(Math.sin(wingAngle) * 0.72);
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.strokeStyle = '#ec4899';
-            targetCtx.lineWidth = 2.2;
-            targetCtx.beginPath();
-            targetCtx.ellipse(-radius * 0.45, 0, radius * 0.62, radius * 0.35, -0.15, 0, Math.PI * 2);
-            targetCtx.fill();
-            targetCtx.stroke();
-            targetCtx.restore();
-
-            targetCtx.restore();
-        }
-
-        // --- DIFFICULTY SETTINGS ---
-        const DIFFICULTIES = {
-            easy: { gravity: 1150, jumpVelocity: -390, pipeSpeed: 152, pipeGap: 186, pipeInterval: 1.95 },
-            normal: { gravity: 1340, jumpVelocity: -415, pipeSpeed: 185, pipeGap: 162, pipeInterval: 1.65 },
-            hard: { gravity: 1500, jumpVelocity: -440, pipeSpeed: 225, pipeGap: 145, pipeInterval: 1.4 }
-        };
-        let currentDifficulty = 'easy';
-
-        document.querySelectorAll('.diff-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentDifficulty = btn.dataset.diff;
-                document.querySelectorAll('.diff-btn').forEach(b => {
-                    b.className = 'diff-btn py-1 rounded-xl text-xs font-bold transition bg-white text-pink-600 border border-pink-200';
-                });
-                btn.className = 'diff-btn py-1 rounded-xl text-xs font-bold transition bg-pink-500 text-white shadow-sm';
-            });
-        });
-
-        // --- GAME STATE & ACTIVE BUFFS ---
-        let gameState = 'START';
-        let score = 0;
-        let roundEarnedCoins = 0;
-
-        let shieldTimer = 0;
-        let magnetTimer = 0;
-        let isX2Active = false;
-
-        let cw = 400;
-        let ch = 700;
-        const groundHeight = 82;
-
-        const player = {
-            x: 115,
-            y: 300,
-            vy: 0,
-            radius: 26,
-            wingPhase: 0,
-            rotation: 0,
-            blinkTimer: 0,
-            isBlinking: false
-        };
-
-        let pipes = [];
-        let pipeSpawnTimer = 0;
-        let stars = [];
-        let particles = [];
-        let floatingTexts = [];
-        let clouds = [];
-        let sakuraPetals = [];
-        let groundScroll = 0;
-
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            cw = rect.width;
-            ch = rect.height;
-            canvas.width = cw;
-            canvas.height = ch;
-            player.x = Math.min(120, cw * 0.28);
-            if (gameState === 'START') {
-                player.y = ch * 0.44;
-            }
-        }
-        window.addEventListener('resize', resizeCanvas);
-
-        function initScenery() {
-            clouds = [];
-            for (let i = 0; i < 5; i++) {
-                clouds.push({
-                    x: Math.random() * cw,
-                    y: 55 + Math.random() * (ch * 0.42),
-                    scale: 0.6 + Math.random() * 0.6,
-                    speed: 18 + Math.random() * 20
-                });
-            }
-            sakuraPetals = [];
-            for (let i = 0; i < 14; i++) {
-                sakuraPetals.push({
-                    x: Math.random() * cw,
-                    y: Math.random() * ch,
-                    size: 4 + Math.random() * 5,
-                    speedX: -20 - Math.random() * 25,
-                    speedY: 22 + Math.random() * 28,
-                    angle: Math.random() * Math.PI * 2,
-                    spin: (Math.random() - 0.5) * 3
-                });
-            }
-        }
-
-        function spawnFlapParticles(x, y) {
-            const colors = ['#ff80b5', '#fbcfe8', '#fde047', '#ffffff'];
-            for (let i = 0; i < 6; i++) {
-                particles.push({
-                    x: x - 12,
-                    y: y + 6,
-                    vx: -40 - Math.random() * 70,
-                    vy: (Math.random() - 0.5) * 90 + 30,
-                    size: 4 + Math.random() * 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    life: 1,
-                    type: 'circle'
-                });
-            }
-        }
-
-        function spawnStarBurst(x, y, color = '#ff69b4') {
-            for (let i = 0; i < 14; i++) {
-                const angle = (Math.PI * 2 * i) / 14;
-                const speed = 60 + Math.random() * 100;
-                particles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: 5 + Math.random() * 4,
-                    color: i % 2 === 0 ? color : '#fef08a',
-                    life: 1,
-                    type: 'star'
-                });
-            }
-        }
-
-        function addFloatingText(text, x, y, color = '#db2777') {
-            floatingTexts.push({ text, x, y, vy: -55, life: 1, color });
-        }
-
-        // --- IN-GAME SKILL ACTIVATION ---
-        function activateShieldSkill() {
-            if (gameState !== 'PLAYING') return;
-            const p = getActiveProfile();
-            if (p.items.shields <= 0) {
-                showToast('⚠️ Hết Khiên Bất Tử! Hãy mua thêm trong Shop nhé!', 'bg-rose-600');
-                return;
-            }
-            p.items.shields -= 1;
-            shieldTimer = Math.max(shieldTimer, 0) + 5.0; // +5 seconds of immortality
-            saveUsersDB();
-            updateAllUserUI();
-            audio.playPowerup();
-            spawnStarBurst(player.x, player.y, '#38bdf8');
-            addFloatingText('🛡️ BẤT TỬ 5 GIÂY!', player.x, player.y - 35, '#0284c7');
-        }
-
-        function activateMagnetSkill() {
-            if (gameState !== 'PLAYING') return;
-            const p = getActiveProfile();
-            if (p.items.magnets <= 0) {
-                showToast('⚠️ Hết Nam Châm! Hãy mua thêm trong Shop nhé!', 'bg-rose-600');
-                return;
-            }
-            p.items.magnets -= 1;
-            magnetTimer = Math.max(magnetTimer, 0) + 15.0; // 15 seconds of star magnet
-            saveUsersDB();
-            updateAllUserUI();
-            audio.playPowerup();
-            spawnStarBurst(player.x, player.y, '#a855f7');
-            addFloatingText('🧲 HÚT SAO 15 GIÂY!', player.x, player.y - 35, '#9333ea');
-        }
-
-        function activateX2Skill() {
-            if (gameState !== 'PLAYING') return;
-            if (isX2Active) {
-                showToast('✨ Thẻ Nhân Đôi đã được bật trong ván này rồi!');
-                return;
-            }
-            const p = getActiveProfile();
-            if (p.items.x2cards <= 0) {
-                showToast('⚠️ Hết Thẻ x2! Hãy mua thêm trong Shop nhé!', 'bg-rose-600');
-                return;
-            }
-            p.items.x2cards -= 1;
-            isX2Active = true;
-            buffX2Pill.classList.remove('hidden');
-            saveUsersDB();
-            updateAllUserUI();
-            audio.playPowerup();
-            spawnStarBurst(player.x, player.y, '#f59e0b');
-            addFloatingText('✨ X2 ĐIỂM & XU!', player.x, player.y - 35, '#d97706');
-        }
-
-        useShieldBtn.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            activateShieldSkill();
-        });
-        useMagnetBtn.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            activateMagnetSkill();
-        });
-        useX2Btn.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            activateX2Skill();
-        });
-
-        // Try consuming a Heart Revive before triggering Game Over
-        function tryHeartRevive() {
-            const p = getActiveProfile();
-            if (p.items.hearts > 0) {
-                p.items.hearts -= 1;
-                saveUsersDB();
-                updateAllUserUI();
-
-                // Bounce player back safely to center & grant 2.5s shield + clear nearby pipes
-                player.y = Math.min(ch * 0.45, ch - groundHeight - 100);
-                player.vy = -340;
-                shieldTimer = Math.max(shieldTimer, 2.5);
-                pipes = pipes.filter(pipe => pipe.x > player.x + 150);
-
-                audio.playPowerup();
-                spawnStarBurst(player.x, player.y, '#f43f5e');
-                addFloatingText('❤️ HỒI SINH! (-1 Tim)', player.x, player.y - 35, '#e11d48');
-                return true;
-            }
-            return false;
-        }
-
-        // --- GAMEPLAY CONTROLS ---
-        function flap() {
-            if (gameState !== 'PLAYING') return;
-            const cfg = DIFFICULTIES[currentDifficulty];
-            player.vy = cfg.jumpVelocity;
-            player.wingPhase += 1.8;
-            audio.playFlap();
-            spawnFlapParticles(player.x, player.y);
-        }
-
-        function startGame() {
-            const p = getActiveProfile();
-            if (p.banned) {
-                showToast('🚫 Tài khoản của bạn đã bị Admin khóa!', 'bg-rose-600');
-                return;
-            }
-
-            audio.init();
-            gameState = 'PLAYING';
-            score = 0;
-            roundEarnedCoins = 0;
-            shieldTimer = 0;
-            magnetTimer = 0;
-            isX2Active = false;
-
-            document.getElementById('live-score').textContent = '0';
-            buffShieldPill.classList.add('hidden');
-            buffMagnetPill.classList.add('hidden');
-            buffX2Pill.classList.add('hidden');
-
-            player.y = ch * 0.42;
-            player.vy = 0;
-            player.rotation = 0;
-
-            pipes = [];
-            stars = [];
-            particles = [];
-            floatingTexts = [];
-            pipeSpawnTimer = 0.6;
-
-            startScreen.classList.add('hidden');
-            gameoverScreen.classList.add('hidden');
-            topSubBar.classList.add('hidden');
-            document.getElementById('live-score-container').classList.remove('hidden');
-            ingameSkillBar.classList.remove('hidden');
-
-            updateAllUserUI();
-            flap();
-        }
-
-        function triggerGameOver() {
-            if (gameState === 'GAMEOVER') return;
-            // Check if player has Heart Revive item!
-            if (tryHeartRevive()) return;
-
-            gameState = 'GAMEOVER';
-            audio.playHit();
-            spawnStarBurst(player.x, player.y, '#f43f5e');
-
-            const p = getActiveProfile();
-            if (score > p.bestScore) {
-                p.bestScore = score;
-            }
-            saveUsersDB();
-            updateAllUserUI();
-
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('final-best').textContent = p.bestScore;
-            document.getElementById('final-earned-coins').textContent = `+${roundEarnedCoins} 🪙`;
-
-            const medalEmojiEl = document.getElementById('medal-emoji');
-            const medalTitleEl = document.getElementById('medal-title');
-            const gameoverCommentEl = document.getElementById('gameover-comment');
-
-            if (score >= 40) {
-                medalEmojiEl.textContent = '💎';
-                medalTitleEl.textContent = 'Nữ Hoàng Bay Lượn (Kim Cương)';
-                gameoverCommentEl.textContent = 'Đỉnh của chóp! Không ai sánh bằng bạn luôn!';
-            } else if (score >= 20) {
-                medalEmojiEl.textContent = '👑';
-                medalTitleEl.textContent = 'Thiên Thần Tỏa Sáng (Vàng)';
-                gameoverCommentEl.textContent = 'Xuất sắc quá! Phản xạ siêu nhanh nhạy!';
-            } else if (score >= 10) {
-                medalEmojiEl.textContent = '🌟';
-                medalTitleEl.textContent = 'Ngôi Sao Dễ Thương (Bạc)';
-                gameoverCommentEl.textContent = 'Rất tuyệt vời! Mua thêm Khiên để phá kỷ lục nhé!';
-            } else {
-                medalEmojiEl.textContent = '🎀';
-                medalTitleEl.textContent = 'Bé Xinh Đáng Yêu';
-                gameoverCommentEl.textContent = 'Bạn có thể mua Tim Hồi Sinh & Khiên trong Shop để bay xa hơn!';
-            }
-
-            document.getElementById('live-score-container').classList.add('hidden');
-            ingameSkillBar.classList.add('hidden');
-            topSubBar.classList.remove('hidden');
-
-            setTimeout(() => {
-                gameoverScreen.classList.remove('hidden');
-            }, 300);
-        }
-
-        canvas.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (gameState === 'PLAYING') {
-                flap();
-            }
-        });
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
-                // Avoid triggering game when typing inside inputs
-                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-                e.preventDefault();
-                if (gameState === 'PLAYING') {
-                    flap();
-                } else if (gameState === 'START' && !startScreen.classList.contains('hidden')) {
-                    startGame();
-                } else if (gameState === 'GAMEOVER' && !gameoverScreen.classList.contains('hidden')) {
-                    startGame();
-                }
-            } else if (gameState === 'PLAYING') {
-                if (e.key === '1') activateShieldSkill();
-                if (e.key === '2') activateMagnetSkill();
-                if (e.key === '3') activateX2Skill();
-            }
-        });
-
-        document.getElementById('start-play-btn').addEventListener('click', startGame);
-        document.getElementById('restart-btn').addEventListener('click', startGame);
-        soundToggleBtn.addEventListener('click', () => {
-            const on = audio.toggle();
-            showToast(on ? '🔊 Đã bật hiệu ứng âm thanh' : '🔇 Đã tắt âm thanh');
-        });
-
-        // --- SPAWN PIPES & BONUS STARS ---
-        function spawnPipePair() {
-            const cfg = DIFFICULTIES[currentDifficulty];
-            const playableHeight = ch - groundHeight;
-            const minTop = 75;
-            const maxTop = playableHeight - cfg.pipeGap - 95;
-            const topHeight = Math.max(minTop, Math.min(maxTop, minTop + Math.random() * (maxTop - minTop)));
-
-            const pipeWidth = 64;
-            pipes.push({
-                x: cw + 20,
-                width: pipeWidth,
-                topHeight: topHeight,
-                bottomY: topHeight + cfg.pipeGap,
-                passed: false,
-                smashed: false,
-                themeIndex: pipes.length % 2
-            });
-
-            // 75% chance to spawn a collectible pink star sticker inside the gap
-            if (Math.random() < 0.75) {
-                stars.push({
-                    x: cw + 20 + pipeWidth / 2,
-                    y: topHeight + cfg.pipeGap / 2 + (Math.random() - 0.5) * 45,
-                    radius: 15,
-                    collected: false,
-                    bobPhase: Math.random() * Math.PI * 2
-                });
-            }
-        }
-
-        // --- DRAWING SCENERY & CANDY PIPES ---
-        function drawBackground() {
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, ch - groundHeight);
-            skyGrad.addColorStop(0, '#fbcfe8');
-            skyGrad.addColorStop(0.5, '#fdf2f8');
-            skyGrad.addColorStop(1, '#e0f2fe');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, cw, ch);
-
-            ctx.save();
-            ctx.globalAlpha = 0.22;
-            ['#f472b6', '#fbbf24', '#34d399', '#60a5fa'].forEach((col, idx) => {
-                ctx.strokeStyle = col;
-                ctx.lineWidth = 10;
-                ctx.beginPath();
-                ctx.arc(cw * 0.5, ch * 0.62, cw * 0.55 - idx * 10, Math.PI, Math.PI * 2);
-                ctx.stroke();
-            });
-            ctx.restore();
-
-            clouds.forEach(c => {
-                ctx.save();
-                ctx.translate(c.x, c.y);
-                ctx.scale(c.scale, c.scale);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
-                ctx.beginPath();
-                ctx.arc(0, 0, 24, 0, Math.PI * 2);
-                ctx.arc(22, -6, 20, 0, Math.PI * 2);
-                ctx.arc(42, 2, 18, 0, Math.PI * 2);
-                ctx.arc(-20, 4, 17, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-
-            ctx.fillStyle = '#fce7f3';
-            ctx.beginPath();
-            ctx.moveTo(0, ch - groundHeight);
-            for (let x = 0; x <= cw; x += 40) {
-                const y = ch - groundHeight - 28 - Math.sin(x * 0.018) * 18;
-                ctx.lineTo(x, y);
-            }
-            ctx.lineTo(cw, ch - groundHeight);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawCandyPipe(p) {
-            if (p.smashed) return;
-            const playableHeight = ch - groundHeight;
-            const bottomHeight = playableHeight - p.bottomY;
-
-            const drawSingleColumn = (x, y, w, h, isTop) => {
-                ctx.save();
-                const grad = ctx.createLinearGradient(x, 0, x + w, 0);
-                if (p.themeIndex === 0) {
-                    grad.addColorStop(0, '#f9a8d4');
-                    grad.addColorStop(0.35, '#fdf2f8');
-                    grad.addColorStop(1, '#f472b6');
-                } else {
-                    grad.addColorStop(0, '#93c5fd');
-                    grad.addColorStop(0.35, '#eff6ff');
-                    grad.addColorStop(1, '#60a5fa');
-                }
-
-                ctx.fillStyle = grad;
-                ctx.strokeStyle = p.themeIndex === 0 ? '#db2777' : '#2563eb';
-                ctx.lineWidth = 2.5;
-
-                ctx.beginPath();
-                ctx.rect(x, y, w, h);
-                ctx.fill();
-                ctx.stroke();
-
-                const capHeight = 24;
-                const capY = isTop ? y + h - capHeight : y;
-                ctx.fillStyle = p.themeIndex === 0 ? '#ff80b5' : '#60a5fa';
-                ctx.beginPath();
-                ctx.roundRect(x - 5, capY, w + 10, capHeight, 8);
-                ctx.fill();
-                ctx.stroke();
-
-                drawStarShape(ctx, x + w / 2, capY + capHeight / 2, 5, 7, 3.5, '#fff1f2', null);
-                ctx.restore();
-            };
-
-            drawSingleColumn(p.x, 0, p.width, p.topHeight, true);
-            drawSingleColumn(p.x, p.bottomY, p.width, bottomHeight, false);
-        }
-
-        function drawGround() {
-            const y = ch - groundHeight;
-            ctx.fillStyle = '#f472b6';
-            ctx.fillRect(0, y, cw, 16);
-
-            ctx.fillStyle = '#fbcfe8';
-            const waveWidth = 28;
-            const offset = -(groundScroll % waveWidth);
-            for (let x = offset - waveWidth; x < cw + waveWidth; x += waveWidth) {
-                ctx.beginPath();
-                ctx.arc(x + waveWidth / 2, y + 14, 10, 0, Math.PI);
-                ctx.fill();
-            }
-
-            const groundGrad = ctx.createLinearGradient(0, y + 16, 0, ch);
-            groundGrad.addColorStop(0, '#fde68a');
-            groundGrad.addColorStop(1, '#fcd34d');
-            ctx.fillStyle = groundGrad;
-            ctx.fillRect(0, y + 16, cw, groundHeight - 16);
-
-            ctx.strokeStyle = '#db2777';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(cw, y);
-            ctx.stroke();
-        }
-
-        // --- UPDATE & RENDER LOOP ---
-        let lastTime = performance.now();
-        let previewWingPhase = 0;
-
-        function update(dt) {
-            const cfg = DIFFICULTIES[currentDifficulty];
-            const pProfile = getActiveProfile();
-
-            player.blinkTimer += dt;
-            if (player.blinkTimer > 3.2) {
-                player.isBlinking = true;
-                if (player.blinkTimer > 3.36) {
-                    player.isBlinking = false;
-                    player.blinkTimer = 0;
-                }
-            }
-
-            clouds.forEach(c => {
-                c.x -= c.speed * dt;
-                if (c.x < -80) c.x = cw + 60;
-            });
-            sakuraPetals.forEach(pt => {
-                pt.x += pt.speedX * dt;
-                pt.y += pt.speedY * dt;
-                pt.angle += pt.spin * dt;
-                if (pt.y > ch - groundHeight) {
-                    pt.y = -10;
-                    pt.x = Math.random() * cw;
-                }
-                if (pt.x < -10) pt.x = cw + 10;
-            });
-
-            if (gameState === 'START') {
-                player.wingPhase += dt * 10;
-                player.y = ch * 0.43 + Math.sin(performance.now() * 0.004) * 10;
-                player.rotation = Math.sin(performance.now() * 0.003) * 0.06;
-                groundScroll += cfg.pipeSpeed * 0.6 * dt;
-            } else if (gameState === 'PLAYING') {
-                groundScroll += cfg.pipeSpeed * dt;
-                player.wingPhase += dt * 15;
-
-                // Update Active Power-up Timers
-                if (shieldTimer > 0) {
-                    shieldTimer -= dt;
-                    buffShieldPill.classList.remove('hidden');
-                    buffShieldTime.textContent = `${Math.max(0, shieldTimer).toFixed(1)}s`;
-                    if (shieldTimer <= 0) {
-                        shieldTimer = 0;
-                        buffShieldPill.classList.add('hidden');
-                    }
-                }
-                if (magnetTimer > 0) {
-                    magnetTimer -= dt;
-                    buffMagnetPill.classList.remove('hidden');
-                    buffMagnetTime.textContent = `${Math.max(0, magnetTimer).toFixed(1)}s`;
-                    if (magnetTimer <= 0) {
-                        magnetTimer = 0;
-                        buffMagnetPill.classList.add('hidden');
-                    }
-                }
-
-                // Physics
-                player.vy += cfg.gravity * dt;
-                player.y += player.vy * dt;
-
-                const targetRot = Math.max(-0.45, Math.min(0.65, player.vy / 520));
-                player.rotation += (targetRot - player.rotation) * 10 * dt;
-
-                if (player.y - player.radius < 0) {
-                    player.y = player.radius;
-                    player.vy = 0;
-                }
-
-                // Floor collision
-                if (player.y + player.radius >= ch - groundHeight) {
-                    if (shieldTimer > 0) {
-                        // Bounce off the ground when Immortal Shield is active!
-                        player.y = ch - groundHeight - player.radius;
-                        player.vy = cfg.jumpVelocity * 0.85;
-                        audio.playFlap();
-                    } else {
-                        player.y = ch - groundHeight - player.radius;
-                        triggerGameOver();
-                    }
-                }
-
-                pipeSpawnTimer += dt;
-                if (pipeSpawnTimer >= cfg.pipeInterval) {
-                    pipeSpawnTimer = 0;
-                    spawnPipePair();
-                }
-
-                const hitRadius = player.radius * 0.78;
-                const mult = isX2Active ? 2 : 1;
-
-                for (let i = pipes.length - 1; i >= 0; i--) {
-                    const p = pipes[i];
-                    p.x -= cfg.pipeSpeed * dt;
-
-                    if (!p.passed && p.x + p.width < player.x) {
-                        p.passed = true;
-                        const pts = 1 * mult;
-                        const cns = 1 * mult;
-                        score += pts;
-                        roundEarnedCoins += cns;
-                        pProfile.coins += cns;
-                        document.getElementById('live-score').textContent = score;
-                        hudCoins.textContent = pProfile.coins;
-                        audio.playScore();
-                        addFloatingText(`+${pts} Điểm (+${cns}🪙)`, player.x, player.y - 30, '#db2777');
-                    }
-
-                    // Collision check with pipe
-                    if (!p.smashed && player.x + hitRadius > p.x && player.x - hitRadius < p.x + p.width) {
-                        if (player.y - hitRadius < p.topHeight || player.y + hitRadius > p.bottomY) {
-                            if (shieldTimer > 0) {
-                                // Smash through pipe with Immortal Shield!
-                                p.smashed = true;
-                                p.passed = true;
-                                const bonus = 2 * mult;
-                                score += bonus;
-                                document.getElementById('live-score').textContent = score;
-                                spawnStarBurst(p.x + p.width / 2, player.y, '#38bdf8');
-                                audio.playPowerup();
-                                addFloatingText(`💥 HÚC VĂNG! +${bonus}`, player.x, player.y - 25, '#0284c7');
-                            } else {
-                                triggerGameOver();
-                            }
-                        }
-                    }
-
-                    if (p.x + p.width < -40) {
-                        pipes.splice(i, 1);
-                    }
-                }
-
-                // Collectible Pink Stars (With Magnet Pull!)
-                for (let i = stars.length - 1; i >= 0; i--) {
-                    const s = stars[i];
-                    s.x -= cfg.pipeSpeed * dt;
-                    s.bobPhase += dt * 4;
-
-                    // If Magnet is active, pull star toward player!
-                    if (magnetTimer > 0 && s.x < cw) {
-                        const dxPull = player.x - s.x;
-                        const dyPull = player.y - s.y;
-                        const dist = Math.hypot(dxPull, dyPull);
-                        if (dist > 5 && dist < 320) {
-                            s.x += (dxPull / dist) * 340 * dt;
-                            s.y += (dyPull / dist) * 340 * dt;
-                        }
-                    }
-
-                    const sy = s.y + Math.sin(s.bobPhase) * 5;
-                    const dx = player.x - s.x;
-                    const dy = player.y - sy;
-
-                    if (!s.collected && Math.hypot(dx, dy) < player.radius + s.radius) {
-                        s.collected = true;
-                        const starPts = 2 * mult;
-                        const starCoins = 5 * mult;
-                        score += starPts;
-                        roundEarnedCoins += starCoins;
-                        pProfile.coins += starCoins;
-                        document.getElementById('live-score').textContent = score;
-                        hudCoins.textContent = pProfile.coins;
-                        saveUsersDB();
-
-                        audio.playStarBonus();
-                        spawnStarBurst(s.x, sy, '#ff69b4');
-                        addFloatingText(`⭐ +${starPts} Điểm (+${starCoins}🪙)`, s.x, sy - 15, '#ec4899');
-                    }
-
-                    if (s.collected || s.x < -30) {
-                        stars.splice(i, 1);
-                    }
-                }
-            }
-
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const pt = particles[i];
-                pt.x += pt.vx * dt;
-                pt.y += pt.vy * dt;
-                pt.life -= dt * 1.9;
-                if (pt.life <= 0) particles.splice(i, 1);
-            }
-
-            for (let i = floatingTexts.length - 1; i >= 0; i--) {
-                const ft = floatingTexts[i];
-                ft.y += ft.vy * dt;
-                ft.life -= dt * 1.4;
-                if (ft.life <= 0) floatingTexts.splice(i, 1);
-            }
-        }
-
-        function render() {
-            ctx.clearRect(0, 0, cw, ch);
-            drawBackground();
-            pipes.forEach(drawCandyPipe);
-
-            stars.forEach(s => {
-                const sy = s.y + Math.sin(s.bobPhase) * 5;
-                ctx.save();
-                ctx.translate(s.x, sy);
-                ctx.rotate(Math.sin(s.bobPhase * 0.7) * 0.25);
-                drawStarShape(ctx, 0, 0, 5, s.radius, s.radius * 0.5, '#ff80b5', '#ffffff');
-                ctx.restore();
-            });
-
-            sakuraPetals.forEach(pt => {
-                ctx.save();
-                ctx.translate(pt.x, pt.y);
-                ctx.rotate(pt.angle);
-                ctx.fillStyle = 'rgba(251, 182, 206, 0.75)';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, pt.size, pt.size * 0.55, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-
-            drawGround();
-
-            particles.forEach(pt => {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, pt.life);
-                if (pt.type === 'star') {
-                    drawStarShape(ctx, pt.x, pt.y, 5, pt.size, pt.size * 0.5, pt.color, null);
-                } else {
-                    ctx.fillStyle = pt.color;
-                    ctx.beginPath();
-                    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.restore();
-            });
-
-            drawCharacterAvatar(
-                ctx,
-                player.x,
-                player.y,
-                player.radius,
-                player.wingPhase,
-                player.rotation,
-                player.isBlinking,
-                shieldTimer > 0,
-                magnetTimer > 0
-            );
-
-            floatingTexts.forEach(ft => {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, ft.life);
-                ctx.font = 'bold 18px "Mali", cursive';
-                ctx.fillStyle = ft.color;
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.textAlign = 'center';
-                ctx.strokeText(ft.text, ft.x, ft.y);
-                ctx.fillText(ft.text, ft.x, ft.y);
-                ctx.restore();
-            });
-
-            if (!startScreen.classList.contains('hidden')) {
-                previewWingPhase += 0.12;
-                previewCtx.clearRect(0, 0, 120, 120);
-                drawCharacterAvatar(
-                    previewCtx,
-                    64,
-                    64,
-                    36,
-                    previewWingPhase,
-                    Math.sin(previewWingPhase * 0.3) * 0.05,
-                    player.isBlinking,
-                    false,
-                    false
-                );
-            }
-        }
-
-        function gameLoop(now) {
-            const dt = Math.min(0.05, (now - lastTime) / 1000);
-            lastTime = now;
-
-            update(dt);
-            render();
-            requestAnimationFrame(gameLoop);
-        }
-
-        window.onload = function () {
-            loadUsersDB();
-            updateAllUserUI();
-            resizeCanvas();
-            initScenery();
-            initAvatarImage();
-            requestAnimationFrame(gameLoop);
-        };
-    </script>
+      } else if(topic === TOPIC_LIVE){
+        onlinePlayers[data.user] = data;
+      } else if(topic === TOPIC_BOSS){
+        worldBoss = data;
+        if(curZone==="combat") rebuildCombatMonsters();
+      }
+    }catch(e){}
+  });
+}
+initCloud();
+
+function saveCloud(){
+  if(curUser && db.users[curUser]) db.users[curUser].updated = Date.now();
+  localStorage.setItem("kaia3d_db", JSON.stringify(db));
+  if(client && client.connected) client.publish(TOPIC_DB, JSON.stringify(db), {retain:true});
+  updateHUD();
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.innerText = msg; t.style.display = "block";
+  clearTimeout(window.tTimer);
+  window.tTimer = setTimeout(()=>t.style.display="none", 2600);
+}
+
+// ================= 3. ĐĂNG KÝ / ĐĂNG NHẬP / TÀI KHOẢN =================
+function handleAuth(mode){
+  const u = document.getElementById("inp-user").value.trim().toLowerCase();
+  const p = document.getElementById("inp-pass").value.trim();
+  const g = document.getElementById("inp-gender").value;
+  const phone = document.getElementById("inp-phone").value.trim();
+  if(!u || !p) return showToast("Vui lòng nhập Tên tài khoản và Mật khẩu!");
+
+  if(mode === "register"){
+    if(db.users[u]) return showToast("Tên tài khoản này đã có người đăng ký!");
+    const isFirst = !db.firstAdmin && Object.keys(db.users).length === 0;
+    if(isFirst) db.firstAdmin = u;
+    db.users[u] = {
+      pass:p, gender:g, phone:phone||"Chưa cập nhật",
+      lv:1, exp:0, silver:300, gold:isFirst?200:0, isAdmin:isFirst, banned:false,
+      equip:{weapon:"w0", outfit:"o0", hair:"h0", acc:"a0", rod:"r0"},
+      bag:["w0","o0","h0","a0","r0"],
+      customStats:null, bait:10, x:0, z:4, updated:Date.now()
+    };
+    curUser = u; saveCloud(); enterGame();
+  } else {
+    if(!db.users[u] || db.users[u].pass !== p) return showToast("Sai tài khoản hoặc mật khẩu!");
+    if(db.users[u].banned) return showToast("🚫 Tài khoản đã bị cấm!");
+    curUser = u; enterGame();
+  }
+}
+
+function getStats(uObj){
+  let hp = 100 + (uObj.lv-1)*45;
+  let atk = 15 + (uObj.lv-1)*8;
+  let def = 5 + (uObj.lv-1)*3;
+  const eq = uObj.equip || {};
+  ["weapon","outfit","hair","acc"].forEach(s=>{
+    const it = getItem(eq[s]);
+    if(it){ hp += (it.hp||0); atk += (it.atk||0); def += (it.def||0); }
+  });
+  return {maxHp:hp, atk:atk, def:def, power: Math.round(hp*0.4 + atk*4 + def*3)};
+}
+
+function getItem(id){
+  if(!id) return null;
+  if(ITEMS_DB[id]) return ITEMS_DB[id];
+  if(curUser && db.users[curUser]?.drops?.[id]) return db.users[curUser].drops[id];
+  return null;
+}
+
+let playerCurHp = 100;
+function updateHUD(){
+  if(!curUser) return;
+  const u = db.users[curUser];
+  const st = getStats(u);
+  if(playerCurHp > st.maxHp) playerCurHp = st.maxHp;
+  document.getElementById("ui-name").innerText = (u.gender==="female"?"👧 ":"👦 ") + curUser;
+  document.getElementById("ui-lv").innerText = `Lv.${u.lv}`;
+  document.getElementById("ui-admin-tag").style.display = u.isAdmin ? "inline-block" : "none";
+  document.getElementById("ui-hp").innerText = `${Math.max(0,Math.round(playerCurHp))}/${st.maxHp}`;
+  document.getElementById("ui-atk").innerText = st.atk;
+  document.getElementById("ui-def").innerText = st.def;
+  document.getElementById("ui-silver").innerText = u.silver;
+  document.getElementById("ui-gold").innerText = u.gold;
+  document.getElementById("ui-bait").innerText = u.bait||0;
+  const rod = getItem(u.equip?.rod) || ITEMS_DB.r0;
+  document.getElementById("ui-fish-buff").innerText = rod.fishBuff||0;
+  if(myMesh) updateCharacter3DAppearance(myMesh, u);
+}
+
+// ================= 4. ĐỘNG CƠ ĐỒ HỌA 3D THREE.JS =================
+let scene, camera, renderer, raycaster, mouseVec, groundPlane;
+let myMesh = null, otherMeshes = {}, envGroup = null, mobs3D = [], targetPos = new THREE.Vector3(0,0,4);
+let selectedMobIdx = 0;
+
+function init3D(){
+  const canvas = document.getElementById("canvas3d");
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x7dd3fc);
+  scene.fog = new THREE.FogExp2(0x7dd3fc, 0.018);
+
+  camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight, 0.1, 200);
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const amb = new THREE.AmbientLight(0xffffff, 0.75);
+  const dir = new THREE.DirectionalLight(0xfffbeb, 0.9);
+  dir.position.set(15, 30, 20);
+  scene.add(amb, dir);
+
+  const groundGeo = new THREE.PlaneGeometry(80, 80);
+  const groundMat = new THREE.MeshLambertMaterial({color:0x4ade80});
+  groundPlane = new THREE.Mesh(groundGeo, groundMat);
+  groundPlane.rotation.x = -Math.PI/2;
+  scene.add(groundPlane);
+
+  envGroup = new THREE.Group();
+  scene.add(envGroup);
+
+  raycaster = new THREE.Raycaster();
+  mouseVec = new THREE.Vector2();
+
+  canvas.addEventListener("pointerdown", onCanvasClick);
+  window.addEventListener("resize", ()=>{
+    camera.aspect = canvas.clientWidth/canvas.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  });
+
+  myMesh = createChibi3D(db.users[curUser]);
+  scene.add(myMesh);
+  buildZoneEnvironment("plaza");
+  animate3D();
+}
+
+function createChibi3D(uData){
+  const group = new THREE.Group();
+  // Thân (Quần áo)
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.55), new THREE.MeshLambertMaterial({color:0x3b82f6}));
+  body.position.y = 0.95; body.name = "body";
+  // Đầu
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 16), new THREE.MeshLambertMaterial({color:0xffedd5}));
+  head.position.y = 1.95;
+  // Tóc
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI*2, 0, Math.PI*0.65), new THREE.MeshLambertMaterial({color:0x1e293b}));
+  hair.position.y = 2.02; hair.name = "hair";
+  // Mắt
+  const eyeGeo = new THREE.SphereGeometry(0.07, 8, 8);
+  const eyeMat = new THREE.MeshBasicMaterial({color:0x111111});
+  const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.2, 1.95, 0.5);
+  const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set(0.2, 1.95, 0.5);
+  // Cánh / Phụ kiện sau lưng
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.9, 0.1), new THREE.MeshLambertMaterial({color:0xffffff}));
+  wing.position.set(0, 1.2, -0.32); wing.name = "wing";
+  // Vũ khí cầm tay phải
+  const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.4, 0.15), new THREE.MeshLambertMaterial({color:0xa16207}));
+  weapon.position.set(0.65, 1.1, 0.35); weapon.rotation.x = Math.PI/4; weapon.name = "weapon";
+
+  group.add(body, head, hair, eyeL, eyeR, wing, weapon);
+  updateCharacter3DAppearance(group, uData);
+  return group;
+}
+
+function updateCharacter3DAppearance(group, uData){
+  if(!uData) return;
+  const eq = uData.equip || {};
+  const w = getItem(eq.weapon) || ITEMS_DB.w0;
+  const o = getItem(eq.outfit) || ITEMS_DB.o0;
+  const h = getItem(eq.hair) || ITEMS_DB.h0;
+  const a = getItem(eq.acc) || ITEMS_DB.a0;
+
+  const body = group.getObjectByName("body");
+  const hair = group.getObjectByName("hair");
+  const wing = group.getObjectByName("wing");
+  const weapon = group.getObjectByName("weapon");
+
+  if(body) body.material.color.setHex(o.color || (uData.gender==="female"?0xf472b6:0x3b82f6));
+  if(hair){
+    hair.material.color.setHex(h.color || 0x1e293b);
+    hair.scale.set(1, uData.gender==="female"?1.25:1, 1);
+  }
+  if(wing){
+    wing.visible = (eq.acc && eq.acc !== "a0");
+    wing.material.color.setHex(a.color || 0xffffff);
+  }
+  if(weapon) weapon.material.color.setHex(w.color || 0xa16207);
+}
+
+function buildZoneEnvironment(zone){
+  while(envGroup.children.length > 0) envGroup.remove(envGroup.children[0]);
+  mobs3D = [];
+
+  if(zone === "plaza"){
+    groundPlane.material.color.setHex(0x4ade80);
+    scene.background.setHex(0x7dd3fc);
+    // Tạo 3 tòa nhà Shop 3D
+    const shopColors = [0x10b981, 0x3b82f6, 0x8b5cf6];
+    [-7, 0, 7].forEach((xPos, i)=>{
+      const box = new THREE.Mesh(new THREE.BoxGeometry(3.8, 3, 3), new THREE.MeshLambertMaterial({color:0xfef3c7}));
+      box.position.set(xPos, 1.5, -6);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(3.2, 1.8, 4), new THREE.MeshLambertMaterial({color:shopColors[i]}));
+      roof.position.set(xPos, 3.9, -6); roof.rotation.y = Math.PI/4;
+      envGroup.add(box, roof);
+    });
+  } else if(zone === "combat"){
+    rebuildCombatMonsters();
+  } else if(zone === "fish"){
+    groundPlane.material.color.setHex(0xfde047); // Bãi cát vàng
+    scene.background.setHex(0x38bdf8);
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(50, 26), new THREE.MeshLambertMaterial({color:0x0284c7}));
+    water.rotation.x = -Math.PI/2;
+    water.position.set(0, 0.05, -8);
+    envGroup.add(water);
+    // Cá 3D bơi dưới hồ
+    for(let i=0;i<7;i++){
+      const f = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.1, 8), new THREE.MeshLambertMaterial({color:i===0?0xfbbf24:0x0f172a}));
+      f.rotation.x = Math.PI/2;
+      f.position.set((Math.random()-0.5)*16, 0.15, -3 - Math.random()*9);
+      envGroup.add(f);
+    }
+  }
+}
+
+function rebuildCombatMonsters(){
+  while(envGroup.children.length > 0) envGroup.remove(envGroup.children[0]);
+  mobs3D = [];
+  const zInfo = ZONES_DATA[curCombatMap];
+  groundPlane.material.color.setHex(zInfo.color);
+  scene.background.setHex(curCombatMap >= 7 ? 0x1e1b4b : 0x7dd3fc);
+
+  // Tạo 5 quái vật trong khu
+  for(let i=0;i<5;i++){
+    const template = zInfo.mobs[i % zInfo.mobs.length];
+    const mGroup = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(0.95), new THREE.MeshLambertMaterial({color:template.color}));
+    mesh.position.y = 1.0;
+    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.12), new THREE.MeshBasicMaterial({color:0xffff00}));
+    eyeL.position.set(-0.3, 1.2, 0.8);
+    const eyeR = eyeL.clone(); eyeR.position.x = 0.3;
+    mGroup.add(mesh, eyeL, eyeR);
+    mGroup.position.set((i-2)*4.2, 0, -4 - (i%2)*3);
+    envGroup.add(mGroup);
+    mobs3D.push({
+      group:mGroup, name:template.name, maxHp:template.hp, hp:template.hp,
+      atk:template.atk, def:template.def, exp:template.exp, silver:template.silver, isBoss:false
+    });
+  }
+
+  // Kiểm tra nếu Boss Thế Giới đang xuất hiện ở khu này
+  if(worldBoss.active && worldBoss.mapId === curCombatMap && worldBoss.hp > 0){
+    const bGroup = new THREE.Group();
+    const bBody = new THREE.Mesh(new THREE.OctahedronGeometry(2.4), new THREE.MeshLambertMaterial({color:0xdc2626}));
+    bBody.position.y = 2.6;
+    const aura = new THREE.Mesh(new THREE.RingGeometry(2.5, 3.2, 24), new THREE.MeshBasicMaterial({color:0xfbbf24, side:THREE.DoubleSide}));
+    aura.rotation.x = Math.PI/2; aura.position.y = 0.1;
+    bGroup.add(bBody, aura);
+    bGroup.position.set(0, 0, -8.5);
+    envGroup.add(bGroup);
+    mobs3D.push({
+      group:bGroup, name:worldBoss.name, maxHp:worldBoss.maxHp, hp:worldBoss.hp,
+      atk:worldBoss.atk, def:worldBoss.def, exp:15000, silver:10000, isBoss:true
+    });
+  }
+  selectedMobIdx = 0;
+}
+
+function onCanvasClick(e){
+  const rect = e.target.getBoundingClientRect();
+  mouseVec.x = ((e.clientX - rect.left)/rect.width)*2 - 1;
+  mouseVec.y = -((e.clientY - rect.top)/rect.height)*2 + 1;
+  raycaster.setFromCamera(mouseVec, camera);
+  const hits = raycaster.intersectObject(groundPlane);
+  if(hits.length > 0){
+    const pt = hits[0].point;
+    targetPos.set(Math.max(-14, Math.min(14, pt.x)), 0, Math.max(-12, Math.min(10, pt.z)));
+    if(curZone === "plaza") broadcastLive("");
+  }
+}
+
+function animate3D(){
+  requestAnimationFrame(animate3D);
+  if(myMesh){
+    myMesh.position.lerp(targetPos, 0.08);
+    camera.position.lerp(new THREE.Vector3(myMesh.position.x, myMesh.position.y + 8.5, myMesh.position.z + 11.5), 0.08);
+    camera.lookAt(myMesh.position.x, myMesh.position.y + 1.2, myMesh.position.z - 2);
+  }
+  // Xoay nhẹ quái 3D
+  mobs3D.forEach((m, idx)=>{
+    m.group.rotation.y += m.isBoss ? 0.025 : 0.015;
+  });
+  renderer.render(scene, camera);
+  render3DLabels();
+}
+
+function projectTo2D(vec3){
+  const v = vec3.clone().project(camera);
+  if(v.z > 1) return null;
+  const canvas = document.getElementById("canvas3d");
+  return {
+    x: (v.x * 0.5 + 0.5) * canvas.clientWidth,
+    y: (-(v.y * 0.5) + 0.5) * canvas.clientHeight
+  };
+}
+
+function render3DLabels(){
+  const layer = document.getElementById("labels-layer");
+  let html = "";
+  if(myMesh && curUser){
+    const p = projectTo2D(myMesh.position.clone().add(new THREE.Vector3(0, 2.8, 0)));
+    if(p){
+      const myChat = onlinePlayers[curUser]?.chat;
+      html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px">
+        ${myChat ? `<div class="chat-bubble">${myChat}</div><br>` : ""}
+        <b style="color:#38bdf8">${curUser} (Lv.${db.users[curUser].lv})</b>
+      </div>`;
+    }
+  }
+  if(curZone === "combat"){
+    mobs3D.forEach((m, i)=>{
+      const p = projectTo2D(m.group.position.clone().add(new THREE.Vector3(0, m.isBoss?5.2:2.3, 0)));
+      if(p){
+        const pct = Math.max(0, Math.round((m.hp/m.maxHp)*100));
+        html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px">
+          <b style="color:${m.isBoss?'#fbbf24':'#f87171'}">${i===selectedMobIdx?'🎯 ':''}${m.name}</b>
+          <div class="hp-mini"><div class="hp-mini-fill" style="width:${pct}%"></div></div>
+          <small>${m.hp}/${m.maxHp}</small>
+        </div>`;
+      }
+    });
+  }
+  layer.innerHTML = html;
+}
+
+// ================= 5. CHIẾN ĐẤU 10 KHU & RỚT ĐỒ & BOSS 1 GIỜ =================
+function changeCombatMap(val){
+  curCombatMap = parseInt(val);
+  rebuildCombatMonsters();
+  showToast("Đã tiến vào " + ZONES_DATA[curCombatMap].name);
+}
+
+function toggleAuto(){
+  autoCombat = !autoCombat;
+  const btn = document.getElementById("btn-auto");
+  btn.innerText = autoCombat ? "🤖 Tự Đánh: BẬT" : "🤖 Tự Đánh: TẮT";
+  btn.className = "btn " + (autoCombat ? "btn-orange" : "btn-green");
+}
+
+function playerAttack(mult){
+  if(curZone !== "combat" || mobs3D.length === 0) return;
+  const u = db.users[curUser];
+  const st = getStats(u);
+  if(selectedMobIdx >= mobs3D.length) selectedMobIdx = 0;
+  const mob = mobs3D[selectedMobIdx];
+
+  // Lao tới gần quái
+  targetPos.set(mob.group.position.x, 0, mob.group.position.z + 2.2);
+
+  // Tính sát thương của người chơi
+  const isCrit = Math.random() < 0.25;
+  let dmg = Math.max(1, Math.round((st.atk * mult - mob.def * 0.4) * (isCrit ? 1.75 : 1)));
+  mob.hp -= dmg;
+
+  // Quái phản đòn
+  const mobDmg = Math.max(1, Math.round(mob.atk - st.def * 0.55));
+  playerCurHp -= mobDmg;
+  if(playerCurHp <= 0){
+    playerCurHp = st.maxHp;
+    targetPos.set(0, 0, 5);
+    showToast("💀 Bạn đã bị hạ gục và được hồi sinh tại điểm xuất phát!");
+  }
+
+  document.getElementById("combat-log").innerHTML = `⚔️ Gây <b style="color:#fbbf24">${dmg}${isCrit?' (Chí mạng!)':''}</b> lên ${mob.name} | Mất -${mobDmg} HP`;
+
+  if(mob.hp <= 0){
+    onMonsterKilled(mob);
+  } else if(mob.isBoss){
+    worldBoss.hp = mob.hp;
+    if(client && client.connected) client.publish(TOPIC_BOSS, JSON.stringify(worldBoss), {retain:true});
+  }
+  updateHUD();
+}
+
+function onMonsterKilled(mob){
+  const u = db.users[curUser];
+  u.silver += mob.silver;
+  u.exp = (u.exp||0) + mob.exp;
+
+  // Kiểm tra lên cấp (Tối đa Lv.100)
+  const needExp = u.lv * 100;
+  if(u.exp >= needExp && u.lv < 100){
+    u.exp -= needExp;
+    u.lv++;
+    playerCurHp = getStats(u).maxHp;
+    showToast(`🎉 CHÚC MỪNG LÊN CẤP ${u.lv}! Chỉ số tăng mạnh!`);
+  }
+
+  // Tỉ lệ rớt trang bị (Quái thường 30%, Boss Thế Giới 100%)
+  if(mob.isBoss || Math.random() < 0.30){
+    dropRandomEquipment(mob.isBoss);
+  }
+
+  if(mob.isBoss){
+    worldBoss.active = false; worldBoss.hp = 0;
+    if(client && client.connected) client.publish(TOPIC_BOSS, JSON.stringify(worldBoss), {retain:true});
+    showToast("🏆 ĐÃ TIÊU DIỆT BOSS THẾ GIỚI! Nhận +10,000 Bạc & Trang Bị Cực Phẩm!");
+    rebuildCombatMonsters();
+  } else {
+    mob.hp = mob.maxHp;
+  }
+  saveCloud();
+}
+
+function dropRandomEquipment(fromBoss){
+  const u = db.users[curUser];
+  if(!u.drops) u.drops = {};
+  const zLv = ZONES_DATA[curCombatMap].maxLv;
+  const slots = ["weapon","outfit","hair","acc"];
+  const slot = slots[Math.floor(Math.random()*slots.length)];
+  const r = fromBoss ? (Math.random()<0.5?4:3) : (Math.random()<0.08?3 : Math.random()<0.25?2 : Math.random()<0.55?1:0);
+  const mult = (r + 1) * (zLv / 5);
+  const id = "drop_" + Date.now().toString(36);
+  const names = {
+    weapon:["Kiếm Chiến","Đao Phá Sơn","Thương Sấm Sét","Đại Kiếm Hư Không"],
+    outfit:["Giáp Hộ Vệ","Chiến Giáp Rồng","Áo Choàng Tinh Tú","Thần Giáp Bất Diệt"],
+    hair:["Tóc Chiến Thần","Tóc Ánh Sao","Tóc Huyết Nguyệt","Tóc Hoàng Đế"],
+    acc:["Cánh Tinh Linh","Hào Quang Chiến","Cánh Thiên Sứ","Thần Dực Tối Thượng"]
+  };
+  const colors = [0x94a3b8, 0x4ade80, 0x38bdf8, 0xc084fc, 0xfbbf24];
+  const item = {
+    id, slot,
+    name: `${names[slot][Math.min(3,r)]} Lv.${zLv}`,
+    r,
+    atk: Math.round((slot==="weapon"?25:10)*mult),
+    hp: Math.round((slot==="outfit"?120:45)*mult),
+    def: Math.round((slot==="outfit"?18:8)*mult),
+    color: colors[r]
+  };
+  u.drops[id] = item;
+  u.bag.push(id);
+  showToast(`🎁 Rớt trang bị: ${item.name} [${RARITY[r]}]!`);
+}
+
+// Hệ thống Boss Thế Giới xuất hiện mỗi 1 giờ
+function checkHourlyWorldBoss(){
+  const now = new Date();
+  const min = now.getMinutes(), sec = now.getSeconds();
+  const leftMin = 59 - min, leftSec = 59 - sec;
+  const hourKey = now.getFullYear()*1000000 + (now.getMonth()+1)*10000 + now.getDate()*100 + now.getHours();
+
+  if(worldBoss.hourKey !== hourKey && min < 20){
+    // Tự động giáng lâm Boss mỗi đầu giờ
+    spawnWorldBoss(hourKey, now.getHours() % 10);
+  }
+  const banner = document.getElementById("boss-timer");
+  if(worldBoss.active && worldBoss.hp > 0){
+    banner.innerHTML = `<b style="color:#fde047">ĐANG XUẤT HIỆN TẠI KHU ${worldBoss.mapId+1}! (${worldBoss.hp} HP)</b>`;
+  } else {
+    banner.innerText = `Xuất hiện sau ${leftMin}p ${leftSec}s`;
+  }
+}
+
+function spawnWorldBoss(hourKey, mapIdx){
+  worldBoss = {
+    active:true, mapId:mapIdx,
+    name:"🐉 Hắc Long Hủy Diệt (BOSS THẾ GIỚI)",
+    maxHp: 50000 * (mapIdx+1), hp: 50000 * (mapIdx+1),
+    atk: 150 * (mapIdx+1), def: 60 * (mapIdx+1), hourKey
+  };
+  if(client && client.connected) client.publish(TOPIC_BOSS, JSON.stringify(worldBoss), {retain:true});
+  if(curZone === "combat") rebuildCombatMonsters();
+  showToast(`🔥 BOSS THẾ GIỚI đã xuất hiện tại Khu ${mapIdx+1}!`);
+}
+
+// ================= 6. KHU CÂU CÁ 3D PLAY TOGETHER =================
+let fishState = "idle", barPos = 10, barDir = 4.5, fishInterval = null;
+
+function fishAction(){
+  const u = db.users[curUser];
+  if(fishState === "idle"){
+    if((u.bait||0) <= 0) return showToast("Hết mồi câu! Hãy mua ở Shop 2.");
+    u.bait--; saveCloud();
+    fishState = "wait";
+    document.getElementById("fish-msg").innerText = "🌊 Đang thả phao... Chờ cá cắn câu [!]";
+    setTimeout(()=>{
+      if(fishState !== "wait") return;
+      fishState = "bite";
+      document.getElementById("fish-msg").innerHTML = "<span style='color:#ef4444;font-size:15px'>❗ CÁ CẮN CÂU! BẤM GIẬT NGAY!</span>";
+    }, 1500 + Math.random()*1800);
+  } else if(fishState === "wait"){
+    fishState = "idle";
+    document.getElementById("fish-msg").innerText = "Giật quá sớm! Cá sợ bơi mất rồi.";
+  } else if(fishState === "bite"){
+    fishState = "reel";
+    document.getElementById("tension-box").style.display = "block";
+    document.getElementById("fish-msg").innerText = "Canh thanh vàng vào vùng XANH LÁ rồi bấm nút!";
+    fishInterval = setInterval(()=>{
+      barPos += barDir;
+      if(barPos >= 92 || barPos <= 3) barDir = -barDir;
+      document.getElementById("tension-bar").style.left = barPos + "%";
+    }, 30);
+  } else if(fishState === "reel"){
+    clearInterval(fishInterval);
+    document.getElementById("tension-box").style.display = "none";
+    fishState = "idle";
+    if(barPos >= 33 && barPos <= 67){
+      const rod = getItem(u.equip?.rod) || ITEMS_DB.r0;
+      const roll = Math.random()*100 + (rod.fishBuff||0)*0.6;
+      let idx = 0;
+      if(roll>135) idx=4; else if(roll>100) idx=3; else if(roll>70) idx=2; else if(roll>38) idx=1;
+      const f = FISH_LIST[idx];
+      u.silver += f.price; saveCloud();
+      document.getElementById("fish-msg").innerHTML = `🎉 Câu trúng <b>${f.name} [${RARITY[f.r]}]</b> (+🪙${f.price} Bạc)!`;
+    } else {
+      document.getElementById("fish-msg").innerText = "💥 Đứt dây câu vì kéo lệch vùng xanh!";
+    }
+  }
+}
+
+// ================= 7. CỬA HÀNG, GACHA, KHO ĐỒ, TÀI KHOẢN, ADMIN =================
+function enterGame(){
+  document.getElementById("login-screen").style.display = "none";
+  const sel = document.getElementById("sel-map");
+  sel.innerHTML = ZONES_DATA.map(z=>`<option value="${z.id}">${z.name}</option>`).join("");
+  playerCurHp = getStats(db.users[curUser]).maxHp;
+  initShopsUI();
+  init3D();
+  updateHUD();
+  setInterval(()=>{
+    checkHourlyWorldBoss();
+    if(autoCombat && curZone === "combat") playerAttack(1);
+  }, 1100);
+}
+
+function switchZone(z, btn){
+  curZone = z;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".ui-overlay").forEach(el=>el.classList.remove("active"));
+  document.getElementById("ui-"+z).classList.add("active");
+  targetPos.set(0, 0, 4);
+  if(myMesh) myMesh.position.set(0, 0, 4);
+  buildZoneEnvironment(z);
+}
+
+function initShopsUI(){
+  let s1 = "", s2 = `<div class="item-row"><div><b>🪱 Mồi Câu Cao Cấp (x10)</b></div><button class="btn btn-green" onclick="buyShopItem('bait',40,'silver')">🪙 40</button></div>`;
+  for(let k in ITEMS_DB){
+    const it = ITEMS_DB[k];
+    if(!it.cost) continue;
+    const row = `<div class="item-row">
+      <div><span class="r-${it.r}">${it.name} [${RARITY[it.r]}]</span><br>
+      <small>${it.slot==='rod'?`Tỉ lệ cá hiếm +${it.fishBuff}%`:`⚔️+${it.atk} ❤️+${it.hp} 🛡️+${it.def}`}</small></div>
+      <button class="btn ${it.cur==='gold'?'btn-orange':'btn-blue'}" onclick="buyShopItem('${k}',${it.cost},'${it.cur}')">${it.cur==='gold'?'👑':'🪙'} ${it.cost}</button>
+    </div>`;
+    if(it.slot === "rod") s2 += row; else s1 += row;
+  }
+  document.getElementById("shop1-list").innerHTML = s1;
+  document.getElementById("shop2-list").innerHTML = s2;
+}
+
+function buyShopItem(id, cost, cur){
+  const u = db.users[curUser];
+  if(u[cur] < cost) return showToast(cur==="gold"?"Không đủ Đồng Vàng (Do Admin cấp)!":"Không đủ Đồng Bạc!");
+  u[cur] -= cost;
+  if(id === "bait") u.bait = (u.bait||0) + 10;
+  else {
+    if(!u.bag.includes(id)) u.bag.push(id);
+    u.equip[ITEMS_DB[id].slot] = id;
+  }
+  saveCloud(); showToast("Mua & Trang bị thành công!");
+}
+
+function rollGacha(cur){
+  const u = db.users[curUser];
+  if(cur==="silver"){ if(u.silver<250) return showToast("Cần 250 Đồng Bạc!"); u.silver-=250; }
+  else { if(u.gold<15) return showToast("Cần 15 Đồng Vàng!"); u.gold-=15; }
+  const roll = Math.random()*100 + (cur==="gold"?40:0);
+  let r = 0;
+  if(roll>118) r=4; else if(roll>92) r=3; else if(roll>65) r=2; else if(roll>35) r=1;
+  const pool = Object.values(ITEMS_DB).filter(x=>x.r===r);
+  const prize = pool[Math.floor(Math.random()*pool.length)] || ITEMS_DB.w1;
+  if(!u.bag.includes(prize.id)) u.bag.push(prize.id);
+  u.equip[prize.slot] = prize.id;
+  document.getElementById("gacha-box").innerHTML = `🎉 Trúng: <span class="r-${prize.r}">${prize.name} [${RARITY[prize.r]}]</span>`;
+  saveCloud();
+}
+
+function openModal(id){
+  closeModals();
+  if(id === "modal-bag"){
+    const u = db.users[curUser];
+    let html = "";
+    u.bag.slice().reverse().forEach(id=>{
+      const it = getItem(id);
+      if(!it) return;
+      const isEq = u.equip[it.slot] === id;
+      html += `<div class="item-row">
+        <div><span class="r-${it.r}">${it.name} [${RARITY[it.r]}]</span><br>
+        <small>${it.slot==='rod'?`Cá hiếm +${it.fishBuff}%`:`⚔️+${it.atk} ❤️+${it.hp} 🛡️+${it.def}`}</small></div>
+        <button class="btn ${isEq?'btn-green':'btn-blue'}" onclick="equipItem('${it.slot}','${id}')">${isEq?'Đang Dùng':'Trang Bị'}</button>
+      </div>`;
+    });
+    document.getElementById("bag-list").innerHTML = html;
+  }
+  document.getElementById(id).classList.add("open");
+}
+
+function equipItem(slot, id){
+  db.users[curUser].equip[slot] = id;
+  saveCloud(); openModal("modal-bag");
+}
+
+function openProfile(){
+  const u = db.users[curUser];
+  const st = getStats(u);
+  document.getElementById("profile-summary").innerHTML = `
+    👤 Tài khoản: <b>${curUser}</b> | Cấp độ: <b>Lv.${u.lv}</b> (${u.exp}/${u.lv*100} EXP)<br>
+    🔥 Lực chiến tổng: <b style="color:#fbbf24">${st.power}</b> | ❤️ HP: ${st.maxHp} | ⚔️ ATK: ${st.atk} | 🛡️ DEF: ${st.def}
+  `;
+  document.getElementById("prof-gender").value = u.gender || "male";
+  document.getElementById("prof-phone").value = u.phone || "";
+  openModal("modal-profile");
+}
+
+function saveProfileInfo(){
+  const u = db.users[curUser];
+  u.gender = document.getElementById("prof-gender").value;
+  u.phone = document.getElementById("prof-phone").value.trim() || "Chưa cập nhật";
+  saveCloud(); showToast("Đã lưu thông tin tài khoản & giới tính!");
+}
+
+function changePassword(){
+  const u = db.users[curUser];
+  const oldP = document.getElementById("prof-oldpass").value.trim();
+  const newP = document.getElementById("prof-newpass").value.trim();
+  if(oldP !== u.pass) return showToast("Mật khẩu hiện tại không đúng!");
+  if(!newP) return showToast("Vui lòng nhập mật khẩu mới!");
+  u.pass = newP;
+  document.getElementById("prof-oldpass").value = "";
+  document.getElementById("prof-newpass").value = "";
+  saveCloud(); showToast("✅ Đổi mật khẩu thành công!");
+}
+
+function openAdmin(){
+  const u = db.users[curUser];
+  openModal("modal-admin");
+  document.getElementById("admin-auth").style.display = u.isAdmin ? "none" : "block";
+  const panel = document.getElementById("admin-panel");
+  if(!u.isAdmin){
+    panel.innerHTML = `<p style="font-size:12px;color:#94a3b8">Khu vực dành riêng cho Quản Trị Viên.</p>`;
+    return;
+  }
+  let html = `<button class="btn btn-red" style="width:100%;margin-bottom:10px" onclick="spawnWorldBoss(Date.now(), curCombatMap)">🔥 Triệu Hồi Boss Thế Giới Ngay (Tại Khu Hiện Tại)</button>`;
+  for(let k in db.users){
+    const m = db.users[k];
+    html += `<div class="item-row" style="flex-direction:column;align-items:flex-start;gap:5px">
+      <div style="font-size:12px"><b>${k}</b> (Lv.${m.lv} | SĐT: ${m.phone||'--'}) | 🪙${m.silver} | 👑${m.gold} ${m.banned?'<b style="color:red">[KHÓA]</b>':''}</div>
+      <div style="display:flex;gap:4px;width:100%">
+        <button class="btn btn-orange" style="flex:1" onclick="adminGift('${k}','gold',50)">+50 👑Vàng</button>
+        <button class="btn btn-green" style="flex:1" onclick="adminGift('${k}','silver',1000)">+1000 🪙Bạc</button>
+        <button class="btn btn-red" style="flex:1" onclick="adminBan('${k}')">${m.banned?'Mở':'Cấm'}</button>
+      </div>
+    </div>`;
+  }
+  panel.innerHTML = html;
+}
+
+function unlockAdmin(){
+  if(document.getElementById("inp-admin-key").value.trim()==="cuongadmin"){
+    db.users[curUser].isAdmin = true; saveCloud(); openAdmin(); showToast("Đã mở quyền Admin!");
+  } else showToast("Sai mã chủ game!");
+}
+function adminGift(t, cur, amt){ db.users[t][cur]=(db.users[t][cur]||0)+amt; saveCloud(); openAdmin(); showToast(`Đã cấp +${amt} cho ${t}`); }
+function adminBan(t){ if(t!==curUser){ db.users[t].banned=!db.users[t].banned; saveCloud(); openAdmin(); } }
+function closeModals(){ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }
+function sendChat(){
+  const inp = document.getElementById("inp-chat");
+  if(!inp.value.trim()) return;
+  broadcastLive(inp.value.trim()); inp.value = "";
+}
+function broadcastLive(chat){
+  if(!curUser || !client || !client.connected) return;
+  const pkt = {user:curUser, chat, t:Date.now()};
+  onlinePlayers[curUser] = pkt;
+  client.publish(TOPIC_LIVE, JSON.stringify(pkt));
+}
+</script>
 </body>
 </html>
