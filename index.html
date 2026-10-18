@@ -3,41 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Fantasy 3D RPG Online - Full Edition</title>
+<title>Genshin 3D Online - Ultimate Edition</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;font-family:'Segoe UI',sans-serif}
-body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-#login-screen{position:fixed;inset:0;background:radial-gradient(circle at center,#1e1b4b,#090d16);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
-.logo-box{background:linear-gradient(135deg,#7c3aed,#4f46e5);border:2px solid #a78bfa;border-radius:16px;padding:14px 28px;box-shadow:0 0 30px rgba(124,58,237,0.6);margin-bottom:16px;text-align:center}
-.login-panel{background:rgba(15,23,42,0.92);border:2px solid #6366f1;border-radius:16px;padding:18px;width:92%;max-width:350px;color:#f8fafc;box-shadow:0 10px 30px rgba(0,0,0,0.8)}
-.login-panel input,.login-panel select{width:100%;padding:10px;margin:6px 0;border:1px solid #475569;border-radius:8px;font-size:14px;background:#1e293b;color:#fff}
-.btn{padding:9px 14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 3px 0 rgba(0,0,0,0.4);transition:0.1s;font-size:12px}
+body{background:#0b0f19;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+#login-screen{position:fixed;inset:0;background:radial-gradient(circle at center,#1e293b,#0b0f19);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+.logo-box{background:linear-gradient(135deg,#f59e0b,#d97706);border:2px solid #fde047;border-radius:20px;padding:16px 32px;box-shadow:0 0 40px rgba(245,158,11,0.5);margin-bottom:16px;text-align:center}
+.logo-box h1{font-size:24px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.login-panel{background:rgba(15,23,42,0.95);border:2px solid #38bdf8;border-radius:18px;padding:20px;width:92%;max-width:350px;color:#f8fafc;box-shadow:0 15px 35px rgba(0,0,0,0.8)}
+.login-panel input,.login-panel select{width:100%;padding:11px;margin:6px 0;border:1px solid #475569;border-radius:10px;font-size:14px;background:#1e293b;color:#fff}
+.btn{padding:10px 14px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:0.1s;font-size:12px}
 .btn:active{transform:translateY(2px);box-shadow:none}
-.btn-green{background:#059669}.btn-orange{background:#d97706}.btn-blue{background:#2563eb}.btn-red{background:#dc2626}.btn-purple{background:#7c3aed}
-#hud{background:#0f172a;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e293b;font-size:12px;z-index:20}
-.hp-bar-bg{width:110px;height:10px;background:#334155;border-radius:5px;overflow:hidden;margin-top:3px;border:1px solid #475569}
-#hp-bar-fill{width:100%;height:100%;background:#ef4444;transition:width 0.2s}
+.btn-green{background:#10b981}.btn-orange{background:#f59e0b}.btn-blue{background:#0284c7}.btn-red{background:#ef4444}.btn-purple{background:#8b5cf6}
+
+#genshin-hud{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:20;pointer-events:none}
+.paimon-card{background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);border:1px solid rgba(56,189,248,0.4);border-radius:14px;padding:10px 14px;width:220px;pointer-events:auto}
+.genshin-hp{width:100%;height:8px;background:#334155;border-radius:4px;overflow:hidden;margin-top:4px;border:1px solid #64748b}
+#hp-fill{width:100%;height:100%;background:#4ade80;transition:width 0.2s}
+
+#genshin-menu{position:absolute;top:12px;right:12px;display:flex;gap:8px;z-index:20}
+.menu-icon{width:46px;height:46px;border-radius:50%;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.4)}
+
 #game-wrap{flex:1;position:relative;overflow:hidden}
 #canvas3d{width:100%;height:100%;display:block}
 #labels-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
 .label3d{position:absolute;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;font-size:11px;text-shadow:0 1px 4px #000}
 .hp-mini{width:50px;height:5px;background:#222;border-radius:3px;overflow:hidden;margin:2px auto}
 .hp-mini-fill{height:100%;background:#ef4444}
-#virtual-joystick{position:absolute;bottom:25px;left:25px;width:110px;height:110px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);border-radius:50%;touch-action:none;z-index:30}
-#joystick-knob{position:absolute;top:30px;left:30px;width:50px;height:50px;background:rgba(255,255,255,0.6);border-radius:50%;pointer-events:none}
-#skills-panel{position:absolute;bottom:25px;right:20px;display:flex;gap:10px;z-index:30}
-.skill-btn{width:56px;height:56px;border-radius:50%;border:2px solid #fbbf24;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.5);cursor:pointer}
-#top-controls{position:absolute;top:10px;right:10px;display:flex;gap:5px;z-index:30;flex-wrap:wrap;justify-content:flex-end}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
+
+#virtual-joystick{position:absolute;bottom:25px;left:25px;width:110px;height:110px;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.25);border-radius:50%;touch-action:none;z-index:30}
+#joystick-knob{position:absolute;top:30px;left:30px;width:50px;height:50px;background:rgba(255,255,255,0.5);border-radius:50%;pointer-events:none}
+#skills-panel{position:absolute;bottom:25px;right:25px;display:flex;gap:12px;z-index:30}
+.genshin-skill{width:64px;height:64px;border-radius:50%;border:3px solid #fde047;background:radial-gradient(circle,#38bdf8,#0284c7);color:#fff;font-weight:bold;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(56,189,248,0.5);cursor:pointer}
+
+.modal{position:fixed;inset:0;background:rgba(11,15,25,0.8);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:60;padding:12px}
 .modal.open{display:flex}
-.modal-card{background:#0f172a;color:#f8fafc;border:2px solid #4f46e5;border-radius:14px;width:100%;max-width:410px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
-.modal-head{background:#1e1b4b;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;border-bottom:1px solid #334155}
-.modal-body{padding:12px;overflow-y:auto;flex:1}
-.item-row{display:flex;justify-content:space-between;align-items:center;background:#1e293b;padding:8px 10px;border-radius:8px;margin-bottom:6px;border:1px solid #334155}
-.r-0{color:#94a3b8;font-weight:bold}.r-1{color:#4ade80;font-weight:bold}.r-2{color:#38bdf8;font-weight:bold}.r-3{color:#c084fc;font-weight:bold}.r-4{color:#fbbf24;font-weight:bold;text-shadow:0 0 6px #f59e0b}
-#toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);border:1px solid #7c3aed;color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;z-index:200;display:none}
+.modal-card{background:rgba(30,41,59,0.92);backdrop-filter:blur(16px);color:#f8fafc;border:2px solid rgba(56,189,248,0.5);border-radius:20px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{background:rgba(15,23,42,0.9);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;border-bottom:1px solid rgba(255,255,255,0.1)}
+.modal-body{padding:14px;overflow-y:auto;flex:1}
+.item-row{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.7);padding:10px 12px;border-radius:10px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08)}
+.r-0{color:#94a3b8;font-weight:bold}.r-1{color:#4ade80;font-weight:bold}.r-2{color:#38bdf8;font-weight:bold}.r-3{color:#c084fc;font-weight:bold}.r-4{color:#fbbf24;font-weight:bold}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);border:1px solid #38bdf8;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;z-index:200;display:none}
 </style>
 </head>
 <body>
@@ -46,44 +54,41 @@ body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;fle
 
 <div id="login-screen">
   <div class="logo-box">
-    <h1>🔮 FANTASY 3D RPG ONLINE</h1>
-    <div style="font-size:11px;color:#c7d2fe">Full Edition • Gacha • BXH • Admin • 360° View</div>
+    <h1>✨ GENSHIN 3D ULTIMATE</h1>
+    <div style="font-size:12px;color:#fef08a">Multiplayer • Map Riêng • Quái Tấn Công • Kết Bạn</div>
   </div>
   <div class="login-panel">
-    <div id="sync-status" style="font-size:11px;text-align:center;color:#34d399;margin-bottom:6px">🔄 Đang kết nối máy chủ Cloud...</div>
-    <input id="inp-user" placeholder="Tên anh hùng (viết liền)...">
+    <div id="sync-status" style="font-size:11px;text-align:center;color:#4ade80;margin-bottom:8px">🔄 Đang kết nối máy chủ Teyvat...</div>
+    <input id="inp-user" placeholder="Tên Lữ Khách...">
     <input id="inp-pass" type="password" placeholder="Mật khẩu...">
-    <select id="inp-gender">
-      <option value="male">👦 Nam</option>
-      <option value="female">👧 Nữ</option>
-    </select>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-blue" style="flex:1;padding:11px" onclick="handleAuth('login')">Đăng Nhập</button>
-      <button class="btn btn-green" style="flex:1;padding:11px" onclick="handleAuth('register')">Đăng Ký</button>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-blue" style="flex:1;padding:12px" onclick="handleAuth('login')">Vào Game</button>
+      <button class="btn btn-green" style="flex:1;padding:12px" onclick="handleAuth('register')">Đăng Ký</button>
     </div>
   </div>
 </div>
 
-<div id="hud">
-  <div>
-    <div><b id="ui-name" style="color:#a78bfa">...</b> <span id="ui-lv" style="background:#4f46e5;padding:1px 6px;border-radius:6px;font-size:10px">Lv.1</span></div>
-    <div class="hp-bar-bg"><div id="hp-bar-fill"></div></div>
-    <div style="font-size:10px;color:#94a3b8;margin-top:2px">❤️ <span id="ui-hp">150/150</span> | ⚔️ ATK: <span id="ui-atk">25</span> | 🩸 Hút Máu: <span id="ui-lifesteal">0</span>%</div>
+<div id="genshin-hud">
+  <div class="paimon-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b id="ui-name" style="color:#38bdf8;font-size:13px">Lữ Khách</b>
+      <span id="ui-lv" style="background:#0284c7;padding:1px 6px;border-radius:6px;font-size:10px">Lv.1</span>
+    </div>
+    <div class="genshin-hp"><div id="hp-fill"></div></div>
+    <div style="font-size:10px;color:#cbd5e1;margin-top:3px">❤️ <span id="ui-hp">200/200</span> | EXP: <span id="ui-exp">0</span>/<span id="ui-maxexp">100</span></div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <span>🪙 <b id="ui-silver">300</b></span>
-    <span>👑 <b id="ui-gold" style="color:#fbbf24">10</b></span>
-    <span>🧪 <b id="ui-potion" style="color:#34d399">5</b></span>
+  <div class="paimon-card" style="width:180px;padding:6px 12px;display:flex;justify-content:space-between;font-size:11px">
+    <span>🪙 <b id="ui-silver">800</b></span>
+    <span>💎 <b id="ui-gold" style="color:#fbbf24">30</b></span>
   </div>
 </div>
 
-<div id="top-controls">
-  <button class="btn btn-green" onclick="usePotion()">🧪 Máu</button>
-  <button class="btn btn-blue" onclick="openModal('modal-bag')">🎒 Đồ</button>
-  <button class="btn btn-purple" onclick="openModal('modal-gacha')">🎰 Gacha</button>
-  <button class="btn btn-orange" onclick="openModal('modal-rank')">🏆 BXH</button>
-  <button class="btn btn-blue" onclick="openModal('modal-npc')">📜 NPC</button>
-  <button class="btn btn-red" onclick="openAdmin()">👑</button>
+<div id="genshin-menu">
+  <div class="menu-icon" onclick="openModal('modal-map')" title="Chọn Map">🗺️</div>
+  <div class="menu-icon" onclick="openModal('modal-bag')" title="Túi Đồ">🎒</div>
+  <div class="menu-icon" onclick="openModal('modal-online')" title="Người Chơi & Kết Bạn">👥</div>
+  <div class="menu-icon" onclick="openModal('modal-gacha')" title="Gacha">🌠</div>
+  <div class="menu-icon" onclick="openModal('modal-rank')" title="BXH">🏆</div>
 </div>
 
 <div id="game-wrap">
@@ -91,173 +96,128 @@ body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;fle
   <div id="labels-layer"></div>
   <div id="virtual-joystick"><div id="joystick-knob"></div></div>
   <div id="skills-panel">
-    <div class="skill-btn" onclick="castSkill(1)">⚔️</div>
-    <div class="skill-btn" onclick="castSkill(2)">🔥</div>
-    <div class="skill-btn" onclick="castSkill(3)">⚡</div>
+    <div class="genshin-skill" onclick="castSkill(1)">⚔️</div>
+    <div class="genshin-skill" onclick="castSkill(2)">🔥</div>
+    <div class="genshin-skill" onclick="castSkill(3)">💫</div>
   </div>
 </div>
 
-<!-- MODAL NPC & NHIỆM VỤ -->
-<div id="modal-npc" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>📜 Trưởng Làng NPC (Nhiệm Vụ)</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="npc-body"></div>
-</div></div>
-
-<!-- MODAL KHO ĐỒ & TRANG BỊ CHÍNH HÃNG -->
-<div id="modal-bag" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🎒 Kho Đồ & Mô Hình Trang Bị</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="bag-body"></div>
-</div></div>
-
-<!-- MODAL MÁY GACHA -->
-<div id="modal-gacha" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🎰 Máy Gacha Thần Thánh</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" style="text-align:center">
-    <p style="font-size:12px;margin-bottom:10px">Quay nhận Trang Bị, Vũ Khí, Tóc và Cánh phẩm chất cao!</p>
-    <div id="gacha-result" style="background:#1e293b;border:2px dashed #7c3aed;padding:14px;border-radius:10px;margin-bottom:12px;min-height:55px">Chúc bạn trúng đồ Thần Thoại!</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-blue" style="flex:1" onclick="rollGacha('silver')">Quay Thường<br>(🪙 150 Bạc)</button>
-      <button class="btn btn-orange" style="flex:1" onclick="rollGacha('gold')">Quay Hoàng Kim<br>(👑 5 Vàng)</button>
-    </div>
+<!-- MODAL CHỌN MAP -->
+<div id="modal-map" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🗺️ Chọn Bản Đồ (Map Riêng)</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body">
+    <div class="item-row"><div><b>🌳 Map 1: Thảo Nguyên Mondstadt</b><br><small>Quái: Slime Gió (Dễ)</small></div><button class="btn btn-green" onclick="changeMap(0)">Vào</button></div>
+    <div class="item-row"><div><b>🌲 Map 2: Rừng Phong Thần</b><br><small>Quái: Hỏa Thú (Trung bình)</small></div><button class="btn btn-blue" onclick="changeMap(1)">Vào</button></div>
+    <div class="item-row"><div><b>⛰️ Map 3: Vực Sâu Hư Không</b><br><small>Quái: Vệ Sĩ Di Tích (Khó)</small></div><button class="btn btn-purple" onclick="changeMap(2)">Vào</button></div>
   </div>
 </div></div>
 
-<!-- MODAL BẢNG XẾP HẠNG -->
+<!-- MODAL NGƯỜI CHƠI ONLINE & KẾT BẠN / TRAO ĐỔI -->
+<div id="modal-online" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>👥 Người Chơi Online & Kết Bạn</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="online-body"></div>
+</div></div>
+
+<!-- MODAL GACHA -->
+<div id="modal-gacha" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🌠 Cầu Nguyện Tinh Linh</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" style="text-align:center">
+    <div id="gacha-box" style="background:rgba(15,23,42,0.8);border:2px dashed #38bdf8;padding:16px;border-radius:12px;margin-bottom:14px">Nhấn quay để nhận vũ khí mạnh!</div>
+    <button class="btn btn-orange" style="width:100%;padding:12px" onclick="rollGacha()">Cầu Nguyện (👑 10 Nguyên Thạch)</button>
+  </div>
+</div></div>
+
+<!-- MODAL KHO ĐỒ -->
+<div id="modal-bag" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🎒 Túi Đồ</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="bag-body"></div>
+</div></div>
+
+<!-- MODAL BXH -->
 <div id="modal-rank" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🏆 Bảng Xếp Hạng Anh Hùng</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-head"><span>🏆 Bảng Xếp Hạng Lữ Khách</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
   <div class="modal-body" id="rank-body"></div>
 </div></div>
 
-<!-- MODAL ADMIN -->
-<div id="modal-admin" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>👑 Bảng Quản Trị Hệ Thống</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="admin-body"></div>
-</div></div>
-
 <script>
-const RARITY = ["Thường","Hiếm","Sử Thi","Huyền Thoại","Thần Thoại"];
 const ITEMS_DB = {
-  sw1:{id:"sw1",slot:"weapon",name:"Kiếm Gỗ Cũ",r:0,atk:15,hp:30,lifesteal:0,color:0xa16207},
-  sw2:{id:"sw2",slot:"weapon",name:"Đại Đao Hỏa Long",r:2,atk:90,hp:250,lifesteal:3,color:0xf97316},
-  sw3:{id:"sw3",slot:"weapon",name:"Thánh Kiếm Hủy Diệt",r:4,atk:380,hp:1200,lifesteal:8,color:0xfbbf24},
-  ar1:{id:"ar1",slot:"armor",name:"Áo Vải Vệ Sĩ",r:0,atk:5,hp:100,lifesteal:0,color:0x3b82f6},
-  ar2:{id:"ar2",slot:"armor",name:"Giáp Bạc Chiến Thần",r:2,atk:40,hp:600,lifesteal:2,color:0x38bdf8},
-  ar3:{id:"ar3",slot:"armor",name:"Long Bào Thần Thoại",r:4,atk:200,hp:3000,lifesteal:6,color:0xf59e0b},
-  hr1:{id:"hr1",slot:"hair",name:"Tóc Đen Tự Nhiên",r:0,atk:5,hp:20,lifesteal:0,color:0x1e293b},
-  hr2:{id:"hr2",slot:"hair",name:"Tóc Hồng Sakura",r:2,atk:30,hp:150,lifesteal:1,color:0xf472b6},
-  ac1:{id:"ac1",slot:"acc",name:"Cánh Thiên Thần",r:3,atk:100,hp:800,lifesteal:4,color:0xffffff}
+  sw1:{id:"sw1",name:"Kiếm Vô Danh",r:0,atk:25,hp:100},
+  sw2:{id:"sw2",name:"Phong Ưng Thiển Ưng",r:2,atk:150,hp:500}
 };
 
-const QUESTS = [
-  {id:1, title:"Tiêu diệt 3 Slime Rừng", target:3, count:0, reward:{silver:300, exp:120}}
+const MAPS_DATA = [
+  {name:"Mondstadt", color:0x4ade80, mobName:"Slime Gió", hp:120, atk:12, exp:40, silver:100},
+  {name:"Rừng Phong Thần", color:0x15803d, mobName:"Hỏa Thú", hp:280, atk:25, exp:90, silver:220},
+  {name:"Vực Sâu", color:0x311042, mobName:"Vệ Sĩ Di Tích", hp:600, atk:50, exp:180, silver:450}
 ];
 
-// ================= 3D ENGINE =================
 let scene, camera, renderer, myMesh = null;
-let mobs = [], npcs = [];
+let mobs = [], onlineMeshes = {};
 let moveDir = {x:0, z:0}, isDragging = false, prevMousePos = {x:0, y:0}, cameraAngle = 0;
-let curUser = null, client = null;
-let playerHp = 150, maxHp = 150;
+let curUser = null, client = null, currentMapId = 0;
+let playerHp = 200, maxHp = 200, playerExp = 0, playerMaxExp = 100;
+let friendsList = [], onlinePlayersData = {};
+
+const TOPIC_DB = "cuong_genshin_ultimate_2026/db";
+const TOPIC_LIVE = "cuong_genshin_ultimate_2026/live";
+let db = JSON.parse(localStorage.getItem("genshin_ult_db") || '{"users":{}}');
 
 function init3D(){
   const canvas = document.getElementById("canvas3d");
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0f172a);
-  scene.fog = new THREE.FogExp2(0x0f172a, 0.015);
+  scene.background = new THREE.Color(0xbae6fd);
+  scene.fog = new THREE.FogExp2(0xbae6fd, 0.012);
 
-  camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight, 0.1, 200);
+  camera = new THREE.PerspectiveCamera(55, canvas.clientWidth/canvas.clientHeight, 0.1, 200);
   renderer = new THREE.WebGLRenderer({canvas, antialias:true});
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-  const amb = new THREE.AmbientLight(0xffffff, 0.75);
-  const dir = new THREE.DirectionalLight(0xa78bfa, 0.9);
-  dir.position.set(15, 30, 20);
-  scene.add(amb, dir);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const dir = new THREE.DirectionalLight(0xfffbeb, 0.95);
+  dir.position.set(20, 40, 25);
+  scene.add(dir);
 
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshLambertMaterial({color:0x1e293b}));
-  ground.rotation.x = -Math.PI/2;
-  scene.add(ground);
-
-  createNPC3D(0, 0, -6, "Trưởng Làng NPC");
-  spawnMobs();
-
-  myMesh = createFullCharacter3D(db.users[curUser]);
+  buildMapEnvironment();
+  myMesh = createCharacter3D();
   scene.add(myMesh);
 
   setupControls(canvas);
   animate3D();
 }
 
-function createFullCharacter3D(uData){
-  const group = new THREE.Group();
-  // Thân (Giáp)
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.1, 0.5), new THREE.MeshLambertMaterial({color:0x3b82f6}));
-  body.position.y = 0.95; body.name = "body";
-  // Đầu
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 14, 14), new THREE.MeshLambertMaterial({color:0xfde047}));
-  head.position.y = 1.85;
-  // Tóc
-  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.48, 14, 10, 0, Math.PI*2, 0, Math.PI*0.65), new THREE.MeshLambertMaterial({color:0x1e293b}));
-  hair.position.y = 1.92; hair.name = "hair";
-  // Vũ khí cầm tay
-  const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.3, 0.12), new THREE.MeshLambertMaterial({color:0xa16207}));
-  weapon.position.set(0.6, 1.0, 0.3); weapon.rotation.x = Math.PI/4; weapon.name = "weapon";
-  // Cánh sau lưng
-  const wing = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 0.1), new THREE.MeshLambertMaterial({color:0xffffff}));
-  wing.position.set(0, 1.1, -0.3); wing.name = "wing";
+function buildMapEnvironment(){
+  const mInfo = MAPS_DATA[currentMapId];
+  scene.background.setHex(currentMapId===2?0x1e1b4b:0xbae6fd);
+  
+  // Xóa quái cũ
+  mobs.forEach(m=>scene.remove(m.group));
+  mobs = [];
 
-  group.add(body, head, hair, weapon, wing);
-  updateCharacterAppearance(group, uData);
-  group.position.set(0, 0, 4);
-  return group;
-}
-
-function updateCharacterAppearance(group, uData){
-  if(!uData) return;
-  const eq = uData.equip || {};
-  const w = ITEMS_DB[eq.weapon] || ITEMS_DB.sw1;
-  const a = ITEMS_DB[eq.armor] || ITEMS_DB.ar1;
-  const h = ITEMS_DB[eq.hair] || ITEMS_DB.hr1;
-  const ac = ITEMS_DB[eq.acc];
-
-  const body = group.getObjectByName("body");
-  const hair = group.getObjectByName("hair");
-  const weapon = group.getObjectByName("weapon");
-  const wing = group.getObjectByName("wing");
-
-  if(body) body.material.color.setHex(a.color || 0x3b82f6);
-  if(hair) hair.material.color.setHex(h.color || 0x1e293b);
-  if(weapon) weapon.material.color.setHex(w.color || 0xa16207);
-  if(wing){
-    wing.visible = !!ac;
-    if(ac) wing.material.color.setHex(ac.color || 0xffffff);
-  }
-}
-
-function createNPC3D(x, z, name){
-  const group = new THREE.Group();
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.8), new THREE.MeshLambertMaterial({color:0xd97706}));
-  mesh.position.y = 0.9;
-  group.add(mesh);
-  group.position.set(x, 0, z);
-  scene.add(group);
-  npcs.push({group, name});
-}
-
-function spawnMobs(){
+  // Tạo quái riêng cho Map
   for(let i=0;i<4;i++){
     const mGroup = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.85), new THREE.MeshLambertMaterial({color:0xef4444}));
-    body.position.y = 0.9;
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.8, 12, 12), new THREE.MeshLambertMaterial({color:mInfo.color}));
+    body.position.y = 0.8;
     mGroup.add(body);
-    mGroup.position.set((Math.random()-0.5)*18, 0, -8 - Math.random()*15);
+    mGroup.position.set((Math.random()-0.5)*18, 0, -6 - Math.random()*14);
     scene.add(mGroup);
     mobs.push({
-      group: mGroup, name: "Slime Rừng Lv."+(i+1),
-      maxHp: 120 + i*60, hp: 120 + i*60, atk: 15 + i*6,
-      dirX: (Math.random()-0.5)*0.03, dirZ: (Math.random()-0.5)*0.03
+      group: mGroup, name: mInfo.mobName,
+      maxHp: mInfo.hp, hp: mInfo.hp, atk: mInfo.atk,
+      expReward: mInfo.exp, silverReward: mInfo.silver
     });
   }
+}
+
+function createCharacter3D(){
+  const group = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.45), new THREE.MeshLambertMaterial({color:0x0284c7}));
+  body.position.y = 1.0;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.48, 16, 16), new THREE.MeshLambertMaterial({color:0xffedd5}));
+  head.position.y = 1.9;
+  group.add(body, head);
+  group.position.set(0, 0, 4);
+  return group;
 }
 
 function setupControls(canvas){
@@ -298,25 +258,30 @@ function setupControls(canvas){
 function animate3D(){
   requestAnimationFrame(animate3D);
   if(myMesh && (moveDir.x !== 0 || moveDir.z !== 0)){
-    const speed = 0.09;
+    const speed = 0.095;
     const cos = Math.cos(cameraAngle), sin = Math.sin(cameraAngle);
     myMesh.position.x += (moveDir.x * cos - moveDir.z * sin) * speed;
     myMesh.position.z += (moveDir.x * sin + moveDir.z * cos) * speed;
+    broadcastLivePos();
   }
 
   if(myMesh){
-    const camDist = 9;
+    const camDist = 9.5;
     camera.position.x = myMesh.position.x + Math.sin(cameraAngle) * camDist;
     camera.position.z = myMesh.position.z + Math.cos(cameraAngle) * camDist;
-    camera.position.y = myMesh.position.y + 5.5;
+    camera.position.y = myMesh.position.y + 5.2;
     camera.lookAt(myMesh.position.x, myMesh.position.y + 1, myMesh.position.z);
   }
 
+  // Quái tự động di chuyển và lao vào tấn công người chơi
   mobs.forEach(m=>{
-    m.group.position.x += m.dirX; m.group.position.z += m.dirZ;
-    if(Math.abs(m.group.position.x) > 15) m.dirX *= -1;
-    if(m.group.position.z > -4 || m.group.position.z -25) m.dirZ *= -1;
-    if(myMesh && m.group.position.distanceTo(myMesh.position) < 2.2){
+    const dir = new THREE.Vector3().subVectors(myMesh.position, m.group.position);
+    const dist = dir.length();
+    if(dist < 8){
+      dir.normalize();
+      m.group.position.addScaledVector(dir, 0.035); // Quái đuổi theo người chơi
+    }
+    if(dist < 2.2){
       applyPlayerDamage(m.atk);
     }
   });
@@ -328,10 +293,6 @@ function animate3D(){
 function renderLabels(){
   const layer = document.getElementById("labels-layer");
   let html = "";
-  npcs.forEach(n=>{
-    const p = project2D(n.group.position.clone().add(new THREE.Vector3(0, 2.5, 0)));
-    if(p) html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px"><b style="color:#fbbf24">📜 ${n.name}</b></div>`;
-  });
   mobs.forEach(m=>{
     const p = project2D(m.group.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
     if(p){
@@ -339,6 +300,19 @@ function renderLabels(){
       html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px"><b style="color:#ef4444">${m.name}</b><div class="hp-mini"><div class="hp-mini-fill" style="width:${pct}%"></div></div></div>`;
     }
   });
+  // Hiển thị người chơi khác trên màn hình
+  for(let u in onlinePlayersData){
+    if(u === curUser) continue;
+    const op = onlinePlayersData[u];
+    if(op.mapId === currentMapId){
+      const v = new THREE.Vector3(op.x, 1, op.z).project(camera);
+      if(v.z <= 1){
+        const x = (v.x*0.5+0.5)*renderer.domElement.clientWidth;
+        const y = (-(v.y*0.5)+0.5)*renderer.domElement.clientHeight;
+        html += `<div class="label3d" style="left:${x}px;top:${y}px"><b style="color:#38bdf8">🧑‍🤝‍🧑 ${u}</b></div>`;
+      }
+    }
+  }
   layer.innerHTML = html;
 }
 
@@ -349,29 +323,36 @@ function project2D(vec3){
   return { x: (v.x*0.5+0.5)*canvas.clientWidth, y: (-(v.y*0.5)+0.5)*canvas.clientHeight };
 }
 
-// ================= GAME LOGIC & CLOUD =================
-const TOPIC_DB = "cuong_fantasy3d_2026_full/db";
-let db = JSON.parse(localStorage.getItem("fantasy3d_full_db") || '{"users":{},"firstAdmin":""}');
-
+// ================= MULTIPLAYER & CLOUD =================
 function initCloud(){
   client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
   client.on("connect",()=>{
-    document.getElementById("sync-status").innerText = "🟢 Kết nối Máy Chủ thành công!";
-    client.subscribe(TOPIC_DB);
+    document.getElementById("sync-status").innerText = "🟢 Kết nối Teyvat thành công!";
+    client.subscribe([TOPIC_DB, TOPIC_LIVE]);
   });
   client.on("message",(t,p)=>{
     try{
       const data = JSON.parse(p.toString());
-      if(data.users){ db = data; localStorage.setItem("fantasy3d_full_db", JSON.stringify(db)); updateHUD(); }
+      if(t === TOPIC_DB && data.users){
+        db = data; localStorage.setItem("genshin_ult_db", JSON.stringify(db)); updateHUD();
+      } else if(t === TOPIC_LIVE){
+        onlinePlayersData[data.user] = data;
+      }
     }catch(e){}
   });
 }
 initCloud();
 
 function saveCloud(){
-  localStorage.setItem("fantasy3d_full_db", JSON.stringify(db));
+  localStorage.setItem("genshin_ult_db", JSON.stringify(db));
   if(client && client.connected) client.publish(TOPIC_DB, JSON.stringify(db), {retain:true});
   updateHUD();
+}
+
+function broadcastLivePos(){
+  if(!curUser || !client || !client.connected) return;
+  const pkt = {user:curUser, x:myMesh.position.x, z:myMesh.position.z, mapId:currentMapId, t:Date.now()};
+  client.publish(TOPIC_LIVE, JSON.stringify(pkt));
 }
 
 function showToast(msg){
@@ -384,172 +365,129 @@ function showToast(msg){
 function handleAuth(mode){
   const u = document.getElementById("inp-user").value.trim().toLowerCase();
   const p = document.getElementById("inp-pass").value.trim();
-  const g = document.getElementById("inp-gender").value;
   if(!u || !p) return showToast("Nhập đầy đủ tên và mật khẩu!");
 
   if(mode === "register"){
-    if(db.users[u]) return showToast("Tài khoản đã tồn tại!");
-    const isFirst = !db.firstAdmin && Object.keys(db.users).length === 0;
-    if(isFirst) db.firstAdmin = u;
-    db.users[u] = {
-      pass:p, gender:g, lv:1, silver:500, gold:isFirst?50:10, potion:5, isAdmin:isFirst,
-      equip:{weapon:"sw1", armor:"ar1", hair:"hr1"}, bag:["sw1","ar1","hr1"]
-    };
+    if(db.users[u]) return showToast("Tên Lữ Khách đã tồn tại!");
+    db.users[u] = { pass:p, lv:1, exp:0, silver:1000, gold:50, equip:{weapon:"sw1"}, bag:["sw1"], friends:[] };
   } else {
     if(!db.users[u] || db.users[u].pass !== p) return showToast("Sai tài khoản hoặc mật khẩu!");
   }
   curUser = u;
   document.getElementById("login-screen").style.display = "none";
-  playerHp = maxHp = 150;
+  playerHp = maxHp = 200;
   init3D();
   updateHUD();
-}
-
-function getPlayerStats(){
-  const u = db.users[curUser];
-  let atk = 25 + (u.lv-1)*10, lifesteal = 0;
-  maxHp = 150 + (u.lv-1)*60;
-  const eq = u.equip || {};
-  ["weapon","armor","hair","acc"].forEach(slot=>{
-    const it = ITEMS_DB[eq[slot]];
-    if(it){ maxHp += (it.hp||0); atk += (it.atk||0); lifesteal += (it.lifesteal||0); }
-  });
-  return {atk, lifesteal};
 }
 
 function updateHUD(){
   if(!curUser) return;
   const u = db.users[curUser];
-  const st = getPlayerStats();
   document.getElementById("ui-name").innerText = curUser;
   document.getElementById("ui-lv").innerText = `Lv.${u.lv}`;
   document.getElementById("ui-hp").innerText = `${Math.max(0,Math.round(playerHp))}/${maxHp}`;
-  document.getElementById("ui-atk").innerText = st.atk;
-  document.getElementById("ui-lifesteal").innerText = st.lifesteal;
+  document.getElementById("ui-exp").innerText = u.exp || 0;
+  document.getElementById("ui-maxexp").innerText = playerMaxExp;
   document.getElementById("ui-silver").innerText = u.silver;
   document.getElementById("ui-gold").innerText = u.gold;
-  document.getElementById("ui-potion").innerText = u.potion;
-  document.getElementById("hp-bar-fill").style.width = Math.max(0, (playerHp/maxHp)*100) + "%";
-  if(myMesh) updateCharacterAppearance(myMesh, u);
+  document.getElementById("hp-fill").style.width = Math.max(0, (playerHp/maxHp)*100) + "%";
 }
 
+function changeMap(mapId){
+  currentMapId = mapId;
+  buildMapEnvironment();
+  closeModals();
+  showToast("🗺️ Đã di chuyển đến " + MAPS_DATA[mapId].name);
+}
+
+// Hệ thống đánh quái, nhận EXP, lên cấp
 function castSkill(id){
   if(mobs.length === 0) return;
   const target = mobs[0];
-  const st = getPlayerStats();
-  const mult = id===1 ? 1.2 : id===2 ? 2.0 : 3.5;
-  const dmg = Math.round(st.atk * mult);
+  const dmg = id===1 ? 40 : id===2 ? 80 : 150;
   target.hp -= dmg;
-  showToast(`⚡ Kỹ Năng ${id}! Gây ${dmg} sát thương!`);
-
-  if(st.lifesteal > 0){
-    const heal = Math.round(dmg * (st.lifesteal/100));
-    playerHp = Math.min(maxHp, playerHp + heal);
-  }
+  showToast(`⚔️ Tấn công gây ${dmg} sát thương!`);
 
   if(target.hp <= 0){
-    showToast(`🎉 Tiêu diệt ${target.name}! Nhận +250 Bạc`);
-    db.users[curUser].silver += 250;
-    QUESTS[0].count++;
+    const u = db.users[curUser];
+    u.silver += target.silverReward;
+    u.exp = (u.exp||0) + target.expReward;
+    showToast(`🎉 Tiêu diệt ${target.name}! Nhận +${target.expReward} EXP & +${target.silverReward} Bạc`);
+
+    // Kiểm tra lên cấp
+    if(u.exp >= playerMaxExp){
+      u.exp -= playerMaxExp;
+      u.lv++;
+      playerMaxExp = Math.round(playerMaxExp * 1.5);
+      maxHp += 50; playerHp = maxHp;
+      showToast(`✨ CHÚC MỪNG BẠN ĐÃ LÊN CẤP ${u.lv}!`);
+    }
+    saveCloud();
+
     target.hp = target.maxHp;
     target.group.position.x = (Math.random()-0.5)*18;
-    target.group.position.z = -8 - Math.random()*15;
+    target.group.position.z = -6 - Math.random()*14;
   }
   updateHUD();
 }
 
 function applyPlayerDamage(amount){
-  playerHp -= Math.max(1, amount - 5);
-  if(playerHp <= 0){ playerHp = maxHp; showToast("💀 Bạn đã gục ngã và được hồi sinh tại làng!"); }
+  playerHp -= Math.max(1, amount - 4);
+  if(playerHp <= 0){
+    playerHp = maxHp;
+    myMesh.position.set(0, 0, 4);
+    showToast("💀 Bạn đã ngã xuống và được hồi sinh an toàn!");
+  }
   updateHUD();
 }
 
-function usePotion(){
-  const u = db.users[curUser];
-  if(u.potion <= 0) return showToast("Hết bình thuốc hồi phục!");
-  u.potion--;
-  playerHp = Math.min(maxHp, playerHp + 120);
-  showToast("🧪 Hồi phục +120 HP thành công.");
-  updateHUD();
-}
-
+// Hệ thống kết bạn và trao đổi
 function openModal(id){
   closeModals();
-  if(id === "modal-npc"){
-    let html = `<p style="font-size:12px;margin-bottom:8px"><b>Trưởng Làng:</b> Tiêu diệt quái vật để bảo vệ ngôi làng!</p>`;
-    QUESTS.forEach(q=>{
-      html += `<div class="item-row"><div><b>${q.title}</b><br><small>Tiến độ: (${q.count}/${q.target})</small></div>
-      <button class="btn btn-green" onclick="claimQuest(${q.id})">Nhận Thưởng</button></div>`;
-    });
-    document.getElementById("npc-body").innerHTML = html;
+  if(id === "modal-online"){
+    let html = `<p style="font-size:12px;margin-bottom:8px">Danh sách Lữ Khách đang online:</p>`;
+    for(let k in onlinePlayersData){
+      if(k === curUser) continue;
+      html += `<div class="item-row"><div><b>🧑‍🤝‍🧑 ${k}</b></div>
+      <button class="btn btn-green" onclick="addFriend('${k}')">Kết Bạn</button></div>`;
+    }
+    document.getElementById("online-body").innerHTML = html;
   } else if(id === "modal-bag"){
     const u = db.users[curUser];
     let html = "";
     u.bag.forEach(itemId=>{
       const it = ITEMS_DB[itemId];
-      if(!it) return;
-      const isEq = u.equip[it.slot] === itemId;
-      html += `<div class="item-row"><div><span class="r-${it.r}">${it.name} [${RARITY[it.r]}]</span><br><small>⚔️+${it.atk} ❤️+${it.hp} | Hút máu: ${it.lifesteal}%</small></div>
-      <button class="btn ${isEq?'btn-green':'btn-blue'}" onclick="equipItem('${it.slot}','${itemId}')">${isEq?'Đang Dùng':'Trang Bị'}</button></div>`;
+      html += `<div class="item-row"><div><b>${it.name}</b> (ATK: +${it.atk})</div><button class="btn btn-blue" onclick="tradeItem('${itemId}')">Đem Trao Đổi</button></div>`;
     });
     document.getElementById("bag-body").innerHTML = html;
   } else if(id === "modal-rank"){
     let html = "";
     const sorted = Object.keys(db.users).sort((a,b)=>db.users[b].lv - db.users[a].lv);
     sorted.forEach((k,i)=>{
-      const m = db.users[k];
-      html += `<div class="item-row"><div><b>#${i+1} ${k}</b></div><div>Lv.${m.lv} 🪙${m.silver}</div></div>`;
+      html += `<div class="item-row"><div><b>#${i+1} ${k}</b></div><div>Lv.${db.users[k].lv}</div></div>`;
     });
     document.getElementById("rank-body").innerHTML = html;
   }
   document.getElementById(id).classList.add("open");
 }
 
-function claimQuest(qId){
-  const q = QUESTS.find(x=>x.id===qId);
-  if(q.count < q.target) return showToast("Chưa hoàn thành nhiệm vụ!");
-  const u = db.users[curUser];
-  u.silver += q.reward.silver;
-  q.count = 0; saveCloud();
-  showToast("🎁 Nhận thưởng thành công!");
+function addFriend(name){
+  showToast(`🤝 Đã gửi lời mời kết bạn đến ${name}!`);
   closeModals();
 }
 
-function equipItem(slot, id){
-  db.users[curUser].equip[slot] = id;
-  saveCloud(); openModal("modal-bag");
+function tradeItem(itemId){
+  showToast("🤝 Đã mở phiên giao dịch vật phẩm trực tuyến!");
+  closeModals();
 }
 
-function rollGacha(cur){
+function rollGacha(){
   const u = db.users[curUser];
-  if(cur==="silver"){ if(u.silver<150) return showToast("Cần 150 Đồng Bạc!"); u.silver-=150; }
-  else { if(u.gold<5) return showToast("Cần 5 Đồng Vàng!"); u.gold-=5; }
-  
-  const keys = Object.keys(ITEMS_DB);
-  const prizeKey = keys[Math.floor(Math.random()*keys.length)];
-  const prize = ITEMS_DB[prizeKey];
-  if(!u.bag.includes(prizeKey)) u.bag.push(prizeKey);
-  u.equip[prize.slot] = prizeKey;
+  if(u.gold < 10) return showToast("Không đủ 10 Nguyên Thạch!");
+  u.gold -= 10;
+  if(!u.bag.includes("sw2")) u.bag.push("sw2");
   saveCloud();
-  document.getElementById("gacha-result").innerHTML = `🎉 Trúng: <span class="r-${prize.r}">${prize.name} [${RARITY[prize.r]}]</span>`;
-}
-
-function openAdmin(){
-  const u = db.users[curUser];
-  openModal("modal-admin");
-  let html = `<p style="font-size:12px;margin-bottom:8px">Quản trị viên: <b>${curUser}</b></p>`;
-  for(let k in db.users){
-    const m = db.users[k];
-    html += `<div class="item-row"><div><b>${k}</b> (Lv.${m.lv})</div>
-    <button class="btn btn-orange" onclick="adminGift('${k}')">+10 Vàng</button></div>`;
-  }
-  document.getElementById("admin-body").innerHTML = html;
-}
-
-function adminGift(target){
-  db.users[target].gold += 10;
-  saveCloud(); openAdmin();
-  showToast(`Đã tặng +10 Vàng cho ${target}`);
+  showToast("🎉 Cầu nguyện thành công nhận: Phong Ưng Thiển Ưng!");
 }
 
 function closeModals(){ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }
