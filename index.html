@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Fantasy 3D RPG Online</title>
+<title>Fantasy 3D RPG Online - Full Edition</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <style>
@@ -11,7 +11,7 @@
 body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
 #login-screen{position:fixed;inset:0;background:radial-gradient(circle at center,#1e1b4b,#090d16);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
 .logo-box{background:linear-gradient(135deg,#7c3aed,#4f46e5);border:2px solid #a78bfa;border-radius:16px;padding:14px 28px;box-shadow:0 0 30px rgba(124,58,237,0.6);margin-bottom:16px;text-align:center}
-.login-panel{background:rgba(15,23,42,0.9);border:2px solid #6366f1;border-radius:16px;padding:18px;width:92%;max-width:350px;color:#f8fafc;box-shadow:0 10px 30px rgba(0,0,0,0.8)}
+.login-panel{background:rgba(15,23,42,0.92);border:2px solid #6366f1;border-radius:16px;padding:18px;width:92%;max-width:350px;color:#f8fafc;box-shadow:0 10px 30px rgba(0,0,0,0.8)}
 .login-panel input,.login-panel select{width:100%;padding:10px;margin:6px 0;border:1px solid #475569;border-radius:8px;font-size:14px;background:#1e293b;color:#fff}
 .btn{padding:9px 14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 3px 0 rgba(0,0,0,0.4);transition:0.1s;font-size:12px}
 .btn:active{transform:translateY(2px);box-shadow:none}
@@ -25,17 +25,14 @@ body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;fle
 .label3d{position:absolute;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;font-size:11px;text-shadow:0 1px 4px #000}
 .hp-mini{width:50px;height:5px;background:#222;border-radius:3px;overflow:hidden;margin:2px auto}
 .hp-mini-fill{height:100%;background:#ef4444}
-/* VIRTUAL JOYSTICK & SKILLS HUD */
 #virtual-joystick{position:absolute;bottom:25px;left:25px;width:110px;height:110px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);border-radius:50%;touch-action:none;z-index:30}
 #joystick-knob{position:absolute;top:30px;left:30px;width:50px;height:50px;background:rgba(255,255,255,0.6);border-radius:50%;pointer-events:none}
 #skills-panel{position:absolute;bottom:25px;right:20px;display:flex;gap:10px;z-index:30}
-.skill-btn{width:56px;height:56px;border-radius:50%;border:2px solid #fbbf24;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.5);cursor:pointer;position:pointer}
-.skill-btn:active{transform:scale(0.92)}
-#top-controls{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:30}
-/* Modal chung */
+.skill-btn{width:56px;height:56px;border-radius:50%;border:2px solid #fbbf24;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.5);cursor:pointer}
+#top-controls{position:absolute;top:10px;right:10px;display:flex;gap:5px;z-index:30;flex-wrap:wrap;justify-content:flex-end}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
 .modal.open{display:flex}
-.modal-card{background:#0f172a;color:#f8fafc;border:2px solid #4f46e5;border-radius:14px;width:100%;max-width:400px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-card{background:#0f172a;color:#f8fafc;border:2px solid #4f46e5;border-radius:14px;width:100%;max-width:410px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
 .modal-head{background:#1e1b4b;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;border-bottom:1px solid #334155}
 .modal-body{padding:12px;overflow-y:auto;flex:1}
 .item-row{display:flex;justify-content:space-between;align-items:center;background:#1e293b;padding:8px 10px;border-radius:8px;margin-bottom:6px;border:1px solid #334155}
@@ -47,103 +44,120 @@ body{background:#090d16;color:#fff;overflow:hidden;height:100vh;display:flex;fle
 
 <div id="toast"></div>
 
-<!-- MÀN HÌNH ĐĂNG NHẬP FANTASY -->
 <div id="login-screen">
   <div class="logo-box">
-    <h1>🔮 FANTASY 3D ONLINE</h1>
-    <div style="font-size:11px;color:#c7d2fe">Thế Giới Phép Thuật • Săn Boss • Giao Tiếp NPC</div>
+    <h1>🔮 FANTASY 3D RPG ONLINE</h1>
+    <div style="font-size:11px;color:#c7d2fe">Full Edition • Gacha • BXH • Admin • 360° View</div>
   </div>
   <div class="login-panel">
-    <div id="sync-status" style="font-size:11px;text-align:center;color:#34d399;margin-bottom:6px">🔄 Đang kết nối máy chủ Fantasy...</div>
-    <input id="inp-user" placeholder="Tên anh hùng...">
+    <div id="sync-status" style="font-size:11px;text-align:center;color:#34d399;margin-bottom:6px">🔄 Đang kết nối máy chủ Cloud...</div>
+    <input id="inp-user" placeholder="Tên anh hùng (viết liền)...">
     <input id="inp-pass" type="password" placeholder="Mật khẩu...">
-    <select id="inp-class">
-      <option value="warrior">⚔️ Lớp: Chiến Binh (Sức mạnh cận chiến)</option>
-      <option value="mage">🔮 Lớp: Pháp Sư (Sát thương nguyên tố)</option>
-      <option value="archer">🏹 Lớp: Xạ Thủ (Tốc độ bách phát)</option>
+    <select id="inp-gender">
+      <option value="male">👦 Nam</option>
+      <option value="female">👧 Nữ</option>
     </select>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-blue" style="flex:1;padding:11px" onclick="handleAuth('login')">Vào Game</button>
+      <button class="btn btn-blue" style="flex:1;padding:11px" onclick="handleAuth('login')">Đăng Nhập</button>
       <button class="btn btn-green" style="flex:1;padding:11px" onclick="handleAuth('register')">Đăng Ký</button>
     </div>
   </div>
 </div>
 
-<!-- HUD TRÊN CÙNG -->
 <div id="hud">
   <div>
     <div><b id="ui-name" style="color:#a78bfa">...</b> <span id="ui-lv" style="background:#4f46e5;padding:1px 6px;border-radius:6px;font-size:10px">Lv.1</span></div>
     <div class="hp-bar-bg"><div id="hp-bar-fill"></div></div>
-    <div style="font-size:10px;color:#94a3b8;margin-top:2px">❤️ <span id="ui-hp">150/150</span> | ⚔️ ATK: <span id="ui-atk">20</span> | 🩸 Hút Máu: <span id="ui-lifesteal">0</span>%</div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:2px">❤️ <span id="ui-hp">150/150</span> | ⚔️ ATK: <span id="ui-atk">25</span> | 🩸 Hút Máu: <span id="ui-lifesteal">0</span>%</div>
   </div>
-  <div style="display:flex;gap:10px;align-items:center">
-    <span>🪙 <b id="ui-silver">100</b></span>
-    <span>💎 <b id="ui-gold" style="color:#fbbf24">10</b></span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span>🪙 <b id="ui-silver">300</b></span>
+    <span>👑 <b id="ui-gold" style="color:#fbbf24">10</b></span>
     <span>🧪 <b id="ui-potion" style="color:#34d399">5</b></span>
   </div>
 </div>
 
-<!-- NÚT ĐIỀU HƯỚNG GÓC PHẢI TRÊN -->
 <div id="top-controls">
-  <button class="btn btn-green" onclick="usePotion()">🧪 Uống Máu</button>
+  <button class="btn btn-green" onclick="usePotion()">🧪 Máu</button>
   <button class="btn btn-blue" onclick="openModal('modal-bag')">🎒 Đồ</button>
-  <button class="btn btn-purple" onclick="openModal('modal-npc')">📜 NPC</button>
-  <button class="btn btn-orange" onclick="openAdmin()">👑</button>
+  <button class="btn btn-purple" onclick="openModal('modal-gacha')">🎰 Gacha</button>
+  <button class="btn btn-orange" onclick="openModal('modal-rank')">🏆 BXH</button>
+  <button class="btn btn-blue" onclick="openModal('modal-npc')">📜 NPC</button>
+  <button class="btn btn-red" onclick="openAdmin()">👑</button>
 </div>
 
-<!-- KHUNG 3D CHIẾN ĐẤU & XOAY 360 ĐỘ -->
 <div id="game-wrap">
   <canvas id="canvas3d"></canvas>
   <div id="labels-layer"></div>
-
-  <!-- JOYSTICK & 3 Ô KỸ NĂNG -->
   <div id="virtual-joystick"><div id="joystick-knob"></div></div>
   <div id="skills-panel">
-    <div class="skill-btn" onclick="castSkill(1)" title="Kỹ năng 1">⚔️</div>
-    <div class="skill-btn" onclick="castSkill(2)" title="Kỹ năng 2">🔥</div>
-    <div class="skill-btn" onclick="castSkill(3)" title="Kỹ năng 3">⚡</div>
+    <div class="skill-btn" onclick="castSkill(1)">⚔️</div>
+    <div class="skill-btn" onclick="castSkill(2)">🔥</div>
+    <div class="skill-btn" onclick="castSkill(3)">⚡</div>
   </div>
 </div>
 
-<!-- MODAL GIAO TIẾP NPC & NHIỆM VỤ THEO CẤP -->
+<!-- MODAL NPC & NHIỆM VỤ -->
 <div id="modal-npc" class="modal"><div class="modal-card">
   <div class="modal-head"><span>📜 Trưởng Làng NPC (Nhiệm Vụ)</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
   <div class="modal-body" id="npc-body"></div>
 </div></div>
 
-<!-- MODAL KHO ĐỒ & TRANG BỊ (HÚT MÁU, PHẨM CHẤT) -->
+<!-- MODAL KHO ĐỒ & TRANG BỊ CHÍNH HÃNG -->
 <div id="modal-bag" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🎒 Kho Trang Bị Phép Thuật</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-head"><span>🎒 Kho Đồ & Mô Hình Trang Bị</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
   <div class="modal-body" id="bag-body"></div>
+</div></div>
+
+<!-- MODAL MÁY GACHA -->
+<div id="modal-gacha" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🎰 Máy Gacha Thần Thánh</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" style="text-align:center">
+    <p style="font-size:12px;margin-bottom:10px">Quay nhận Trang Bị, Vũ Khí, Tóc và Cánh phẩm chất cao!</p>
+    <div id="gacha-result" style="background:#1e293b;border:2px dashed #7c3aed;padding:14px;border-radius:10px;margin-bottom:12px;min-height:55px">Chúc bạn trúng đồ Thần Thoại!</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-blue" style="flex:1" onclick="rollGacha('silver')">Quay Thường<br>(🪙 150 Bạc)</button>
+      <button class="btn btn-orange" style="flex:1" onclick="rollGacha('gold')">Quay Hoàng Kim<br>(👑 5 Vàng)</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- MODAL BẢNG XẾP HẠNG -->
+<div id="modal-rank" class="modal"><div class="modal-card">
+  <div class="modal-head"><span>🏆 Bảng Xếp Hạng Anh Hùng</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-body" id="rank-body"></div>
 </div></div>
 
 <!-- MODAL ADMIN -->
 <div id="modal-admin" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>👑 Quản Trị Hệ Thống</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
+  <div class="modal-head"><span>👑 Bảng Quản Trị Hệ Thống</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
   <div class="modal-body" id="admin-body"></div>
 </div></div>
 
 <script>
-// ================= 1. DỮ LIỆU FANTASY & HÚT MÁU & NPC =================
 const RARITY = ["Thường","Hiếm","Sử Thi","Huyền Thoại","Thần Thoại"];
 const ITEMS_DB = {
-  sw1:{id:"sw1",slot:"weapon",name:"Kiếm Sắt Cổ",r:0,atk:15,hp:50,lifesteal:0,color:0x94a3b8},
-  sw2:{id:"sw2",slot:"weapon",name:"Thanh Kiếm Hỏa Long",r:2,atk:80,hp:300,lifesteal:3,color:0xf97316},
-  sw3:{id:"sw3",slot:"weapon",name:"Thánh Kiếm Hủy Diệt",r:4,atk:350,hp:1500,lifesteal:8,color:0xfbbf24},
-  ar1:{id:"ar1",slot:"armor",name:"Áo Choàng Phù Sư",r:1,atk:10,hp:250,lifesteal:1,color:0x38bdf8},
-  ar2:{id:"ar2",slot:"armor",name:"Giáp Rồng Bất Tử",r:3,atk:120,hp:1200,lifesteal:5,color:0xc084fc}
+  sw1:{id:"sw1",slot:"weapon",name:"Kiếm Gỗ Cũ",r:0,atk:15,hp:30,lifesteal:0,color:0xa16207},
+  sw2:{id:"sw2",slot:"weapon",name:"Đại Đao Hỏa Long",r:2,atk:90,hp:250,lifesteal:3,color:0xf97316},
+  sw3:{id:"sw3",slot:"weapon",name:"Thánh Kiếm Hủy Diệt",r:4,atk:380,hp:1200,lifesteal:8,color:0xfbbf24},
+  ar1:{id:"ar1",slot:"armor",name:"Áo Vải Vệ Sĩ",r:0,atk:5,hp:100,lifesteal:0,color:0x3b82f6},
+  ar2:{id:"ar2",slot:"armor",name:"Giáp Bạc Chiến Thần",r:2,atk:40,hp:600,lifesteal:2,color:0x38bdf8},
+  ar3:{id:"ar3",slot:"armor",name:"Long Bào Thần Thoại",r:4,atk:200,hp:3000,lifesteal:6,color:0xf59e0b},
+  hr1:{id:"hr1",slot:"hair",name:"Tóc Đen Tự Nhiên",r:0,atk:5,hp:20,lifesteal:0,color:0x1e293b},
+  hr2:{id:"hr2",slot:"hair",name:"Tóc Hồng Sakura",r:2,atk:30,hp:150,lifesteal:1,color:0xf472b6},
+  ac1:{id:"ac1",slot:"acc",name:"Cánh Thiên Thần",r:3,atk:100,hp:800,lifesteal:4,color:0xffffff}
 };
 
-const QUESTS_DATA = [
-  {id:1, title:"Tiêu diệt 3 Slime Rừng", reqType:"kill", target:3, count:0, reward:{silver:200, exp:100}, desc:"Lũ Slime đang quấy phá lối vào làng. Hãy tiêu diệt chúng!"},
-  {id:2, title:"Săn Quái Cấp Cao ở Thung Lũng", reqType:"kill", target:5, count:0, reward:{silver:600, gold:5, exp:350}, desc:"Dũng sĩ hãy tiến sâu vào thung lũng dẹp trừ yêu thú."}
+const QUESTS = [
+  {id:1, title:"Tiêu diệt 3 Slime Rừng", target:3, count:0, reward:{silver:300, exp:120}}
 ];
 
-// ================= 2. ĐỘNG CƠ 3D THREE.JS & XOAY 360 ĐỘ =================
+// ================= 3D ENGINE =================
 let scene, camera, renderer, myMesh = null;
-let mobs = [], npcs = [], bullets = [];
+let mobs = [], npcs = [];
 let moveDir = {x:0, z:0}, isDragging = false, prevMousePos = {x:0, y:0}, cameraAngle = 0;
 let curUser = null, client = null;
+let playerHp = 150, maxHp = 150;
 
 function init3D(){
   const canvas = document.getElementById("canvas3d");
@@ -155,40 +169,69 @@ function init3D(){
   renderer = new THREE.WebGLRenderer({canvas, antialias:true});
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-  const amb = new THREE.AmbientLight(0xffffff, 0.7);
-  const dir = new THREE.DirectionalLight(0xa78bfa, 0.8);
-  dir.position.set(10, 25, 15);
+  const amb = new THREE.AmbientLight(0xffffff, 0.75);
+  const dir = new THREE.DirectionalLight(0xa78bfa, 0.9);
+  dir.position.set(15, 30, 20);
   scene.add(amb, dir);
 
-  // Sân đấu Fantasy 3D
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshLambertMaterial({color:0x1e293b}));
   ground.rotation.x = -Math.PI/2;
   scene.add(ground);
 
-  // Tạo NPC giao tiếp trong không gian 3D
   createNPC3D(0, 0, -6, "Trưởng Làng NPC");
-
-  // Tạo Quái vật có thể di chuyển và tấn công
   spawnMobs();
 
-  // Tạo Nhân vật chính
-  myMesh = createCharacter3D();
+  myMesh = createFullCharacter3D(db.users[curUser]);
   scene.add(myMesh);
 
-  // Lắng nghe sự kiện xoay camera 360 độ và Joystick
   setupControls(canvas);
   animate3D();
 }
 
-function createCharacter3D(){
+function createFullCharacter3D(uData){
   const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshLambertMaterial({color:0x4f46e5}));
-  body.position.y = 1;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), new THREE.MeshLambertMaterial({color:0xfde047}));
+  // Thân (Giáp)
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.1, 0.5), new THREE.MeshLambertMaterial({color:0x3b82f6}));
+  body.position.y = 0.95; body.name = "body";
+  // Đầu
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 14, 14), new THREE.MeshLambertMaterial({color:0xfde047}));
   head.position.y = 1.85;
-  group.add(body, head);
-  group.position.set(0, 0, 5);
+  // Tóc
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.48, 14, 10, 0, Math.PI*2, 0, Math.PI*0.65), new THREE.MeshLambertMaterial({color:0x1e293b}));
+  hair.position.y = 1.92; hair.name = "hair";
+  // Vũ khí cầm tay
+  const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.3, 0.12), new THREE.MeshLambertMaterial({color:0xa16207}));
+  weapon.position.set(0.6, 1.0, 0.3); weapon.rotation.x = Math.PI/4; weapon.name = "weapon";
+  // Cánh sau lưng
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 0.1), new THREE.MeshLambertMaterial({color:0xffffff}));
+  wing.position.set(0, 1.1, -0.3); wing.name = "wing";
+
+  group.add(body, head, hair, weapon, wing);
+  updateCharacterAppearance(group, uData);
+  group.position.set(0, 0, 4);
   return group;
+}
+
+function updateCharacterAppearance(group, uData){
+  if(!uData) return;
+  const eq = uData.equip || {};
+  const w = ITEMS_DB[eq.weapon] || ITEMS_DB.sw1;
+  const a = ITEMS_DB[eq.armor] || ITEMS_DB.ar1;
+  const h = ITEMS_DB[eq.hair] || ITEMS_DB.hr1;
+  const ac = ITEMS_DB[eq.acc];
+
+  const body = group.getObjectByName("body");
+  const hair = group.getObjectByName("hair");
+  const weapon = group.getObjectByName("weapon");
+  const wing = group.getObjectByName("wing");
+
+  if(body) body.material.color.setHex(a.color || 0x3b82f6);
+  if(hair) hair.material.color.setHex(h.color || 0x1e293b);
+  if(weapon) weapon.material.color.setHex(w.color || 0xa16207);
+  if(wing){
+    wing.visible = !!ac;
+    if(ac) wing.material.color.setHex(ac.color || 0xffffff);
+  }
 }
 
 function createNPC3D(x, z, name){
@@ -207,18 +250,16 @@ function spawnMobs(){
     const body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.85), new THREE.MeshLambertMaterial({color:0xef4444}));
     body.position.y = 0.9;
     mGroup.add(body);
-    const x = (Math.random()-0.5)*20, z = -10 - Math.random()*15;
-    mGroup.position.set(x, 0, z);
+    mGroup.position.set((Math.random()-0.5)*18, 0, -8 - Math.random()*15);
     scene.add(mGroup);
     mobs.push({
       group: mGroup, name: "Slime Rừng Lv."+(i+1),
-      maxHp: 100 + i*50, hp: 100 + i*50, atk: 12 + i*5,
-      dirX: (Math.random()-0.5)*0.04, dirZ: (Math.random()-0.5)*0.04
+      maxHp: 120 + i*60, hp: 120 + i*60, atk: 15 + i*6,
+      dirX: (Math.random()-0.5)*0.03, dirZ: (Math.random()-0.5)*0.03
     });
   }
 }
 
-// ================= 3. ĐIỀU KHIỂN JOYSTICK & XOAY 360 ĐỘ =================
 function setupControls(canvas){
   const stick = document.getElementById("virtual-joystick");
   const knob = document.getElementById("joystick-knob");
@@ -238,7 +279,6 @@ function setupControls(canvas){
       knob.style.transform = `translate(${dx}px, ${dy}px)`;
       moveDir.x = dx/40; moveDir.z = dy/40;
     }
-    // Xoay góc nhìn 360 độ khi vuốt màn hình
     if(isDragging){
       cameraAngle -= (e.clientX - prevMousePos.x) * 0.008;
       prevMousePos = {x:e.clientX, y:e.clientY};
@@ -246,10 +286,7 @@ function setupControls(canvas){
   });
 
   window.addEventListener("pointerup", e=>{
-    if(e.pointerId === touchId){
-      touchId = null; knob.style.transform = `translate(0px, 0px)`;
-      moveDir.x = 0; moveDir.z = 0;
-    }
+    if(e.pointerId === touchId){ touchId = null; knob.style.transform = `translate(0px, 0px)`; moveDir.x = 0; moveDir.z = 0; }
     isDragging = false;
   });
 
@@ -262,13 +299,11 @@ function animate3D(){
   requestAnimationFrame(animate3D);
   if(myMesh && (moveDir.x !== 0 || moveDir.z !== 0)){
     const speed = 0.09;
-    // Di chuyển theo hướng camera xoay 360 độ
     const cos = Math.cos(cameraAngle), sin = Math.sin(cameraAngle);
     myMesh.position.x += (moveDir.x * cos - moveDir.z * sin) * speed;
     myMesh.position.z += (moveDir.x * sin + moveDir.z * cos) * speed;
   }
 
-  // Camera bám theo nhân vật với góc xoay 360 độ
   if(myMesh){
     const camDist = 9;
     camera.position.x = myMesh.position.x + Math.sin(cameraAngle) * camDist;
@@ -277,13 +312,10 @@ function animate3D(){
     camera.lookAt(myMesh.position.x, myMesh.position.y + 1, myMesh.position.z);
   }
 
-  // Quái di chuyển tuần tra và tấn công
   mobs.forEach(m=>{
     m.group.position.x += m.dirX; m.group.position.z += m.dirZ;
     if(Math.abs(m.group.position.x) > 15) m.dirX *= -1;
-    if(m.group.position.z > -4 || m.group.position.z < -25) m.dirZ *= -1;
-
-    // Nếu người chơi đến gần, quái lao vào tấn công
+    if(m.group.position.z > -4 || m.group.position.z -25) m.dirZ *= -1;
     if(myMesh && m.group.position.distanceTo(myMesh.position) < 2.2){
       applyPlayerDamage(m.atk);
     }
@@ -298,7 +330,7 @@ function renderLabels(){
   let html = "";
   npcs.forEach(n=>{
     const p = project2D(n.group.position.clone().add(new THREE.Vector3(0, 2.5, 0)));
-    if(p) html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px"><b style="color:#fbbf24">📜 ${n.name} (Chạm NPC)</b></div>`;
+    if(p) html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px"><b style="color:#fbbf24">📜 ${n.name}</b></div>`;
   });
   mobs.forEach(m=>{
     const p = project2D(m.group.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
@@ -317,69 +349,9 @@ function project2D(vec3){
   return { x: (v.x*0.5+0.5)*canvas.clientWidth, y: (-(v.y*0.5)+0.5)*canvas.clientHeight };
 }
 
-// ================= 4. KỸ NĂNG, HÚT MÁU & THUỐC HỒI PHỤC =================
-let playerHp = 150, maxHp = 150;
-
-function getPlayerStats(){
-  const u = db.users[curUser];
-  let atk = 20 + (u.lv-1)*10, lifesteal = 0;
-  maxHp = 150 + (u.lv-1)*60;
-  const eq = u.equip || {};
-  if(eq.weapon && ITEMS_DB[eq.weapon]){ atk += ITEMS_DB[eq.weapon].atk; lifesteal += ITEMS_DB[eq.weapon].lifesteal; }
-  if(eq.armor && ITEMS_DB[eq.armor]){ maxHp += ITEMS_DB[eq.armor].hp; lifesteal += ITEMS_DB[eq.armor].lifesteal; }
-  return {atk, lifesteal};
-}
-
-function castSkill(id){
-  if(mobs.length === 0) return;
-  const target = mobs[0]; // Tấn công quái gần nhất
-  const st = getPlayerStats();
-  const mult = id===1 ? 1.2 : id===2 ? 2.0 : 3.2;
-  const dmg = Math.round(st.atk * mult);
-
-  target.hp -= dmg;
-  showToast(`⚡ Thi triển Kỹ Năng ${id}! Gây ${dmg} sát thương phép!`);
-
-  // Hiệu ứng hút máu (Lifesteal) hồi phục trực tiếp HP cho nhân vật
-  if(st.lifesteal > 0){
-    const heal = Math.round(dmg * (st.lifesteal/100));
-    playerHp = Math.min(maxHp, playerHp + heal);
-    showToast(`🩸 Hút máu hồi phục +${heal} HP!`);
-  }
-
-  if(target.hp <= 0){
-    showToast(`🎉 Tiêu diệt thành công ${target.name}! Nhận +200 Bạc`);
-    db.users[curUser].silver += 200;
-    // Cập nhật nhiệm vụ NPC
-    QUESTS_DATA[0].count++;
-    target.hp = target.maxHp;
-    target.group.position.x = (Math.random()-0.5)*20;
-    target.group.position.z = -10 - Math.random()*15;
-  }
-  updateHUD();
-}
-
-function applyPlayerDamage(amount){
-  playerHp -= Math.max(1, amount - 5);
-  if(playerHp <= 0){
-    playerHp = maxHp;
-    showToast("💀 Bạn đã gục ngã và được hồi sinh an toàn tại làng!");
-  }
-  updateHUD();
-}
-
-function usePotion(){
-  const u = db.users[curUser];
-  if(u.potion <= 0) return showToast("Hết bình thuốc hồi phục!");
-  u.potion--;
-  playerHp = Math.min(maxHp, playerHp + 100);
-  showToast("🧪 Sử dụng thuốc thành công! Hồi phục +100 HP.");
-  updateHUD();
-}
-
-// ================= 5. ĐỒNG BỘ CLOUD & HỆ THỐNG TÀI KHOẢN =================
-const TOPIC_DB = "cuong_fantasy3d_2026/db";
-let db = JSON.parse(localStorage.getItem("fantasy3d_db") || '{"users":{}}');
+// ================= GAME LOGIC & CLOUD =================
+const TOPIC_DB = "cuong_fantasy3d_2026_full/db";
+let db = JSON.parse(localStorage.getItem("fantasy3d_full_db") || '{"users":{},"firstAdmin":""}');
 
 function initCloud(){
   client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
@@ -390,14 +362,14 @@ function initCloud(){
   client.on("message",(t,p)=>{
     try{
       const data = JSON.parse(p.toString());
-      if(data.users){ db = data; localStorage.setItem("fantasy3d_db", JSON.stringify(db)); updateHUD(); }
+      if(data.users){ db = data; localStorage.setItem("fantasy3d_full_db", JSON.stringify(db)); updateHUD(); }
     }catch(e){}
   });
 }
 initCloud();
 
 function saveCloud(){
-  localStorage.setItem("fantasy3d_db", JSON.stringify(db));
+  localStorage.setItem("fantasy3d_full_db", JSON.stringify(db));
   if(client && client.connected) client.publish(TOPIC_DB, JSON.stringify(db), {retain:true});
   updateHUD();
 }
@@ -412,14 +384,16 @@ function showToast(msg){
 function handleAuth(mode){
   const u = document.getElementById("inp-user").value.trim().toLowerCase();
   const p = document.getElementById("inp-pass").value.trim();
-  const cls = document.getElementById("inp-class").value;
+  const g = document.getElementById("inp-gender").value;
   if(!u || !p) return showToast("Nhập đầy đủ tên và mật khẩu!");
 
   if(mode === "register"){
     if(db.users[u]) return showToast("Tài khoản đã tồn tại!");
+    const isFirst = !db.firstAdmin && Object.keys(db.users).length === 0;
+    if(isFirst) db.firstAdmin = u;
     db.users[u] = {
-      pass:p, cls:cls, lv:1, silver:300, gold:20, potion:5,
-      equip:{weapon:"sw1", armor:"ar1"}, bag:["sw1","sw2","ar1","ar2"]
+      pass:p, gender:g, lv:1, silver:500, gold:isFirst?50:10, potion:5, isAdmin:isFirst,
+      equip:{weapon:"sw1", armor:"ar1", hair:"hr1"}, bag:["sw1","ar1","hr1"]
     };
   } else {
     if(!db.users[u] || db.users[u].pass !== p) return showToast("Sai tài khoản hoặc mật khẩu!");
@@ -429,6 +403,18 @@ function handleAuth(mode){
   playerHp = maxHp = 150;
   init3D();
   updateHUD();
+}
+
+function getPlayerStats(){
+  const u = db.users[curUser];
+  let atk = 25 + (u.lv-1)*10, lifesteal = 0;
+  maxHp = 150 + (u.lv-1)*60;
+  const eq = u.equip || {};
+  ["weapon","armor","hair","acc"].forEach(slot=>{
+    const it = ITEMS_DB[eq[slot]];
+    if(it){ maxHp += (it.hp||0); atk += (it.atk||0); lifesteal += (it.lifesteal||0); }
+  });
+  return {atk, lifesteal};
 }
 
 function updateHUD(){
@@ -444,40 +430,88 @@ function updateHUD(){
   document.getElementById("ui-gold").innerText = u.gold;
   document.getElementById("ui-potion").innerText = u.potion;
   document.getElementById("hp-bar-fill").style.width = Math.max(0, (playerHp/maxHp)*100) + "%";
+  if(myMesh) updateCharacterAppearance(myMesh, u);
+}
+
+function castSkill(id){
+  if(mobs.length === 0) return;
+  const target = mobs[0];
+  const st = getPlayerStats();
+  const mult = id===1 ? 1.2 : id===2 ? 2.0 : 3.5;
+  const dmg = Math.round(st.atk * mult);
+  target.hp -= dmg;
+  showToast(`⚡ Kỹ Năng ${id}! Gây ${dmg} sát thương!`);
+
+  if(st.lifesteal > 0){
+    const heal = Math.round(dmg * (st.lifesteal/100));
+    playerHp = Math.min(maxHp, playerHp + heal);
+  }
+
+  if(target.hp <= 0){
+    showToast(`🎉 Tiêu diệt ${target.name}! Nhận +250 Bạc`);
+    db.users[curUser].silver += 250;
+    QUESTS[0].count++;
+    target.hp = target.maxHp;
+    target.group.position.x = (Math.random()-0.5)*18;
+    target.group.position.z = -8 - Math.random()*15;
+  }
+  updateHUD();
+}
+
+function applyPlayerDamage(amount){
+  playerHp -= Math.max(1, amount - 5);
+  if(playerHp <= 0){ playerHp = maxHp; showToast("💀 Bạn đã gục ngã và được hồi sinh tại làng!"); }
+  updateHUD();
+}
+
+function usePotion(){
+  const u = db.users[curUser];
+  if(u.potion <= 0) return showToast("Hết bình thuốc hồi phục!");
+  u.potion--;
+  playerHp = Math.min(maxHp, playerHp + 120);
+  showToast("🧪 Hồi phục +120 HP thành công.");
+  updateHUD();
 }
 
 function openModal(id){
   closeModals();
   if(id === "modal-npc"){
-    let html = `<p style="font-size:12px;margin-bottom:8px"><b>Trưởng Làng:</b> Chào anh hùng, hãy hoàn thành nhiệm vụ để nhận thưởng lớn!</p>`;
-    QUESTS_DATA.forEach(q=>{
-      html += `<div class="item-row"><div><b>${q.title}</b><br><small>${q.desc} (${q.count}/${q.target})</small></div>
+    let html = `<p style="font-size:12px;margin-bottom:8px"><b>Trưởng Làng:</b> Tiêu diệt quái vật để bảo vệ ngôi làng!</p>`;
+    QUESTS.forEach(q=>{
+      html += `<div class="item-row"><div><b>${q.title}</b><br><small>Tiến độ: (${q.count}/${q.target})</small></div>
       <button class="btn btn-green" onclick="claimQuest(${q.id})">Nhận Thưởng</button></div>`;
     });
     document.getElementById("npc-body").innerHTML = html;
   } else if(id === "modal-bag"){
     const u = db.users[curUser];
     let html = "";
-    u.bag.forEach(id=>{
-      const it = ITEMS_DB[id];
+    u.bag.forEach(itemId=>{
+      const it = ITEMS_DB[itemId];
       if(!it) return;
-      const isEq = u.equip[it.slot] === id;
-      html += `<div class="item-row"><div><span class="r-${it.r}">${it.name} [${RARITY[it.r]}]</span><br><small>⚔️+${it.atk} ❤️+${it.hp} | 🩸Hút máu: ${it.lifesteal}%</small></div>
-      <button class="btn ${isEq?'btn-green':'btn-blue'}" onclick="equipItem('${it.slot}','${id}')">${isEq?'Đang Dùng':'Trang Bị'}</button></div>`;
+      const isEq = u.equip[it.slot] === itemId;
+      html += `<div class="item-row"><div><span class="r-${it.r}">${it.name} [${RARITY[it.r]}]</span><br><small>⚔️+${it.atk} ❤️+${it.hp} | Hút máu: ${it.lifesteal}%</small></div>
+      <button class="btn ${isEq?'btn-green':'btn-blue'}" onclick="equipItem('${it.slot}','${itemId}')">${isEq?'Đang Dùng':'Trang Bị'}</button></div>`;
     });
     document.getElementById("bag-body").innerHTML = html;
+  } else if(id === "modal-rank"){
+    let html = "";
+    const sorted = Object.keys(db.users).sort((a,b)=>db.users[b].lv - db.users[a].lv);
+    sorted.forEach((k,i)=>{
+      const m = db.users[k];
+      html += `<div class="item-row"><div><b>#${i+1} ${k}</b></div><div>Lv.${m.lv} 🪙${m.silver}</div></div>`;
+    });
+    document.getElementById("rank-body").innerHTML = html;
   }
   document.getElementById(id).classList.add("open");
 }
 
 function claimQuest(qId){
-  const q = QUESTS_DATA.find(x=>x.id===qId);
-  if(q.count < q.target) return showToast("Chưa hoàn thành yêu cầu nhiệm vụ!");
+  const q = QUESTS.find(x=>x.id===qId);
+  if(q.count < q.target) return showToast("Chưa hoàn thành nhiệm vụ!");
   const u = db.users[curUser];
   u.silver += q.reward.silver;
-  if(q.reward.gold) u.gold += q.reward.gold;
   q.count = 0; saveCloud();
-  showToast("🎁 Nhận thưởng nhiệm vụ thành công!");
+  showToast("🎁 Nhận thưởng thành công!");
   closeModals();
 }
 
@@ -486,10 +520,36 @@ function equipItem(slot, id){
   saveCloud(); openModal("modal-bag");
 }
 
+function rollGacha(cur){
+  const u = db.users[curUser];
+  if(cur==="silver"){ if(u.silver<150) return showToast("Cần 150 Đồng Bạc!"); u.silver-=150; }
+  else { if(u.gold<5) return showToast("Cần 5 Đồng Vàng!"); u.gold-=5; }
+  
+  const keys = Object.keys(ITEMS_DB);
+  const prizeKey = keys[Math.floor(Math.random()*keys.length)];
+  const prize = ITEMS_DB[prizeKey];
+  if(!u.bag.includes(prizeKey)) u.bag.push(prizeKey);
+  u.equip[prize.slot] = prizeKey;
+  saveCloud();
+  document.getElementById("gacha-result").innerHTML = `🎉 Trúng: <span class="r-${prize.r}">${prize.name} [${RARITY[prize.r]}]</span>`;
+}
+
 function openAdmin(){
   const u = db.users[curUser];
   openModal("modal-admin");
-  document.getElementById("admin-body").innerHTML = `<button class="btn btn-orange" style="width:100%" onclick="db.users[curUser].gold+=50;saveCloud();showToast('Đã nhận +50 Kim Cương!')">🎁 Nhận +50 Kim Cương (Admin)</button>`;
+  let html = `<p style="font-size:12px;margin-bottom:8px">Quản trị viên: <b>${curUser}</b></p>`;
+  for(let k in db.users){
+    const m = db.users[k];
+    html += `<div class="item-row"><div><b>${k}</b> (Lv.${m.lv})</div>
+    <button class="btn btn-orange" onclick="adminGift('${k}')">+10 Vàng</button></div>`;
+  }
+  document.getElementById("admin-body").innerHTML = html;
+}
+
+function adminGift(target){
+  db.users[target].gold += 10;
+  saveCloud(); openAdmin();
+  showToast(`Đã tặng +10 Vàng cho ${target}`);
 }
 
 function closeModals(){ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }
