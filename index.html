@@ -36,7 +36,6 @@
             overflow-x: hidden;
         }
 
-        /* Thanh điều hướng góc trên */
         .top-bar {
             position: fixed;
             top: 10px;
@@ -63,7 +62,6 @@
             color: #000;
         }
 
-        /* Khung màn hình chung */
         .screen {
             display: none;
             width: 95%;
@@ -86,7 +84,6 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Logo & Tiêu đề */
         .logo-circle {
             width: 130px;
             height: 130px;
@@ -121,7 +118,6 @@
             font-size: 15px;
         }
 
-        /* Form nhập liệu */
         .form-box {
             max-width: 420px;
             margin: 0 auto;
@@ -165,7 +161,6 @@
             box-shadow: 0 6px 20px rgba(245, 176, 65, 0.7);
         }
 
-        /* Giao diện chơi game chính */
         .game-layout {
             display: grid;
             grid-template-columns: 1fr 280px;
@@ -184,12 +179,11 @@
             justify-content: space-between;
         }
 
-        /* Quyền trợ giúp */
         .lifelines {
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
 
@@ -231,7 +225,6 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Thông tin người chơi trên sân khấu */
         .status-header {
             display: flex;
             justify-content: space-between;
@@ -239,7 +232,7 @@
             background: rgba(255,255,255,0.06);
             padding: 10px 18px;
             border-radius: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-size: 14px;
         }
 
@@ -247,17 +240,48 @@
             color: var(--gold);
         }
 
-        /* Khung câu hỏi */
+        /* Đồng hồ đếm ngược */
+        .timer-box {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .timer-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            background: #040d2e;
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(245, 176, 65, 0.4);
+        }
+
+        .timer-circle.warning {
+            border-color: var(--wrong);
+            color: var(--wrong);
+            animation: pulseTimer 0.6s infinite alternate;
+        }
+
+        @keyframes pulseTimer {
+            from { transform: scale(1); }
+            to { transform: scale(1.12); }
+        }
+
         .question-container {
             background: linear-gradient(90deg, #040d2e 0%, #0d276b 50%, #040d2e 100%);
             border: 2px solid var(--border-blue);
             border-radius: 30px;
-            padding: 24px 28px;
+            padding: 22px 28px;
             text-align: center;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 600;
-            margin-bottom: 20px;
-            min-height: 110px;
+            margin-bottom: 18px;
+            min-height: 105px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -265,12 +289,11 @@
             line-height: 1.4;
         }
 
-        /* 4 Đáp án */
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         @media (max-width: 600px) {
@@ -338,7 +361,6 @@
             50% { opacity: 0.4; }
         }
 
-        /* Thang tiền thưởng */
         .money-ladder {
             background: #030a24;
             border: 2px solid var(--border-blue);
@@ -373,7 +395,6 @@
             opacity: 0.45;
         }
 
-        /* Bảng xếp hạng & Quản trị */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -405,7 +426,6 @@
         .badge-unused { background: var(--correct); color: #000; }
         .badge-used { background: var(--wrong); color: #fff; }
 
-        /* Hộp thoại Popup trợ giúp / Thông báo */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -443,7 +463,6 @@
             color: #e2e8f0;
         }
 
-        /* Biểu đồ khán giả */
         .chart-bars {
             display: flex;
             justify-content: space-around;
@@ -484,18 +503,17 @@
 </head>
 <body>
 
-    <!-- Thanh công cụ góc trên -->
     <div class="top-bar">
         <button class="btn-small" onclick="showScreen('homeScreen')">🏠 Trang chủ</button>
         <button class="btn-small" onclick="openLeaderboard()">🏆 Bảng xếp hạng</button>
         <button class="btn-small" onclick="showScreen('adminLoginScreen')">🔐 Admin</button>
     </div>
 
-    <!-- 1. MÀN HÌNH CHÍNH (NHẬP MÃ CHƠI) -->
+    <!-- 1. MÀN HÌNH CHÍNH -->
     <div id="homeScreen" class="screen active">
         <div class="logo-circle">AI LÀ<br>TRIỆU PHÚ<br>❤️</div>
         <h1>AI LÀ TRIỆU PHÚ</h1>
-        <p class="subtitle">Phiên bản đặc biệt: Đặng Văn Cường & Nguyễn Thị Ngọc Trân<br>Vượt qua 15 câu hỏi để rinh giải thưởng lên tới <b>2.500.000 VNĐ</b>!</p>
+        <p class="subtitle">Phiên bản đặc biệt: Đặng Văn Cường & Nguyễn Thị Ngọc Trân<br>Thử thách 15 câu hỏi (30 giây mỗi câu) - Giải thưởng <b>2.500.000 VNĐ</b>!</p>
 
         <div class="form-box">
             <input type="text" id="playerNameInput" placeholder="Nhập Họ và Tên của bạn..." maxlength="30">
@@ -515,12 +533,16 @@
                         <span>Đang có: <b id="uiCurrentPrize">0 đ</b></span>
                     </div>
 
-                    <!-- 4 Quyền trợ giúp -->
                     <div class="lifelines">
                         <button id="ll5050" class="lifeline-btn" onclick="use5050()" title="Loại bỏ 2 đáp án sai">50 : 50</button>
                         <button id="llPhone" class="lifeline-btn" onclick="usePhone()" title="Gọi điện thoại cho người thân">📞 Gọi điện</button>
                         <button id="llAudience" class="lifeline-btn" onclick="useAudience()" title="Hỏi ý kiến khán giả trường quay">📊 Khán giả</button>
                         <button id="llAdvice" class="lifeline-btn" onclick="useAdvice()" title="Tư vấn tại chỗ (Tổ tư vấn)">💡 Tổ tư vấn</button>
+                    </div>
+
+                    <!-- Đồng hồ đếm ngược 30 giây -->
+                    <div class="timer-box">
+                        <div id="timerCircle" class="timer-circle">30</div>
                     </div>
                 </div>
 
@@ -542,12 +564,11 @@
                 </div>
             </div>
 
-            <!-- Cột Thang tiền thưởng 15 mốc -->
             <div id="moneyLadder" class="money-ladder"></div>
         </div>
     </div>
 
-    <!-- 3. MÀN HÌNH BẢNG XẾP HẠNG ONLINE -->
+    <!-- 3. MÀN HÌNH BẢNG XẾP HẠNG -->
     <div id="leaderboardScreen" class="screen">
         <h2>🏆 BẢNG XẾP HẠNG NGƯỜI CHƠI</h2>
         <p class="subtitle">Kết quả được cập nhật trực tuyến theo thời gian thực</p>
@@ -611,7 +632,7 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP (Trợ giúp & Thông báo kết quả) -->
+    <!-- MODAL POPUP -->
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modalTitle">Thông báo</h3>
@@ -620,17 +641,13 @@
         </div>
     </div>
 
-    <!-- TÍCH HỢP FIREBASE SDK (Hỗ trợ lưu Online, tự động chuyển sang LocalStorage nếu chưa gắn config) -->
+    <!-- SCRIPT CHÍNH -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // =========================================================================
-        // CẤU HÌNH FIREBASE (Dán firebaseConfig của bạn vào đây để đồng bộ nhiều máy)
-        // Nếu để trống apiKey, game vẫn chạy mượt mà và lưu trên trình duyệt hiện tại!
-        // =========================================================================
         const firebaseConfig = {
-            apiKey: "", // Dán apiKey Firebase của bạn vào đây
+            apiKey: "",
             authDomain: "",
             projectId: "",
             storageBucket: "",
@@ -646,140 +663,47 @@
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 useCloud = true;
-                console.log("Đã kết nối Firebase Firestore thành công!");
-            } catch (e) {
-                console.warn("Lỗi Firebase, chuyển sang chế độ lưu cục bộ:", e);
-            }
+            } catch (e) {}
         }
 
-        // Tài khoản Admin mặc định (Bạn có thể sửa tại đây)
         const ADMIN_ACCOUNT = {
             username: "admin",
-            password: "24071997" // Mặc định là ngày sinh của Cường
+            password: "24071997"
         };
 
-        // 15 Mốc giải thưởng (Tổng giải thưởng cao nhất: 2.500.000 VNĐ)
-        // Mốc an toàn: Câu 5 (150.000đ) và Câu 10 (600.000đ)
         const PRIZE_LADDER = [
-            20000,      // Câu 1
-            40000,      // Câu 2
-            60000,      // Câu 3
-            100000,     // Câu 4
-            150000,     // Câu 5 (Mốc quan trọng 1)
-            200000,     // Câu 6
-            250000,     // Câu 7
-            350000,     // Câu 8
-            450000,     // Câu 9
-            600000,     // Câu 10 (Mốc quan trọng 2)
-            800000,     // Câu 11
-            1000000,    // Câu 12
-            1300000,    // Câu 13
-            1800000,    // Câu 14
-            2500000     // Câu 15 (Độc đắc)
+            20000, 40000, 60000, 100000, 150000,
+            200000, 250000, 350000, 450000, 600000,
+            800000, 1000000, 1300000, 1800000, 2500000
         ];
 
-        // BỘ 15 CÂU HỎI TỪ DỄ TỚI KHÓ VỀ ĐẶNG VĂN CƯỜNG & NGUYỄN THỊ NGỌC TRÂN
         const QUESTIONS = [
-            {
-                q: "Câu 1: Họ và tên đầy đủ của nhân vật nam chính trong trò chơi này là gì?",
-                options: ["Đặng Văn Hùng", "Đặng Văn Cường", "Nguyễn Văn Cường", "Trần Văn Cường"],
-                correct: 1,
-                hint: "Cái tên quá quen thuộc rồi: Đặng Văn Cường nhé!"
-            },
-            {
-                q: "Câu 2: Quê quán của Đặng Văn Cường ở tỉnh/thành phố nào của Việt Nam?",
-                options: ["Thái Bình", "Nam Định", "Thái Nguyên", "Hà Nội"],
-                correct: 2,
-                hint: "Quê hương 'Đệ nhất danh trà' - Thái Nguyên!"
-            },
-            {
-                q: "Câu 3: Họ và tên đầy đủ của bạn gái Đặng Văn Cường là gì?",
-                options: ["Nguyễn Thị Ngọc Trân", "Trần Thị Ngọc Trân", "Lê Thị Bảo Trân", "Nguyễn Ngọc Huyền Trân"],
-                correct: 0,
-                hint: "Chắc chắn là cô gái xinh đẹp Nguyễn Thị Ngọc Trân rồi!"
-            },
-            {
-                q: "Câu 4: Hiện tại, Đặng Văn Cường đang sinh sống và làm việc tại quốc gia nào?",
-                options: ["Hàn Quốc", "Nhật Bản", "Đài Loan", "Úc"],
-                correct: 1,
-                hint: "Anh ấy đang làm việc và sinh sống tại xứ sở hoa anh đào - Nhật Bản."
-            },
-            {
-                q: "Câu 5 (Mốc 150.000đ): Món ăn yêu thích của Nguyễn Thị Ngọc Trân là món nào sau đây?",
-                options: ["Bún đậu mắm tôm", "Mì cay 7 cấp độ", "Sushi", "Gà rán"],
-                correct: 2,
-                hint: "Một món ăn truyền thống cực kỳ nổi tiếng của Nhật Bản: Sushi!"
-            },
-            {
-                q: "Câu 6: Cường và Ngọc Trân đã quen biết nhau lần đầu tiên thông qua ứng dụng nào?",
-                options: ["Tinder", "Facebook Dating", "WePlay", "Zalo"],
-                correct: 2,
-                hint: "Bắt nguồn từ những ván game vui nhộn trên ứng dụng WePlay!"
-            },
-            {
-                q: "Câu 7: Ngày tháng năm sinh chính xác của Đặng Văn Cường là ngày nào?",
-                options: ["24/07/1997", "27/04/1997", "24/07/1998", "14/07/1997"],
-                correct: 0,
-                hint: "Sinh ngày 24 tháng 7 năm 1997 (24/07/1997) nhé."
-            },
-            {
-                q: "Câu 8: Ngọc Trân thường hay gọi Cường bằng biệt danh 'đáng yêu' và hài hước nào?",
-                options: ["Bụng bự", "Đầu hói", "Mắt hí", "Cường ngố"],
-                correct: 1,
-                hint: "Một biệt danh nghe xong là bật cười ngay: 'Đầu hói'!"
-            },
-            {
-                q: "Câu 9: Cường và Ngọc Trân chính thức bắt đầu yêu nhau vào ngày tháng năm nào?",
-                options: ["14/02/2026", "01/01/2026", "31/01/2026", "28/02/2026"],
-                correct: 2,
-                hint: "Ngày cuối cùng của tháng Giêng năm 2026: 31/01/2026."
-            },
-            {
-                q: "Câu 10 (Mốc 600.000đ): Hai bạn đã có buổi gặp mặt trực tiếp đầu tiên tại thành phố nào?",
-                options: ["TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ"],
-                correct: 3,
-                hint: "Xứ Tây Đô gạo trắng nước trong - Thành phố Cần Thơ!"
-            },
-            {
-                q: "Câu 11: Ngày đầu tiên Đặng Văn Cường và Nguyễn Thị Ngọc Trân gặp nhau trực tiếp ở Cần Thơ là ngày nào?",
-                options: ["02/09/2026", "10/09/2026", "20/09/2026", "10/10/2026"],
-                correct: 1,
-                hint: "Ngày hội ngộ đầu tiên đầy cảm xúc là ngày 10/09/2026."
-            },
-            {
-                q: "Câu 12: Dựa vào ngày sinh 24/07/1997, Đặng Văn Cường thuộc cung Hoàng Đạo nào và tuổi con giáp gì?",
-                options: ["Cung Sư Tử - Tuổi Đinh Sửu", "Cung Cự Giải - Tuổi Đinh Sửu", "Cung Sư Tử - Tuổi Bính Tý", "Cung Xử Nữ - Tuổi Đinh Sửu"],
-                correct: 0,
-                hint: "Sinh 24/7 thuộc cung Sư Tử (23/7 - 22/8) và năm 1997 là tuổi Đinh Sửu (con Trâu)."
-            },
-            {
-                q: "Câu 13: Giờ tiêu chuẩn tại nơi Cường sống (Nhật Bản) chênh lệch như thế nào so với giờ nơi hai người gặp nhau (Cần Thơ - Việt Nam)?",
-                options: ["Nhanh hơn 1 tiếng", "Nhanh hơn 2 tiếng", "Chậm hơn 2 tiếng", "Nhanh hơn 3 tiếng"],
-                correct: 1,
-                hint: "Nhật Bản ở múi giờ GMT+9, còn Việt Nam ở GMT+7, tức Nhật Bản nhanh hơn 2 tiếng."
-            },
-            {
-                q: "Câu 14: Tính từ ngày chính thức yêu nhau (31/01/2026) đến đúng ngày đầu tiên gặp mặt tại Cần Thơ (10/09/2026) là bao nhiêu ngày (năm 2026 không nhuận)?",
-                options: ["212 ngày", "222 ngày", "232 ngày", "242 ngày"],
-                correct: 1,
-                hint: "Tháng 2 (28) + T3 (31) + T4 (30) + T5 (31) + T6 (30) + T7 (31) + T8 (31) + 10 ngày T9 = 222 ngày yêu xa trước khi gặp mặt!"
-            },
-            {
-                q: "Câu 15 (Độc đắc 2.500.000đ): Cộng tất cả các con số trong Ngày và Tháng của: Sinh nhật Cường (24 + 7), Ngày bắt đầu yêu (31 + 1) và Ngày đầu gặp nhau (10 + 9) sẽ ra con số may mắn nào?",
-                options: ["80", "82", "84", "86"],
-                correct: 1,
-                hint: "(24 + 7) + (31 + 1) + (10 + 9) = 31 + 32 + 19 = 82!"
-            }
+            { q: "Câu 1: Họ và tên đầy đủ của nhân vật nam chính trong trò chơi này là gì?", options: ["Đặng Văn Hùng", "Đặng Văn Cường", "Nguyễn Văn Cường", "Trần Văn Cường"], correct: 1, hint: "Cái tên quá quen thuộc rồi: Đặng Văn Cường nhé!" },
+            { q: "Câu 2: Quê quán của Đặng Văn Cường ở tỉnh/thành phố nào của Việt Nam?", options: ["Thái Bình", "Nam Định", "Thái Nguyên", "Hà Nội"], correct: 2, hint: "Quê hương 'Đệ nhất danh trà' - Thái Nguyên!" },
+            { q: "Câu 3: Họ và tên đầy đủ của bạn gái Đặng Văn Cường là gì?", options: ["Nguyễn Thị Ngọc Trân", "Trần Thị Ngọc Trân", "Lê Thị Bảo Trân", "Nguyễn Ngọc Huyền Trân"], correct: 0, hint: "Chắc chắn là cô gái xinh đẹp Nguyễn Thị Ngọc Trân rồi!" },
+            { q: "Câu 4: Hiện tại, Đặng Văn Cường đang sinh sống và làm việc tại quốc gia nào?", options: ["Hàn Quốc", "Nhật Bản", "Đài Loan", "Úc"], correct: 1, hint: "Anh ấy đang làm việc và sinh sống tại xứ sở hoa anh đào - Nhật Bản." },
+            { q: "Câu 5 (Mốc 150.000đ): Món ăn yêu thích của Nguyễn Thị Ngọc Trân là món nào sau đây?", options: ["Bún đậu mắm tôm", "Mì cay 7 cấp độ", "Sushi", "Gà rán"], correct: 2, hint: "Một món ăn truyền thống cực kỳ nổi tiếng của Nhật Bản: Sushi!" },
+            { q: "Câu 6: Cường và Ngọc Trân đã quen biết nhau lần đầu tiên thông qua ứng dụng nào?", options: ["Tinder", "Facebook Dating", "WePlay", "Zalo"], correct: 2, hint: "Bắt nguồn từ những ván game vui nhộn trên ứng dụng WePlay!" },
+            { q: "Câu 7: Ngày tháng năm sinh chính xác của Đặng Văn Cường là ngày nào?", options: ["24/07/1997", "27/04/1997", "24/07/1998", "14/07/1997"], correct: 0, hint: "Sinh ngày 24 tháng 7 năm 1997 (24/07/1997) nhé." },
+            { q: "Câu 8: Ngọc Trân thường hay gọi Cường bằng biệt danh 'đáng yêu' và hài hước nào?", options: ["Bụng bự", "Đầu hói", "Mắt hí", "Cường ngố"], correct: 1, hint: "Một biệt danh nghe xong là bật cười ngay: 'Đầu hói'!" },
+            { q: "Câu 9: Cường và Ngọc Trân chính thức bắt đầu yêu nhau vào ngày tháng năm nào?", options: ["14/02/2026", "01/01/2026", "31/01/2026", "28/02/2026"], correct: 2, hint: "Ngày cuối cùng của tháng Giêng năm 2026: 31/01/2026." },
+            { q: "Câu 10 (Mốc 600.000đ): Hai bạn đã có buổi gặp mặt trực tiếp đầu tiên tại thành phố nào?", options: ["TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ"], correct: 3, hint: "Xứ Tây Đô gạo trắng nước trong - Thành phố Cần Thơ!" },
+            { q: "Câu 11: Ngày đầu tiên Đặng Văn Cường và Nguyễn Thị Ngọc Trân gặp nhau trực tiếp ở Cần Thơ là ngày nào?", options: ["02/09/2026", "10/09/2026", "20/09/2026", "10/10/2026"], correct: 1, hint: "Ngày hội ngộ đầu tiên đầy cảm xúc là ngày 10/09/2026." },
+            { q: "Câu 12: Dựa vào ngày sinh 24/07/1997, Đặng Văn Cường thuộc cung Hoàng Đạo nào và tuổi con giáp gì?", options: ["Cung Sư Tử - Tuổi Đinh Sửu", "Cung Cự Giải - Tuổi Đinh Sửu", "Cung Sư Tử - Tuổi Bính Tý", "Cung Xử Nữ - Tuổi Đinh Sửu"], correct: 0, hint: "Sinh 24/7 thuộc cung Sư Tử (23/7 - 22/8) và năm 1997 là tuổi Đinh Sửu (con Trâu)." },
+            { q: "Câu 13: Giờ tiêu chuẩn tại nơi Cường sống (Nhật Bản) chênh lệch như thế nào so với giờ nơi hai người gặp nhau (Cần Thơ - Việt Nam)?", options: ["Nhanh hơn 1 tiếng", "Nhanh hơn 2 tiếng", "Chậm hơn 2 tiếng", "Nhanh hơn 3 tiếng"], correct: 1, hint: "Nhật Bản ở múi giờ GMT+9, còn Việt Nam ở GMT+7, tức Nhật Bản nhanh hơn 2 tiếng." },
+            { q: "Câu 14: Tính từ ngày chính thức yêu nhau (31/01/2026) đến đúng ngày đầu tiên gặp mặt tại Cần Thơ (10/09/2026) là bao nhiêu ngày (năm 2026 không nhuận)?", options: ["212 ngày", "222 ngày", "232 ngày", "242 ngày"], correct: 1, hint: "Tháng 2 (28) + T3 (31) + T4 (30) + T5 (31) + T6 (30) + T7 (31) + T8 (31) + 10 ngày T9 = 222 ngày yêu xa trước khi gặp mặt!" },
+            { q: "Câu 15 (Độc đắc 2.500.000đ): Cộng tất cả các con số trong Ngày và Tháng của: Sinh nhật Cường (24 + 7), Ngày bắt đầu yêu (31 + 1) và Ngày đầu gặp nhau (10 + 9) sẽ ra con số may mắn nào?", options: ["80", "82", "84", "86"], correct: 1, hint: "(24 + 7) + (31 + 1) + (10 + 9) = 31 + 32 + 19 = 82!" }
         ];
 
-        // Trạng thái ván chơi
         let currentPlayer = "";
         let currentCode = "";
         let currentQIndex = 0;
         let isLocked = false;
         let lifelinesUsed = { l5050: false, phone: false, audience: false, advice: false };
+        let timerInterval = null;
+        let timeLeft = 30;
 
-        // Hệ thống âm thanh Web Audio API (Không cần file ngoài)
+        // --- HỆ THỐNG ÂM THANH WEB AUDIO API ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(freq, type, duration, delay = 0) {
             setTimeout(() => {
@@ -788,7 +712,7 @@
                     const gain = audioCtx.createGain();
                     osc.type = type;
                     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
@@ -799,6 +723,7 @@
         }
 
         function sfxSelect() { playTone(440, 'sine', 0.25); }
+        function sfxTick() { playTone(880, 'sine', 0.08); } // Tiếng tích tắc đồng hồ
         function sfxCorrect() {
             playTone(523.25, 'triangle', 0.18, 0);
             playTone(659.25, 'triangle', 0.18, 150);
@@ -809,9 +734,7 @@
             playTone(164.81, 'sawtooth', 0.5, 250);
         }
 
-        // ==========================================
-        // CÁC HÀM LƯU TRỮ DỮ LIỆU (FIREBASE / LOCAL)
-        // ==========================================
+        // --- HÀM XỬ LÝ DỮ LIỆU ---
         async function getCodesData() {
             if (useCloud) {
                 const snap = await getDocs(collection(db, "game_codes"));
@@ -821,7 +744,6 @@
             } else {
                 const raw = localStorage.getItem("altp_codes");
                 if (!raw) {
-                    // Tạo sẵn 1 mã mẫu nếu chạy lần đầu
                     const init = { "CUONGTRAN": { used: false, player: "", prize: 0 } };
                     localStorage.setItem("altp_codes", JSON.stringify(init));
                     return init;
@@ -871,10 +793,8 @@
             }
         }
 
-        // ==========================================
-        // ĐIỀU HƯỚNG MÀN HÌNH & TIỆN ÍCH
-        // ==========================================
         window.showScreen = function(id) {
+            if (id !== 'gameScreen') stopTimer();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         };
@@ -893,9 +813,54 @@
             document.getElementById('modalOverlay').classList.remove('active');
         };
 
-        // ==========================================
-        // LUỒNG BẮT ĐẦU CHƠI & KIỂM TRA MÃ 1 LẦN
-        // ==========================================
+        // --- ĐỒNG HỒ ĐẾM NGƯỢC 30 GIÂY ---
+        function startTimer() {
+            stopTimer();
+            timeLeft = 30;
+            const timerCircle = document.getElementById('timerCircle');
+            timerCircle.innerText = timeLeft;
+            timerCircle.classList.remove('warning');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerCircle.innerText = timeLeft;
+                if (timeLeft <= 5) {
+                    timerCircle.classList.add('warning');
+                    sfxTick();
+                }
+
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function handleTimeOut() {
+            if (isLocked) return;
+            isLocked = true;
+            sfxWrong();
+
+            const qObj = QUESTIONS[currentQIndex];
+            document.getElementById('ans' + qObj.correct).classList.add('correct');
+
+            let safePrize = 0;
+            if (currentQIndex >= 10) safePrize = PRIZE_LADDER[9];
+            else if (currentQIndex >= 5) safePrize = PRIZE_LADDER[4];
+
+            setTimeout(() => {
+                finishGame(safePrize, currentQIndex, "⏰ HẾT GIỜ!", `Đã hết 30 giây suy nghĩ!<br>Đáp án đúng là: <b>${qObj.options[qObj.correct]}</b>.`);
+            }, 2000);
+        }
+
+        // --- BẮT ĐẦU VÀ CHƠI GAME ---
         window.startGame = async function() {
             const name = document.getElementById('playerNameInput').value.trim();
             const code = document.getElementById('playCodeInput').value.trim().toUpperCase();
@@ -919,12 +884,7 @@
                 return;
             }
 
-            // Đánh dấu mã đã sử dụng ngay khi vào game để chống F5 chơi lại
-            await saveCodeItem(code, {
-                used: true,
-                player: name,
-                prize: 0
-            });
+            await saveCodeItem(code, { used: true, player: name, prize: 0 });
 
             currentPlayer = name;
             currentCode = code;
@@ -971,14 +931,13 @@
             });
 
             renderMoneyLadder();
+            startTimer();
         }
 
-        // ==========================================
-        // XỬ LÝ CHỌN ĐÁP ÁN & TÍNH TIỀN THƯỞNG
-        // ==========================================
         window.selectAnswer = function(choiceIdx) {
             if (isLocked) return;
             isLocked = true;
+            stopTimer();
             sfxSelect();
 
             const chosenBtn = document.getElementById('ans' + choiceIdx);
@@ -994,7 +953,6 @@
 
                     setTimeout(() => {
                         if (currentQIndex === 14) {
-                            // Chiến thắng tuyệt đối câu 15
                             finishGame(PRIZE_LADDER[14], 15, "🎉 CHÚC MỪNG TRIỆU PHÚ!", "Xuất sắc! Bạn đã vượt qua toàn bộ 15 câu hỏi về Đặng Văn Cường & Nguyễn Thị Ngọc Trân!");
                         } else {
                             currentQIndex++;
@@ -1006,10 +964,9 @@
                     document.getElementById('ans' + qObj.correct).classList.add('correct');
                     sfxWrong();
 
-                    // Tính tiền thưởng rớt về mốc an toàn (Câu 5 hoặc Câu 10)
                     let safePrize = 0;
-                    if (currentQIndex >= 10) safePrize = PRIZE_LADDER[9]; // 600.000đ
-                    else if (currentQIndex >= 5) safePrize = PRIZE_LADDER[4]; // 150.000đ
+                    if (currentQIndex >= 10) safePrize = PRIZE_LADDER[9];
+                    else if (currentQIndex >= 5) safePrize = PRIZE_LADDER[4];
 
                     setTimeout(() => {
                         finishGame(safePrize, currentQIndex, "😢 RẤT TIẾC! BẠN ĐÃ TRẢ LỜI SAI", `Đáp án đúng là: <b>${qObj.options[qObj.correct]}</b>.<br>Bạn ra về với mức thưởng ở mốc an toàn.`);
@@ -1020,12 +977,14 @@
 
         window.stopGameVoluntarily = function() {
             if (isLocked) return;
+            stopTimer();
             const currentEarned = currentQIndex > 0 ? PRIZE_LADDER[currentQIndex - 1] : 0;
             finishGame(currentEarned, currentQIndex, "🛑 DỪNG CUỘC CHƠI", "Bạn đã quyết định dừng cuộc chơi để bảo toàn số tiền thưởng hiện có!");
         };
 
         async function finishGame(finalPrize, passedCount, title, message) {
             isLocked = true;
+            stopTimer();
             await saveCodeItem(currentCode, {
                 used: true,
                 player: currentPlayer,
@@ -1053,9 +1012,7 @@
             }, 2200);
         }
 
-        // ==========================================
-        // 4 QUYỀN TRỢ GIÚP CHUẨN AI LÀ TRIỆU PHÚ
-        // ==========================================
+        // --- 4 QUYỀN TRỢ GIÚP ---
         window.use5050 = function() {
             if (isLocked || lifelinesUsed.l5050) return;
             lifelinesUsed.l5050 = true;
@@ -1090,7 +1047,7 @@
 
             const correctIdx = QUESTIONS[currentQIndex].correct;
             let percents = [0, 0, 0, 0];
-            percents[correctIdx] = Math.floor(Math.random() * 25) + 55; // 55% -> 80%
+            percents[correctIdx] = Math.floor(Math.random() * 25) + 55;
             let remain = 100 - percents[correctIdx];
 
             for (let i = 0; i < 4; i++) {
@@ -1133,9 +1090,7 @@
             `);
         };
 
-        // ==========================================
-        // BẢNG XẾP HẠNG & QUẢN TRỊ VIÊN (ADMIN)
-        // ==========================================
+        // --- BẢNG XẾP HẠNG & ADMIN ---
         window.openLeaderboard = async function() {
             showScreen('leaderboardScreen');
             const tbody = document.getElementById('leaderboardBody');
