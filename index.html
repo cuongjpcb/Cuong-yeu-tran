@@ -1,496 +1,1242 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Genshin 3D Online - Ultimate Edition</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;user-select:none;font-family:'Segoe UI',sans-serif}
-body{background:#0b0f19;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-#login-screen{position:fixed;inset:0;background:radial-gradient(circle at center,#1e293b,#0b0f19);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
-.logo-box{background:linear-gradient(135deg,#f59e0b,#d97706);border:2px solid #fde047;border-radius:20px;padding:16px 32px;box-shadow:0 0 40px rgba(245,158,11,0.5);margin-bottom:16px;text-align:center}
-.logo-box h1{font-size:24px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
-.login-panel{background:rgba(15,23,42,0.95);border:2px solid #38bdf8;border-radius:18px;padding:20px;width:92%;max-width:350px;color:#f8fafc;box-shadow:0 15px 35px rgba(0,0,0,0.8)}
-.login-panel input,.login-panel select{width:100%;padding:11px;margin:6px 0;border:1px solid #475569;border-radius:10px;font-size:14px;background:#1e293b;color:#fff}
-.btn{padding:10px 14px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:0.1s;font-size:12px}
-.btn:active{transform:translateY(2px);box-shadow:none}
-.btn-green{background:#10b981}.btn-orange{background:#f59e0b}.btn-blue{background:#0284c7}.btn-red{background:#ef4444}.btn-purple{background:#8b5cf6}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Là Triệu Phú - Phiên Bản Đặc Biệt: Cường & Ngọc Trân</title>
+    <style>
+        :root {
+            --bg-dark: #020824;
+            --bg-blue: #0a1b5c;
+            --gold: #f5b041;
+            --gold-light: #fdebd0;
+            --blue-box: #071342;
+            --border-blue: #3498db;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --selected: #f39c12;
+        }
 
-#genshin-hud{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:20;pointer-events:none}
-.paimon-card{background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);border:1px solid rgba(56,189,248,0.4);border-radius:14px;padding:10px 14px;width:220px;pointer-events:auto}
-.genshin-hp{width:100%;height:8px;background:#334155;border-radius:4px;overflow:hidden;margin-top:4px;border:1px solid #64748b}
-#hp-fill{width:100%;height:100%;background:#4ade80;transition:width 0.2s}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
 
-#genshin-menu{position:absolute;top:12px;right:12px;display:flex;gap:8px;z-index:20}
-.menu-icon{width:46px;height:46px;border-radius:50%;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.4)}
+        body {
+            background: radial-gradient(circle at center, #0f297a 0%, #020617 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
 
-#game-wrap{flex:1;position:relative;overflow:hidden}
-#canvas3d{width:100%;height:100%;display:block}
-#labels-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
-.label3d{position:absolute;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;font-size:11px;text-shadow:0 1px 4px #000}
-.hp-mini{width:50px;height:5px;background:#222;border-radius:3px;overflow:hidden;margin:2px auto}
-.hp-mini-fill{height:100%;background:#ef4444}
+        /* Thanh điều hướng góc trên */
+        .top-bar {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
 
-#virtual-joystick{position:absolute;bottom:25px;left:25px;width:110px;height:110px;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.25);border-radius:50%;touch-action:none;z-index:30}
-#joystick-knob{position:absolute;top:30px;left:30px;width:50px;height:50px;background:rgba(255,255,255,0.5);border-radius:50%;pointer-events:none}
-#skills-panel{position:absolute;bottom:25px;right:25px;display:flex;gap:12px;z-index:30}
-.genshin-skill{width:64px;height:64px;border-radius:50%;border:3px solid #fde047;background:radial-gradient(circle,#38bdf8,#0284c7);color:#fff;font-weight:bold;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(56,189,248,0.5);cursor:pointer}
+        .btn-small {
+            background: rgba(7, 19, 66, 0.85);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
 
-.modal{position:fixed;inset:0;background:rgba(11,15,25,0.8);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:60;padding:12px}
-.modal.open{display:flex}
-.modal-card{background:rgba(30,41,59,0.92);backdrop-filter:blur(16px);color:#f8fafc;border:2px solid rgba(56,189,248,0.5);border-radius:20px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
-.modal-head{background:rgba(15,23,42,0.9);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;border-bottom:1px solid rgba(255,255,255,0.1)}
-.modal-body{padding:14px;overflow-y:auto;flex:1}
-.item-row{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.7);padding:10px 12px;border-radius:10px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08)}
-.r-0{color:#94a3b8;font-weight:bold}.r-1{color:#4ade80;font-weight:bold}.r-2{color:#38bdf8;font-weight:bold}.r-3{color:#c084fc;font-weight:bold}.r-4{color:#fbbf24;font-weight:bold}
-#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);border:1px solid #38bdf8;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;z-index:200;display:none}
-</style>
+        .btn-small:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* Khung màn hình chung */
+        .screen {
+            display: none;
+            width: 95%;
+            max-width: 1100px;
+            background: rgba(4, 12, 44, 0.9);
+            border: 2px solid var(--border-blue);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(0, 140, 255, 0.35);
+            position: relative;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Logo & Tiêu đề */
+        .logo-circle {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1e3c72 0%, #061130 80%);
+            border: 4px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--gold);
+            box-shadow: 0 0 25px rgba(245, 176, 65, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #bcd4f6;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        /* Form nhập liệu */
+        .form-box {
+            max-width: 420px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        input {
+            padding: 12px 16px;
+            border-radius: 25px;
+            border: 2px solid var(--border-blue);
+            background: #040d2e;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(245, 176, 65, 0.5);
+        }
+
+        .btn-main {
+            background: linear-gradient(180deg, #f5b041 0%, #b7791f 100%);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(245, 176, 65, 0.4);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 176, 65, 0.7);
+        }
+
+        /* Giao diện chơi game chính */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+
+        @media (max-width: 820px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .play-zone {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Quyền trợ giúp */
+        .lifelines {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lifeline-btn {
+            background: radial-gradient(circle, #153580 0%, #06133b 100%);
+            border: 2px solid var(--gold);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .lifeline-btn:hover:not(.used) {
+            background: var(--gold);
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        .lifeline-btn.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #666;
+        }
+
+        .lifeline-btn.used::after {
+            content: "✖";
+            position: absolute;
+            color: var(--wrong);
+            font-size: 28px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Thông tin người chơi trên sân khấu */
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.06);
+            padding: 10px 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .status-header span b {
+            color: var(--gold);
+        }
+
+        /* Khung câu hỏi */
+        .question-container {
+            background: linear-gradient(90deg, #040d2e 0%, #0d276b 50%, #040d2e 100%);
+            border: 2px solid var(--border-blue);
+            border-radius: 30px;
+            padding: 24px 28px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 150, 255, 0.3);
+            line-height: 1.4;
+        }
+
+        /* 4 Đáp án */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .answer-btn {
+            background: linear-gradient(90deg, #06133b 0%, #0c2368 50%, #06133b 100%);
+            border: 2px solid var(--border-blue);
+            border-radius: 30px;
+            padding: 14px 20px;
+            color: #fff;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .answer-btn .letter {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            background: #14328c;
+        }
+
+        .answer-btn.selected {
+            background: var(--selected) !important;
+            color: #000 !important;
+            border-color: #fff !important;
+            font-weight: bold;
+        }
+
+        .answer-btn.selected .letter {
+            color: #000;
+        }
+
+        .answer-btn.correct {
+            background: var(--correct) !important;
+            color: #000 !important;
+            border-color: #fff !important;
+            font-weight: bold;
+            animation: blink 0.35s 3;
+        }
+
+        .answer-btn.wrong {
+            background: var(--wrong) !important;
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        .answer-btn.hidden-50 {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.4; }
+        }
+
+        /* Thang tiền thưởng */
+        .money-ladder {
+            background: #030a24;
+            border: 2px solid var(--border-blue);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 3px;
+        }
+
+        .ladder-step {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--gold);
+        }
+
+        .ladder-step.milestone {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .ladder-step.current {
+            background: var(--gold);
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        .ladder-step.passed {
+            opacity: 0.45;
+        }
+
+        /* Bảng xếp hạng & Quản trị */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(4, 13, 46, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+            font-size: 14px;
+        }
+
+        th {
+            background: #0d276b;
+            color: var(--gold);
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-unused { background: var(--correct); color: #000; }
+        .badge-used { background: var(--wrong); color: #fff; }
+
+        /* Hộp thoại Popup trợ giúp / Thông báo */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #061442;
+            border: 2px solid var(--gold);
+            border-radius: 14px;
+            max-width: 480px;
+            width: 100%;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(245, 176, 65, 0.5);
+        }
+
+        .modal-box h3 {
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .modal-box p {
+            line-height: 1.5;
+            margin-bottom: 18px;
+            color: #e2e8f0;
+        }
+
+        /* Biểu đồ khán giả */
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 150px;
+            margin: 20px 0 10px;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 5px;
+        }
+
+        .bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 45px;
+        }
+
+        .bar-fill {
+            width: 100%;
+            background: linear-gradient(180deg, var(--gold) 0%, #d35400 100%);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.6s ease;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .scroll-table {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
 
-<div id="toast"></div>
-
-<div id="login-screen">
-  <div class="logo-box">
-    <h1>✨ GENSHIN 3D ULTIMATE</h1>
-    <div style="font-size:12px;color:#fef08a">Multiplayer • Map Riêng • Quái Tấn Công • Kết Bạn</div>
-  </div>
-  <div class="login-panel">
-    <div id="sync-status" style="font-size:11px;text-align:center;color:#4ade80;margin-bottom:8px">🔄 Đang kết nối máy chủ Teyvat...</div>
-    <input id="inp-user" placeholder="Tên Lữ Khách...">
-    <input id="inp-pass" type="password" placeholder="Mật khẩu...">
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn btn-blue" style="flex:1;padding:12px" onclick="handleAuth('login')">Vào Game</button>
-      <button class="btn btn-green" style="flex:1;padding:12px" onclick="handleAuth('register')">Đăng Ký</button>
+    <!-- Thanh công cụ góc trên -->
+    <div class="top-bar">
+        <button class="btn-small" onclick="showScreen('homeScreen')">🏠 Trang chủ</button>
+        <button class="btn-small" onclick="openLeaderboard()">🏆 Bảng xếp hạng</button>
+        <button class="btn-small" onclick="showScreen('adminLoginScreen')">🔐 Admin</button>
     </div>
-  </div>
-</div>
 
-<div id="genshin-hud">
-  <div class="paimon-card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <b id="ui-name" style="color:#38bdf8;font-size:13px">Lữ Khách</b>
-      <span id="ui-lv" style="background:#0284c7;padding:1px 6px;border-radius:6px;font-size:10px">Lv.1</span>
+    <!-- 1. MÀN HÌNH CHÍNH (NHẬP MÃ CHƠI) -->
+    <div id="homeScreen" class="screen active">
+        <div class="logo-circle">AI LÀ<br>TRIỆU PHÚ<br>❤️</div>
+        <h1>AI LÀ TRIỆU PHÚ</h1>
+        <p class="subtitle">Phiên bản đặc biệt: Đặng Văn Cường & Nguyễn Thị Ngọc Trân<br>Vượt qua 15 câu hỏi để rinh giải thưởng lên tới <b>2.500.000 VNĐ</b>!</p>
+
+        <div class="form-box">
+            <input type="text" id="playerNameInput" placeholder="Nhập Họ và Tên của bạn..." maxlength="30">
+            <input type="text" id="playCodeInput" placeholder="Nhập Mã dự thi (Do Admin cấp)..." style="text-transform: uppercase;">
+            <button class="btn-main" onclick="startGame()">BẮT ĐẦU LÊN GHẾ NÓNG</button>
+        </div>
     </div>
-    <div class="genshin-hp"><div id="hp-fill"></div></div>
-    <div style="font-size:10px;color:#cbd5e1;margin-top:3px">❤️ <span id="ui-hp">200/200</span> | EXP: <span id="ui-exp">0</span>/<span id="ui-maxexp">100</span></div>
-  </div>
-  <div class="paimon-card" style="width:180px;padding:6px 12px;display:flex;justify-content:space-between;font-size:11px">
-    <span>🪙 <b id="ui-silver">800</b></span>
-    <span>💎 <b id="ui-gold" style="color:#fbbf24">30</b></span>
-  </div>
-</div>
 
-<div id="genshin-menu">
-  <div class="menu-icon" onclick="openModal('modal-map')" title="Chọn Map">🗺️</div>
-  <div class="menu-icon" onclick="openModal('modal-bag')" title="Túi Đồ">🎒</div>
-  <div class="menu-icon" onclick="openModal('modal-online')" title="Người Chơi & Kết Bạn">👥</div>
-  <div class="menu-icon" onclick="openModal('modal-gacha')" title="Gacha">🌠</div>
-  <div class="menu-icon" onclick="openModal('modal-rank')" title="BXH">🏆</div>
-</div>
+    <!-- 2. MÀN HÌNH CHƠI GAME -->
+    <div id="gameScreen" class="screen">
+        <div class="game-layout">
+            <div class="play-zone">
+                <div>
+                    <div class="status-header">
+                        <span>Người chơi: <b id="uiPlayerName">---</b></span>
+                        <span>Mã: <b id="uiPlayerCode">---</b></span>
+                        <span>Đang có: <b id="uiCurrentPrize">0 đ</b></span>
+                    </div>
 
-<div id="game-wrap">
-  <canvas id="canvas3d"></canvas>
-  <div id="labels-layer"></div>
-  <div id="virtual-joystick"><div id="joystick-knob"></div></div>
-  <div id="skills-panel">
-    <div class="genshin-skill" onclick="castSkill(1)">⚔️</div>
-    <div class="genshin-skill" onclick="castSkill(2)">🔥</div>
-    <div class="genshin-skill" onclick="castSkill(3)">💫</div>
-  </div>
-</div>
+                    <!-- 4 Quyền trợ giúp -->
+                    <div class="lifelines">
+                        <button id="ll5050" class="lifeline-btn" onclick="use5050()" title="Loại bỏ 2 đáp án sai">50 : 50</button>
+                        <button id="llPhone" class="lifeline-btn" onclick="usePhone()" title="Gọi điện thoại cho người thân">📞 Gọi điện</button>
+                        <button id="llAudience" class="lifeline-btn" onclick="useAudience()" title="Hỏi ý kiến khán giả trường quay">📊 Khán giả</button>
+                        <button id="llAdvice" class="lifeline-btn" onclick="useAdvice()" title="Tư vấn tại chỗ (Tổ tư vấn)">💡 Tổ tư vấn</button>
+                    </div>
+                </div>
 
-<!-- MODAL CHỌN MAP -->
-<div id="modal-map" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🗺️ Chọn Bản Đồ (Map Riêng)</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body">
-    <div class="item-row"><div><b>🌳 Map 1: Thảo Nguyên Mondstadt</b><br><small>Quái: Slime Gió (Dễ)</small></div><button class="btn btn-green" onclick="changeMap(0)">Vào</button></div>
-    <div class="item-row"><div><b>🌲 Map 2: Rừng Phong Thần</b><br><small>Quái: Hỏa Thú (Trung bình)</small></div><button class="btn btn-blue" onclick="changeMap(1)">Vào</button></div>
-    <div class="item-row"><div><b>⛰️ Map 3: Vực Sâu Hư Không</b><br><small>Quái: Vệ Sĩ Di Tích (Khó)</small></div><button class="btn btn-purple" onclick="changeMap(2)">Vào</button></div>
-  </div>
-</div></div>
+                <div>
+                    <div id="questionBox" class="question-container">
+                        Đang tải câu hỏi...
+                    </div>
 
-<!-- MODAL NGƯỜI CHƠI ONLINE & KẾT BẠN / TRAO ĐỔI -->
-<div id="modal-online" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>👥 Người Chơi Online & Kết Bạn</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="online-body"></div>
-</div></div>
+                    <div class="answers-grid">
+                        <button id="ans0" class="answer-btn" onclick="selectAnswer(0)"><span class="letter">A:</span> <span class="text"></span></button>
+                        <button id="ans1" class="answer-btn" onclick="selectAnswer(1)"><span class="letter">B:</span> <span class="text"></span></button>
+                        <button id="ans2" class="answer-btn" onclick="selectAnswer(2)"><span class="letter">C:</span> <span class="text"></span></button>
+                        <button id="ans3" class="answer-btn" onclick="selectAnswer(3)"><span class="letter">D:</span> <span class="text"></span></button>
+                    </div>
 
-<!-- MODAL GACHA -->
-<div id="modal-gacha" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🌠 Cầu Nguyện Tinh Linh</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" style="text-align:center">
-    <div id="gacha-box" style="background:rgba(15,23,42,0.8);border:2px dashed #38bdf8;padding:16px;border-radius:12px;margin-bottom:14px">Nhấn quay để nhận vũ khí mạnh!</div>
-    <button class="btn btn-orange" style="width:100%;padding:12px" onclick="rollGacha()">Cầu Nguyện (👑 10 Nguyên Thạch)</button>
-  </div>
-</div></div>
+                    <div style="text-align: center;">
+                        <button class="btn-small" style="border-color: #e74c3c; color: #ffb8b8;" onclick="stopGameVoluntarily()">🛑 Dừng cuộc chơi & Bảo toàn tiền thưởng</button>
+                    </div>
+                </div>
+            </div>
 
-<!-- MODAL KHO ĐỒ -->
-<div id="modal-bag" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🎒 Túi Đồ</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="bag-body"></div>
-</div></div>
+            <!-- Cột Thang tiền thưởng 15 mốc -->
+            <div id="moneyLadder" class="money-ladder"></div>
+        </div>
+    </div>
 
-<!-- MODAL BXH -->
-<div id="modal-rank" class="modal"><div class="modal-card">
-  <div class="modal-head"><span>🏆 Bảng Xếp Hạng Lữ Khách</span><button class="btn btn-red" onclick="closeModals()">X</button></div>
-  <div class="modal-body" id="rank-body"></div>
-</div></div>
+    <!-- 3. MÀN HÌNH BẢNG XẾP HẠNG ONLINE -->
+    <div id="leaderboardScreen" class="screen">
+        <h2>🏆 BẢNG XẾP HẠNG NGƯỜI CHƠI</h2>
+        <p class="subtitle">Kết quả được cập nhật trực tuyến theo thời gian thực</p>
+        <div class="scroll-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Người chơi</th>
+                        <th>Mã dự thi</th>
+                        <th>Vượt qua</th>
+                        <th>Tiền thưởng</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <tr><td colspan="6">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<script>
-const ITEMS_DB = {
-  sw1:{id:"sw1",name:"Kiếm Vô Danh",r:0,atk:25,hp:100},
-  sw2:{id:"sw2",name:"Phong Ưng Thiển Ưng",r:2,atk:150,hp:500}
-};
+    <!-- 4. MÀN HÌNH ĐĂNG NHẬP ADMIN -->
+    <div id="adminLoginScreen" class="screen">
+        <h2>🔐 ĐĂNG NHẬP QUẢN TRỊ VIÊN</h2>
+        <p class="subtitle">Chỉ dành cho Admin để tạo mã dự thi và quản lý bảng xếp hạng</p>
+        <div class="form-box">
+            <input type="text" id="adminUser" placeholder="Tên đăng nhập Admin">
+            <input type="password" id="adminPass" placeholder="Mật khẩu Admin">
+            <button class="btn-main" onclick="loginAdmin()">ĐĂNG NHẬP</button>
+        </div>
+    </div>
 
-const MAPS_DATA = [
-  {name:"Mondstadt", color:0x4ade80, mobName:"Slime Gió", hp:120, atk:12, exp:40, silver:100},
-  {name:"Rừng Phong Thần", color:0x15803d, mobName:"Hỏa Thú", hp:280, atk:25, exp:90, silver:220},
-  {name:"Vực Sâu", color:0x311042, mobName:"Vệ Sĩ Di Tích", hp:600, atk:50, exp:180, silver:450}
-];
+    <!-- 5. BẢNG ĐIỀU KHIỂN ADMIN -->
+    <div id="adminPanelScreen" class="screen">
+        <h2>⚙️ BẢNG ĐIỀU KHIỂN ADMIN</h2>
+        <p class="subtitle">Tạo mã chơi 1 lần (Mỗi mã chỉ vào chơi được duy nhất 1 lượt)</p>
 
-let scene, camera, renderer, myMesh = null;
-let mobs = [], onlineMeshes = {};
-let moveDir = {x:0, z:0}, isDragging = false, prevMousePos = {x:0, y:0}, cameraAngle = 0;
-let curUser = null, client = null, currentMapId = 0;
-let playerHp = 200, maxHp = 200, playerExp = 0, playerMaxExp = 100;
-let friendsList = [], onlinePlayersData = {};
+        <div class="admin-controls">
+            <input type="text" id="customCodeInput" placeholder="Nhập mã tùy chọn (VD: TRAN2026)" style="width: 240px; text-transform: uppercase;">
+            <button class="btn-main" onclick="createCustomCode()">+ Tạo mã tự chọn</button>
+            <button class="btn-main" style="background: #3498db; color: #fff;" onclick="createRandomCode()">🎲 Tạo mã ngẫu nhiên</button>
+            <button class="btn-small" style="border-color: #e74c3c; color: #ff9999;" onclick="clearLeaderboard()">🗑️ Xóa BXH</button>
+        </div>
 
-const TOPIC_DB = "cuong_genshin_ultimate_2026/db";
-const TOPIC_LIVE = "cuong_genshin_ultimate_2026/live";
-let db = JSON.parse(localStorage.getItem("genshin_ult_db") || '{"users":{}}');
+        <div class="scroll-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã Dự Thi</th>
+                        <th>Trạng Thái</th>
+                        <th>Người Đã Sử Dụng</th>
+                        <th>Kết Quả Đạt Được</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="adminCodesBody">
+                    <tr><td colspan="5">Đang tải danh sách mã...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-function init3D(){
-  const canvas = document.getElementById("canvas3d");
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xbae6fd);
-  scene.fog = new THREE.FogExp2(0xbae6fd, 0.012);
+    <!-- MODAL POPUP (Trợ giúp & Thông báo kết quả) -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modalTitle">Thông báo</h3>
+            <div id="modalContent"></div>
+            <button class="btn-main" onclick="closeModal()">ĐÓNG</button>
+        </div>
+    </div>
 
-  camera = new THREE.PerspectiveCamera(55, canvas.clientWidth/canvas.clientHeight, 0.1, 200);
-  renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    <!-- TÍCH HỢP FIREBASE SDK (Hỗ trợ lưu Online, tự động chuyển sang LocalStorage nếu chưa gắn config) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-  const dir = new THREE.DirectionalLight(0xfffbeb, 0.95);
-  dir.position.set(20, 40, 25);
-  scene.add(dir);
+        // =========================================================================
+        // CẤU HÌNH FIREBASE (Dán firebaseConfig của bạn vào đây để đồng bộ nhiều máy)
+        // Nếu để trống apiKey, game vẫn chạy mượt mà và lưu trên trình duyệt hiện tại!
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "", // Dán apiKey Firebase của bạn vào đây
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
 
-  buildMapEnvironment();
-  myMesh = createCharacter3D();
-  scene.add(myMesh);
+        let db = null;
+        let useCloud = false;
 
-  setupControls(canvas);
-  animate3D();
-}
+        if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                useCloud = true;
+                console.log("Đã kết nối Firebase Firestore thành công!");
+            } catch (e) {
+                console.warn("Lỗi Firebase, chuyển sang chế độ lưu cục bộ:", e);
+            }
+        }
 
-function buildMapEnvironment(){
-  const mInfo = MAPS_DATA[currentMapId];
-  scene.background.setHex(currentMapId===2?0x1e1b4b:0xbae6fd);
-  
-  // Xóa quái cũ
-  mobs.forEach(m=>scene.remove(m.group));
-  mobs = [];
+        // Tài khoản Admin mặc định (Bạn có thể sửa tại đây)
+        const ADMIN_ACCOUNT = {
+            username: "admin",
+            password: "24071997" // Mặc định là ngày sinh của Cường
+        };
 
-  // Tạo quái riêng cho Map
-  for(let i=0;i<4;i++){
-    const mGroup = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.8, 12, 12), new THREE.MeshLambertMaterial({color:mInfo.color}));
-    body.position.y = 0.8;
-    mGroup.add(body);
-    mGroup.position.set((Math.random()-0.5)*18, 0, -6 - Math.random()*14);
-    scene.add(mGroup);
-    mobs.push({
-      group: mGroup, name: mInfo.mobName,
-      maxHp: mInfo.hp, hp: mInfo.hp, atk: mInfo.atk,
-      expReward: mInfo.exp, silverReward: mInfo.silver
-    });
-  }
-}
+        // 15 Mốc giải thưởng (Tổng giải thưởng cao nhất: 2.500.000 VNĐ)
+        // Mốc an toàn: Câu 5 (150.000đ) và Câu 10 (600.000đ)
+        const PRIZE_LADDER = [
+            20000,      // Câu 1
+            40000,      // Câu 2
+            60000,      // Câu 3
+            100000,     // Câu 4
+            150000,     // Câu 5 (Mốc quan trọng 1)
+            200000,     // Câu 6
+            250000,     // Câu 7
+            350000,     // Câu 8
+            450000,     // Câu 9
+            600000,     // Câu 10 (Mốc quan trọng 2)
+            800000,     // Câu 11
+            1000000,    // Câu 12
+            1300000,    // Câu 13
+            1800000,    // Câu 14
+            2500000     // Câu 15 (Độc đắc)
+        ];
 
-function createCharacter3D(){
-  const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.45), new THREE.MeshLambertMaterial({color:0x0284c7}));
-  body.position.y = 1.0;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.48, 16, 16), new THREE.MeshLambertMaterial({color:0xffedd5}));
-  head.position.y = 1.9;
-  group.add(body, head);
-  group.position.set(0, 0, 4);
-  return group;
-}
+        // BỘ 15 CÂU HỎI TỪ DỄ TỚI KHÓ VỀ ĐẶNG VĂN CƯỜNG & NGUYỄN THỊ NGỌC TRÂN
+        const QUESTIONS = [
+            {
+                q: "Câu 1: Họ và tên đầy đủ của nhân vật nam chính trong trò chơi này là gì?",
+                options: ["Đặng Văn Hùng", "Đặng Văn Cường", "Nguyễn Văn Cường", "Trần Văn Cường"],
+                correct: 1,
+                hint: "Cái tên quá quen thuộc rồi: Đặng Văn Cường nhé!"
+            },
+            {
+                q: "Câu 2: Quê quán của Đặng Văn Cường ở tỉnh/thành phố nào của Việt Nam?",
+                options: ["Thái Bình", "Nam Định", "Thái Nguyên", "Hà Nội"],
+                correct: 2,
+                hint: "Quê hương 'Đệ nhất danh trà' - Thái Nguyên!"
+            },
+            {
+                q: "Câu 3: Họ và tên đầy đủ của bạn gái Đặng Văn Cường là gì?",
+                options: ["Nguyễn Thị Ngọc Trân", "Trần Thị Ngọc Trân", "Lê Thị Bảo Trân", "Nguyễn Ngọc Huyền Trân"],
+                correct: 0,
+                hint: "Chắc chắn là cô gái xinh đẹp Nguyễn Thị Ngọc Trân rồi!"
+            },
+            {
+                q: "Câu 4: Hiện tại, Đặng Văn Cường đang sinh sống và làm việc tại quốc gia nào?",
+                options: ["Hàn Quốc", "Nhật Bản", "Đài Loan", "Úc"],
+                correct: 1,
+                hint: "Anh ấy đang làm việc và sinh sống tại xứ sở hoa anh đào - Nhật Bản."
+            },
+            {
+                q: "Câu 5 (Mốc 150.000đ): Món ăn yêu thích của Nguyễn Thị Ngọc Trân là món nào sau đây?",
+                options: ["Bún đậu mắm tôm", "Mì cay 7 cấp độ", "Sushi", "Gà rán"],
+                correct: 2,
+                hint: "Một món ăn truyền thống cực kỳ nổi tiếng của Nhật Bản: Sushi!"
+            },
+            {
+                q: "Câu 6: Cường và Ngọc Trân đã quen biết nhau lần đầu tiên thông qua ứng dụng nào?",
+                options: ["Tinder", "Facebook Dating", "WePlay", "Zalo"],
+                correct: 2,
+                hint: "Bắt nguồn từ những ván game vui nhộn trên ứng dụng WePlay!"
+            },
+            {
+                q: "Câu 7: Ngày tháng năm sinh chính xác của Đặng Văn Cường là ngày nào?",
+                options: ["24/07/1997", "27/04/1997", "24/07/1998", "14/07/1997"],
+                correct: 0,
+                hint: "Sinh ngày 24 tháng 7 năm 1997 (24/07/1997) nhé."
+            },
+            {
+                q: "Câu 8: Ngọc Trân thường hay gọi Cường bằng biệt danh 'đáng yêu' và hài hước nào?",
+                options: ["Bụng bự", "Đầu hói", "Mắt hí", "Cường ngố"],
+                correct: 1,
+                hint: "Một biệt danh nghe xong là bật cười ngay: 'Đầu hói'!"
+            },
+            {
+                q: "Câu 9: Cường và Ngọc Trân chính thức bắt đầu yêu nhau vào ngày tháng năm nào?",
+                options: ["14/02/2026", "01/01/2026", "31/01/2026", "28/02/2026"],
+                correct: 2,
+                hint: "Ngày cuối cùng của tháng Giêng năm 2026: 31/01/2026."
+            },
+            {
+                q: "Câu 10 (Mốc 600.000đ): Hai bạn đã có buổi gặp mặt trực tiếp đầu tiên tại thành phố nào?",
+                options: ["TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ"],
+                correct: 3,
+                hint: "Xứ Tây Đô gạo trắng nước trong - Thành phố Cần Thơ!"
+            },
+            {
+                q: "Câu 11: Ngày đầu tiên Đặng Văn Cường và Nguyễn Thị Ngọc Trân gặp nhau trực tiếp ở Cần Thơ là ngày nào?",
+                options: ["02/09/2026", "10/09/2026", "20/09/2026", "10/10/2026"],
+                correct: 1,
+                hint: "Ngày hội ngộ đầu tiên đầy cảm xúc là ngày 10/09/2026."
+            },
+            {
+                q: "Câu 12: Dựa vào ngày sinh 24/07/1997, Đặng Văn Cường thuộc cung Hoàng Đạo nào và tuổi con giáp gì?",
+                options: ["Cung Sư Tử - Tuổi Đinh Sửu", "Cung Cự Giải - Tuổi Đinh Sửu", "Cung Sư Tử - Tuổi Bính Tý", "Cung Xử Nữ - Tuổi Đinh Sửu"],
+                correct: 0,
+                hint: "Sinh 24/7 thuộc cung Sư Tử (23/7 - 22/8) và năm 1997 là tuổi Đinh Sửu (con Trâu)."
+            },
+            {
+                q: "Câu 13: Giờ tiêu chuẩn tại nơi Cường sống (Nhật Bản) chênh lệch như thế nào so với giờ nơi hai người gặp nhau (Cần Thơ - Việt Nam)?",
+                options: ["Nhanh hơn 1 tiếng", "Nhanh hơn 2 tiếng", "Chậm hơn 2 tiếng", "Nhanh hơn 3 tiếng"],
+                correct: 1,
+                hint: "Nhật Bản ở múi giờ GMT+9, còn Việt Nam ở GMT+7, tức Nhật Bản nhanh hơn 2 tiếng."
+            },
+            {
+                q: "Câu 14: Tính từ ngày chính thức yêu nhau (31/01/2026) đến đúng ngày đầu tiên gặp mặt tại Cần Thơ (10/09/2026) là bao nhiêu ngày (năm 2026 không nhuận)?",
+                options: ["212 ngày", "222 ngày", "232 ngày", "242 ngày"],
+                correct: 1,
+                hint: "Tháng 2 (28) + T3 (31) + T4 (30) + T5 (31) + T6 (30) + T7 (31) + T8 (31) + 10 ngày T9 = 222 ngày yêu xa trước khi gặp mặt!"
+            },
+            {
+                q: "Câu 15 (Độc đắc 2.500.000đ): Cộng tất cả các con số trong Ngày và Tháng của: Sinh nhật Cường (24 + 7), Ngày bắt đầu yêu (31 + 1) và Ngày đầu gặp nhau (10 + 9) sẽ ra con số may mắn nào?",
+                options: ["80", "82", "84", "86"],
+                correct: 1,
+                hint: "(24 + 7) + (31 + 1) + (10 + 9) = 31 + 32 + 19 = 82!"
+            }
+        ];
 
-function setupControls(canvas){
-  const stick = document.getElementById("virtual-joystick");
-  const knob = document.getElementById("joystick-knob");
-  let touchId = null, startX = 0, startY = 0;
+        // Trạng thái ván chơi
+        let currentPlayer = "";
+        let currentCode = "";
+        let currentQIndex = 0;
+        let isLocked = false;
+        let lifelinesUsed = { l5050: false, phone: false, audience: false, advice: false };
 
-  stick.addEventListener("pointerdown", e=>{
-    touchId = e.pointerId;
-    const rect = stick.getBoundingClientRect();
-    startX = rect.left + 55; startY = rect.top + 55;
-  });
+        // Hệ thống âm thanh Web Audio API (Không cần file ngoài)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration, delay = 0) {
+            setTimeout(() => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch(e){}
+            }, delay);
+        }
 
-  window.addEventListener("pointermove", e=>{
-    if(e.pointerId === touchId){
-      let dx = e.clientX - startX, dy = e.clientY - startY;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if(dist > 40){ dx = (dx/dist)*40; dy = (dy/dist)*40; }
-      knob.style.transform = `translate(${dx}px, ${dy}px)`;
-      moveDir.x = dx/40; moveDir.z = dy/40;
-    }
-    if(isDragging){
-      cameraAngle -= (e.clientX - prevMousePos.x) * 0.008;
-      prevMousePos = {x:e.clientX, y:e.clientY};
-    }
-  });
+        function sfxSelect() { playTone(440, 'sine', 0.25); }
+        function sfxCorrect() {
+            playTone(523.25, 'triangle', 0.18, 0);
+            playTone(659.25, 'triangle', 0.18, 150);
+            playTone(783.99, 'triangle', 0.35, 300);
+        }
+        function sfxWrong() {
+            playTone(220, 'sawtooth', 0.3, 0);
+            playTone(164.81, 'sawtooth', 0.5, 250);
+        }
 
-  window.addEventListener("pointerup", e=>{
-    if(e.pointerId === touchId){ touchId = null; knob.style.transform = `translate(0px, 0px)`; moveDir.x = 0; moveDir.z = 0; }
-    isDragging = false;
-  });
+        // ==========================================
+        // CÁC HÀM LƯU TRỮ DỮ LIỆU (FIREBASE / LOCAL)
+        // ==========================================
+        async function getCodesData() {
+            if (useCloud) {
+                const snap = await getDocs(collection(db, "game_codes"));
+                const list = {};
+                snap.forEach(d => list[d.id] = d.data());
+                return list;
+            } else {
+                const raw = localStorage.getItem("altp_codes");
+                if (!raw) {
+                    // Tạo sẵn 1 mã mẫu nếu chạy lần đầu
+                    const init = { "CUONGTRAN": { used: false, player: "", prize: 0 } };
+                    localStorage.setItem("altp_codes", JSON.stringify(init));
+                    return init;
+                }
+                return JSON.parse(raw);
+            }
+        }
 
-  canvas.addEventListener("pointerdown", e=>{
-    if(e.target === canvas){ isDragging = true; prevMousePos = {x:e.clientX, y:e.clientY}; }
-  });
-}
+        async function saveCodeItem(code, data) {
+            if (useCloud) {
+                await setDoc(doc(db, "game_codes", code), data);
+            } else {
+                const all = await getCodesData();
+                all[code] = data;
+                localStorage.setItem("altp_codes", JSON.stringify(all));
+            }
+        }
 
-function animate3D(){
-  requestAnimationFrame(animate3D);
-  if(myMesh && (moveDir.x !== 0 || moveDir.z !== 0)){
-    const speed = 0.095;
-    const cos = Math.cos(cameraAngle), sin = Math.sin(cameraAngle);
-    myMesh.position.x += (moveDir.x * cos - moveDir.z * sin) * speed;
-    myMesh.position.z += (moveDir.x * sin + moveDir.z * cos) * speed;
-    broadcastLivePos();
-  }
+        async function removeCodeItem(code) {
+            if (useCloud) {
+                await deleteDoc(doc(db, "game_codes", code));
+            } else {
+                const all = await getCodesData();
+                delete all[code];
+                localStorage.setItem("altp_codes", JSON.stringify(all));
+            }
+        }
 
-  if(myMesh){
-    const camDist = 9.5;
-    camera.position.x = myMesh.position.x + Math.sin(cameraAngle) * camDist;
-    camera.position.z = myMesh.position.z + Math.cos(cameraAngle) * camDist;
-    camera.position.y = myMesh.position.y + 5.2;
-    camera.lookAt(myMesh.position.x, myMesh.position.y + 1, myMesh.position.z);
-  }
+        async function getLeaderboardData() {
+            if (useCloud) {
+                const snap = await getDocs(collection(db, "leaderboard"));
+                const arr = [];
+                snap.forEach(d => arr.push(d.data()));
+                return arr;
+            } else {
+                return JSON.parse(localStorage.getItem("altp_leaderboard") || "[]");
+            }
+        }
 
-  // Quái tự động di chuyển và lao vào tấn công người chơi
-  mobs.forEach(m=>{
-    const dir = new THREE.Vector3().subVectors(myMesh.position, m.group.position);
-    const dist = dir.length();
-    if(dist < 8){
-      dir.normalize();
-      m.group.position.addScaledVector(dir, 0.035); // Quái đuổi theo người chơi
-    }
-    if(dist < 2.2){
-      applyPlayerDamage(m.atk);
-    }
-  });
+        async function addLeaderboardEntry(entry) {
+            if (useCloud) {
+                await setDoc(doc(db, "leaderboard", entry.code), entry);
+            } else {
+                const arr = await getLeaderboardData();
+                arr.push(entry);
+                localStorage.setItem("altp_leaderboard", JSON.stringify(arr));
+            }
+        }
 
-  renderer.render(scene, camera);
-  renderLabels();
-}
+        // ==========================================
+        // ĐIỀU HƯỚNG MÀN HÌNH & TIỆN ÍCH
+        // ==========================================
+        window.showScreen = function(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        };
 
-function renderLabels(){
-  const layer = document.getElementById("labels-layer");
-  let html = "";
-  mobs.forEach(m=>{
-    const p = project2D(m.group.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
-    if(p){
-      const pct = Math.max(0, Math.round((m.hp/m.maxHp)*100));
-      html += `<div class="label3d" style="left:${p.x}px;top:${p.y}px"><b style="color:#ef4444">${m.name}</b><div class="hp-mini"><div class="hp-mini-fill" style="width:${pct}%"></div></div></div>`;
-    }
-  });
-  // Hiển thị người chơi khác trên màn hình
-  for(let u in onlinePlayersData){
-    if(u === curUser) continue;
-    const op = onlinePlayersData[u];
-    if(op.mapId === currentMapId){
-      const v = new THREE.Vector3(op.x, 1, op.z).project(camera);
-      if(v.z <= 1){
-        const x = (v.x*0.5+0.5)*renderer.domElement.clientWidth;
-        const y = (-(v.y*0.5)+0.5)*renderer.domElement.clientHeight;
-        html += `<div class="label3d" style="left:${x}px;top:${y}px"><b style="color:#38bdf8">🧑‍🤝‍🧑 ${u}</b></div>`;
-      }
-    }
-  }
-  layer.innerHTML = html;
-}
+        function formatVND(num) {
+            return num.toLocaleString('vi-VN') + " VNĐ";
+        }
 
-function project2D(vec3){
-  const v = vec3.clone().project(camera);
-  if(v.z > 1) return null;
-  const canvas = document.getElementById("canvas3d");
-  return { x: (v.x*0.5+0.5)*canvas.clientWidth, y: (-(v.y*0.5)+0.5)*canvas.clientHeight };
-}
+        function showModal(title, htmlContent) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerHTML = htmlContent;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
 
-// ================= MULTIPLAYER & CLOUD =================
-function initCloud(){
-  client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
-  client.on("connect",()=>{
-    document.getElementById("sync-status").innerText = "🟢 Kết nối Teyvat thành công!";
-    client.subscribe([TOPIC_DB, TOPIC_LIVE]);
-  });
-  client.on("message",(t,p)=>{
-    try{
-      const data = JSON.parse(p.toString());
-      if(t === TOPIC_DB && data.users){
-        db = data; localStorage.setItem("genshin_ult_db", JSON.stringify(db)); updateHUD();
-      } else if(t === TOPIC_LIVE){
-        onlinePlayersData[data.user] = data;
-      }
-    }catch(e){}
-  });
-}
-initCloud();
+        window.closeModal = function() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        };
 
-function saveCloud(){
-  localStorage.setItem("genshin_ult_db", JSON.stringify(db));
-  if(client && client.connected) client.publish(TOPIC_DB, JSON.stringify(db), {retain:true});
-  updateHUD();
-}
+        // ==========================================
+        // LUỒNG BẮT ĐẦU CHƠI & KIỂM TRA MÃ 1 LẦN
+        // ==========================================
+        window.startGame = async function() {
+            const name = document.getElementById('playerNameInput').value.trim();
+            const code = document.getElementById('playCodeInput').value.trim().toUpperCase();
 
-function broadcastLivePos(){
-  if(!curUser || !client || !client.connected) return;
-  const pkt = {user:curUser, x:myMesh.position.x, z:myMesh.position.z, mapId:currentMapId, t:Date.now()};
-  client.publish(TOPIC_LIVE, JSON.stringify(pkt));
-}
+            if (!name) {
+                showModal("Thiếu thông tin", "<p>Vui lòng nhập Họ và Tên của bạn trước khi bắt đầu!</p>");
+                return;
+            }
+            if (!code) {
+                showModal("Thiếu mã dự thi", "<p>Vui lòng nhập Mã dự thi do Admin Đặng Văn Cường cấp!</p>");
+                return;
+            }
 
-function showToast(msg){
-  const t = document.getElementById("toast");
-  t.innerText = msg; t.style.display = "block";
-  clearTimeout(window.tTimer);
-  window.tTimer = setTimeout(()=>t.style.display="none", 2500);
-}
+            const codes = await getCodesData();
+            if (!codes[code]) {
+                showModal("Mã không hợp lệ", "<p>Mã dự thi <b>" + code + "</b> không tồn tại. Hãy liên hệ Admin để nhận mã nhé!</p>");
+                return;
+            }
+            if (codes[code].used) {
+                showModal("Mã đã qua sử dụng", `<p>Mã <b>${code}</b> đã được sử dụng bởi người chơi <b>${codes[code].player}</b>.<br>Mỗi mã chỉ được phép chơi duy nhất 1 lần!</p>`);
+                return;
+            }
 
-function handleAuth(mode){
-  const u = document.getElementById("inp-user").value.trim().toLowerCase();
-  const p = document.getElementById("inp-pass").value.trim();
-  if(!u || !p) return showToast("Nhập đầy đủ tên và mật khẩu!");
+            // Đánh dấu mã đã sử dụng ngay khi vào game để chống F5 chơi lại
+            await saveCodeItem(code, {
+                used: true,
+                player: name,
+                prize: 0
+            });
 
-  if(mode === "register"){
-    if(db.users[u]) return showToast("Tên Lữ Khách đã tồn tại!");
-    db.users[u] = { pass:p, lv:1, exp:0, silver:1000, gold:50, equip:{weapon:"sw1"}, bag:["sw1"], friends:[] };
-  } else {
-    if(!db.users[u] || db.users[u].pass !== p) return showToast("Sai tài khoản hoặc mật khẩu!");
-  }
-  curUser = u;
-  document.getElementById("login-screen").style.display = "none";
-  playerHp = maxHp = 200;
-  init3D();
-  updateHUD();
-}
+            currentPlayer = name;
+            currentCode = code;
+            currentQIndex = 0;
+            lifelinesUsed = { l5050: false, phone: false, audience: false, advice: false };
 
-function updateHUD(){
-  if(!curUser) return;
-  const u = db.users[curUser];
-  document.getElementById("ui-name").innerText = curUser;
-  document.getElementById("ui-lv").innerText = `Lv.${u.lv}`;
-  document.getElementById("ui-hp").innerText = `${Math.max(0,Math.round(playerHp))}/${maxHp}`;
-  document.getElementById("ui-exp").innerText = u.exp || 0;
-  document.getElementById("ui-maxexp").innerText = playerMaxExp;
-  document.getElementById("ui-silver").innerText = u.silver;
-  document.getElementById("ui-gold").innerText = u.gold;
-  document.getElementById("hp-fill").style.width = Math.max(0, (playerHp/maxHp)*100) + "%";
-}
+            document.getElementById('uiPlayerName').innerText = currentPlayer;
+            document.getElementById('uiPlayerCode').innerText = currentCode;
+            document.querySelectorAll('.lifeline-btn').forEach(b => b.classList.remove('used'));
 
-function changeMap(mapId){
-  currentMapId = mapId;
-  buildMapEnvironment();
-  closeModals();
-  showToast("🗺️ Đã di chuyển đến " + MAPS_DATA[mapId].name);
-}
+            renderMoneyLadder();
+            loadQuestion();
+            showScreen('gameScreen');
+        };
 
-// Hệ thống đánh quái, nhận EXP, lên cấp
-function castSkill(id){
-  if(mobs.length === 0) return;
-  const target = mobs[0];
-  const dmg = id===1 ? 40 : id===2 ? 80 : 150;
-  target.hp -= dmg;
-  showToast(`⚔️ Tấn công gây ${dmg} sát thương!`);
+        function renderMoneyLadder() {
+            const container = document.getElementById('moneyLadder');
+            container.innerHTML = "";
+            PRIZE_LADDER.forEach((amount, idx) => {
+                const div = document.createElement('div');
+                const isMilestone = (idx === 4 || idx === 9 || idx === 14);
+                div.className = "ladder-step" + (isMilestone ? " milestone" : "");
+                if (idx === currentQIndex) div.classList.add('current');
+                else if (idx < currentQIndex) div.classList.add('passed');
 
-  if(target.hp <= 0){
-    const u = db.users[curUser];
-    u.silver += target.silverReward;
-    u.exp = (u.exp||0) + target.expReward;
-    showToast(`🎉 Tiêu diệt ${target.name}! Nhận +${target.expReward} EXP & +${target.silverReward} Bạc`);
+                div.innerHTML = `<span>Câu ${idx + 1}</span><span>${formatVND(amount)}</span>`;
+                container.appendChild(div);
+            });
 
-    // Kiểm tra lên cấp
-    if(u.exp >= playerMaxExp){
-      u.exp -= playerMaxExp;
-      u.lv++;
-      playerMaxExp = Math.round(playerMaxExp * 1.5);
-      maxHp += 50; playerHp = maxHp;
-      showToast(`✨ CHÚC MỪNG BẠN ĐÃ LÊN CẤP ${u.lv}!`);
-    }
-    saveCloud();
+            const currentPrize = currentQIndex > 0 ? PRIZE_LADDER[currentQIndex - 1] : 0;
+            document.getElementById('uiCurrentPrize').innerText = formatVND(currentPrize);
+        }
 
-    target.hp = target.maxHp;
-    target.group.position.x = (Math.random()-0.5)*18;
-    target.group.position.z = -6 - Math.random()*14;
-  }
-  updateHUD();
-}
+        function loadQuestion() {
+            isLocked = false;
+            const qObj = QUESTIONS[currentQIndex];
+            document.getElementById('questionBox').innerText = qObj.q;
 
-function applyPlayerDamage(amount){
-  playerHp -= Math.max(1, amount - 4);
-  if(playerHp <= 0){
-    playerHp = maxHp;
-    myMesh.position.set(0, 0, 4);
-    showToast("💀 Bạn đã ngã xuống và được hồi sinh an toàn!");
-  }
-  updateHUD();
-}
+            qObj.options.forEach((optText, i) => {
+                const btn = document.getElementById('ans' + i);
+                btn.className = "answer-btn";
+                btn.disabled = false;
+                btn.querySelector('.text').innerText = optText;
+            });
 
-// Hệ thống kết bạn và trao đổi
-function openModal(id){
-  closeModals();
-  if(id === "modal-online"){
-    let html = `<p style="font-size:12px;margin-bottom:8px">Danh sách Lữ Khách đang online:</p>`;
-    for(let k in onlinePlayersData){
-      if(k === curUser) continue;
-      html += `<div class="item-row"><div><b>🧑‍🤝‍🧑 ${k}</b></div>
-      <button class="btn btn-green" onclick="addFriend('${k}')">Kết Bạn</button></div>`;
-    }
-    document.getElementById("online-body").innerHTML = html;
-  } else if(id === "modal-bag"){
-    const u = db.users[curUser];
-    let html = "";
-    u.bag.forEach(itemId=>{
-      const it = ITEMS_DB[itemId];
-      html += `<div class="item-row"><div><b>${it.name}</b> (ATK: +${it.atk})</div><button class="btn btn-blue" onclick="tradeItem('${itemId}')">Đem Trao Đổi</button></div>`;
-    });
-    document.getElementById("bag-body").innerHTML = html;
-  } else if(id === "modal-rank"){
-    let html = "";
-    const sorted = Object.keys(db.users).sort((a,b)=>db.users[b].lv - db.users[a].lv);
-    sorted.forEach((k,i)=>{
-      html += `<div class="item-row"><div><b>#${i+1} ${k}</b></div><div>Lv.${db.users[k].lv}</div></div>`;
-    });
-    document.getElementById("rank-body").innerHTML = html;
-  }
-  document.getElementById(id).classList.add("open");
-}
+            renderMoneyLadder();
+        }
 
-function addFriend(name){
-  showToast(`🤝 Đã gửi lời mời kết bạn đến ${name}!`);
-  closeModals();
-}
+        // ==========================================
+        // XỬ LÝ CHỌN ĐÁP ÁN & TÍNH TIỀN THƯỞNG
+        // ==========================================
+        window.selectAnswer = function(choiceIdx) {
+            if (isLocked) return;
+            isLocked = true;
+            sfxSelect();
 
-function tradeItem(itemId){
-  showToast("🤝 Đã mở phiên giao dịch vật phẩm trực tuyến!");
-  closeModals();
-}
+            const chosenBtn = document.getElementById('ans' + choiceIdx);
+            chosenBtn.classList.add('selected');
 
-function rollGacha(){
-  const u = db.users[curUser];
-  if(u.gold < 10) return showToast("Không đủ 10 Nguyên Thạch!");
-  u.gold -= 10;
-  if(!u.bag.includes("sw2")) u.bag.push("sw2");
-  saveCloud();
-  showToast("🎉 Cầu nguyện thành công nhận: Phong Ưng Thiển Ưng!");
-}
+            const qObj = QUESTIONS[currentQIndex];
 
-function closeModals(){ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }
-</script>
+            setTimeout(() => {
+                chosenBtn.classList.remove('selected');
+                if (choiceIdx === qObj.correct) {
+                    chosenBtn.classList.add('correct');
+                    sfxCorrect();
+
+                    setTimeout(() => {
+                        if (currentQIndex === 14) {
+                            // Chiến thắng tuyệt đối câu 15
+                            finishGame(PRIZE_LADDER[14], 15, "🎉 CHÚC MỪNG TRIỆU PHÚ!", "Xuất sắc! Bạn đã vượt qua toàn bộ 15 câu hỏi về Đặng Văn Cường & Nguyễn Thị Ngọc Trân!");
+                        } else {
+                            currentQIndex++;
+                            loadQuestion();
+                        }
+                    }, 1600);
+                } else {
+                    chosenBtn.classList.add('wrong');
+                    document.getElementById('ans' + qObj.correct).classList.add('correct');
+                    sfxWrong();
+
+                    // Tính tiền thưởng rớt về mốc an toàn (Câu 5 hoặc Câu 10)
+                    let safePrize = 0;
+                    if (currentQIndex >= 10) safePrize = PRIZE_LADDER[9]; // 600.000đ
+                    else if (currentQIndex >= 5) safePrize = PRIZE_LADDER[4]; // 150.000đ
+
+                    setTimeout(() => {
+                        finishGame(safePrize, currentQIndex, "😢 RẤT TIẾC! BẠN ĐÃ TRẢ LỜI SAI", `Đáp án đúng là: <b>${qObj.options[qObj.correct]}</b>.<br>Bạn ra về với mức thưởng ở mốc an toàn.`);
+                    }, 2000);
+                }
+            }, 1400);
+        };
+
+        window.stopGameVoluntarily = function() {
+            if (isLocked) return;
+            const currentEarned = currentQIndex > 0 ? PRIZE_LADDER[currentQIndex - 1] : 0;
+            finishGame(currentEarned, currentQIndex, "🛑 DỪNG CUỘC CHƠI", "Bạn đã quyết định dừng cuộc chơi để bảo toàn số tiền thưởng hiện có!");
+        };
+
+        async function finishGame(finalPrize, passedCount, title, message) {
+            isLocked = true;
+            await saveCodeItem(currentCode, {
+                used: true,
+                player: currentPlayer,
+                prize: finalPrize
+            });
+
+            await addLeaderboardEntry({
+                player: currentPlayer,
+                code: currentCode,
+                passed: passedCount,
+                prize: finalPrize,
+                time: new Date().toLocaleString('vi-VN')
+            });
+
+            showModal(title, `
+                <p>${message}</p>
+                <p style="font-size: 20px; color: var(--gold); font-weight: bold; margin: 15px 0;">
+                    Tổng giải thưởng nhận được:<br>${formatVND(finalPrize)}
+                </p>
+                <p style="font-size: 13px; color: #aaa;">Kết quả của bạn đã được lưu lên Bảng Xếp Hạng!</p>
+            `);
+
+            setTimeout(() => {
+                openLeaderboard();
+            }, 2200);
+        }
+
+        // ==========================================
+        // 4 QUYỀN TRỢ GIÚP CHUẨN AI LÀ TRIỆU PHÚ
+        // ==========================================
+        window.use5050 = function() {
+            if (isLocked || lifelinesUsed.l5050) return;
+            lifelinesUsed.l5050 = true;
+            document.getElementById('ll5050').classList.add('used');
+
+            const correctIdx = QUESTIONS[currentQIndex].correct;
+            let wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIdx);
+            wrongIndices.sort(() => Math.random() - 0.5);
+
+            document.getElementById('ans' + wrongIndices[0]).classList.add('hidden-50');
+            document.getElementById('ans' + wrongIndices[1]).classList.add('hidden-50');
+        };
+
+        window.usePhone = function() {
+            if (isLocked || lifelinesUsed.phone) return;
+            lifelinesUsed.phone = true;
+            document.getElementById('llPhone').classList.add('used');
+
+            const qObj = QUESTIONS[currentQIndex];
+            showModal("📞 GỌI ĐIỆN THOẠI CHO NGƯỜI THÂN", `
+                <p><b>Kết nối với Ngọc Trân & Cường...</b></p>
+                <p style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; font-style: italic;">
+                    "Alo! Câu này dễ ợt nha! ${qObj.hint} Cứ chốt đáp án <b>${['A','B','C','D'][qObj.correct]}</b> cho mình!"
+                </p>
+            `);
+        };
+
+        window.useAudience = function() {
+            if (isLocked || lifelinesUsed.audience) return;
+            lifelinesUsed.audience = true;
+            document.getElementById('llAudience').classList.add('used');
+
+            const correctIdx = QUESTIONS[currentQIndex].correct;
+            let percents = [0, 0, 0, 0];
+            percents[correctIdx] = Math.floor(Math.random() * 25) + 55; // 55% -> 80%
+            let remain = 100 - percents[correctIdx];
+
+            for (let i = 0; i < 4; i++) {
+                if (i !== correctIdx) {
+                    const p = Math.floor(Math.random() * remain);
+                    percents[i] = p;
+                    remain -= p;
+                }
+            }
+            percents[(correctIdx + 1) % 4] += remain;
+
+            const letters = ['A', 'B', 'C', 'D'];
+            let barsHtml = `<div class="chart-bars">`;
+            for (let i = 0; i < 4; i++) {
+                barsHtml += `
+                    <div class="bar-col">
+                        <span style="font-size:12px; margin-bottom:4px;">${percents[i]}%</span>
+                        <div class="bar-fill" style="height: ${percents[i] * 1.2}px;"></div>
+                        <strong style="margin-top:6px; color:var(--gold)">${letters[i]}</strong>
+                    </div>
+                `;
+            }
+            barsHtml += `</div>`;
+
+            showModal("📊 Ý KIẾN KHÁN GIẢ TRƯỜNG QUAY", barsHtml);
+        };
+
+        window.useAdvice = function() {
+            if (isLocked || lifelinesUsed.advice) return;
+            lifelinesUsed.advice = true;
+            document.getElementById('llAdvice').classList.add('used');
+
+            const qObj = QUESTIONS[currentQIndex];
+            const letter = ['A', 'B', 'C', 'D'][qObj.correct];
+            showModal("💡 TỔ TƯ VẤN TẠI CHỖ", `
+                <p>3 thành viên trong Tổ tư vấn tại trường quay lần lượt đưa ra ý kiến:</p>
+                <p>🙋‍♂️ <b>Thành viên 1:</b> "Tôi chắc chắn 100% đáp án là <b>${letter}</b>."</p>
+                <p>🙋‍♀️ <b>Thành viên 2:</b> "${qObj.hint} Chọn <b>${letter}</b> nhé!"</p>
+                <p>🧑‍💻 <b>Thành viên 3:</b> "Đồng ý với 2 bạn trên, chốt <b>${letter}</b> đi bạn!"</p>
+            `);
+        };
+
+        // ==========================================
+        // BẢNG XẾP HẠNG & QUẢN TRỊ VIÊN (ADMIN)
+        // ==========================================
+        window.openLeaderboard = async function() {
+            showScreen('leaderboardScreen');
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = `<tr><td colspan="6">Đang tải...</td></tr>`;
+
+            const list = await getLeaderboardData();
+            list.sort((a, b) => b.prize - a.prize || b.passed - a.passed);
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">Chưa có người chơi nào ghi danh.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((item, idx) => `
+                <tr>
+                    <td><b>#${idx + 1}</b></td>
+                    <td style="color:var(--gold); font-weight:bold;">${item.player}</td>
+                    <td>${item.code}</td>
+                    <td>${item.passed} / 15 câu</td>
+                    <td style="color:#2ecc71; font-weight:bold;">${formatVND(item.prize)}</td>
+                    <td style="font-size:12px; color:#aaa;">${item.time}</td>
+                </tr>
+            `).join('');
+        };
+
+        window.loginAdmin = function() {
+            const u = document.getElementById('adminUser').value.trim();
+            const p = document.getElementById('adminPass').value.trim();
+
+            if (u === ADMIN_ACCOUNT.username && p === ADMIN_ACCOUNT.password) {
+                showScreen('adminPanelScreen');
+                loadAdminCodes();
+            } else {
+                showModal("Sai thông tin", "<p>Tên đăng nhập hoặc mật khẩu Admin không chính xác!</p>");
+            }
+        };
+
+        async function loadAdminCodes() {
+            const tbody = document.getElementById('adminCodesBody');
+            const codes = await getCodesData();
+            const keys = Object.keys(codes);
+
+            if (keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5">Chưa có mã dự thi nào. Hãy bấm tạo mã!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = keys.map(code => {
+                const info = codes[code];
+                const badge = info.used
+                    ? `<span class="badge badge-used">Đã sử dụng</span>`
+                    : `<span class="badge badge-unused">Chưa dùng</span>`;
+                return `
+                    <tr>
+                        <td style="font-weight:bold; color:var(--gold); letter-spacing:1px;">${code}</td>
+                        <td>${badge}</td>
+                        <td>${info.player || "---"}</td>
+                        <td>${info.used ? formatVND(info.prize || 0) : "---"}</td>
+                        <td>
+                            <button class="btn-small" style="padding:3px 10px; font-size:12px;" onclick="deleteCode('${code}')">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.createCustomCode = async function() {
+            const code = document.getElementById('customCodeInput').value.trim().toUpperCase();
+            if (!code) return;
+            await saveCodeItem(code, { used: false, player: "", prize: 0 });
+            document.getElementById('customCodeInput').value = "";
+            loadAdminCodes();
+        };
+
+        window.createRandomCode = async function() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "CT-";
+            for (let i = 0; i < 5; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            await saveCodeItem(code, { used: false, player: "", prize: 0 });
+            loadAdminCodes();
+        };
+
+        window.deleteCode = async function(code) {
+            await removeCodeItem(code);
+            loadAdminCodes();
+        };
+
+        window.clearLeaderboard = async function() {
+            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ Bảng xếp hạng không?")) return;
+            if (useCloud) {
+                const snap = await getDocs(collection(db, "leaderboard"));
+                for (const d of snap.docs) {
+                    await deleteDoc(doc(db, "leaderboard", d.id));
+                }
+            } else {
+                localStorage.removeItem("altp_leaderboard");
+            }
+            showModal("Đã xóa", "<p>Đã làm mới Bảng xếp hạng thành công!</p>");
+        };
+    </script>
 </body>
 </html>
